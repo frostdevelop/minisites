@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head>
+<title>TextPadv1</title>
+<style>
+    html {
+    padding: 5%;
+    color: #EEE;
+    font-family: Courier New, monospace;
+    font-size: 20px;
+    color-scheme: dark;
+    }
+
+    body {
+    background: #222;
+    }
+
+    input, button, textarea, iframe {
+    border: black solid 1px;
+    border-radius: 2px;
+    box-shadow: 0px 0px 5px black;
+    padding: 5px;
+    }
+
+    input, button, textarea {
+    border: black solid 1px;
+    border-radius: 2px;
+    box-shadow: 0px 0px 5px black;
+    padding: 5px;
+    }
+
+    textarea {
+        height: 80vh;
+        width: 80vw;
+    }
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+<textarea id="inp0e"></textarea>
+<div id="buttons">
+<button id="trig0e">Download</button>
+</div>
+<footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+<script>
+    let inp0 = document.getElementById("inp0e");
+    let trig0 = document.getElementById("trig0e");
+    function trig0f(e) {
+    let dwnelem = document.createElement("a");
+    dwnelem.download = "Export - Textpad.txt";
+    dwnelem.type = "text/html";
+    let dwndata = new Blob([inp0.value]);
+    dwnelem.href = URL.createObjectURL(dwndata);
+    document.body.appendChild(dwnelem);
+    dwnelem.click();
+    dwnelem.remove();
+    return;
+    }
+
+    trig0.addEventListener("click", trig0f);
+    inp0.addEventListener("keydown", (e)=>{if(e.key == "s" && e.ctrlKey){e.preventDefault();trig0f(e)}});
+</script>
+</body>
+</html>
