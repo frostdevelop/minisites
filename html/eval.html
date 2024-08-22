@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Eval</title>
+  <style>
+    html {
+      padding: 5%;
+      color: #EEE;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+    }
+    body {
+      background: #222;
+    }
+    input, button, textarea {
+      border: black solid 1px;
+      border-radius: 2px;
+      box-shadow: 0px 0px 5px black;
+      padding: 5px;
+    }
+    textarea {
+      width: 80vw;
+      height: 80vh;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>Eval</h1>
+  <h2>Eval Javascript!</h2>
+  <button id="trig0e" style="display:block">Run</button>
+  <textarea id="inp0e"></textarea>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    let inp0 = document.getElementById("inp0e");
+    let trig0 = document.getElementById("trig0e");
+    let out0 = document.getElementById("out0e");
+    
+    trig0.addEventListener("click", (e)=>{eval(inp0.value)});
+    inp0.addEventListener("keydown", (e)=>{if(e.key == "Enter" && !e.shiftKey){e.preventDefault();eval(inp0.value);}});
+  </script>
+</body>
+
+</html>

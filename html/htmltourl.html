@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Html to URL</title>
+  <style>
+    html {
+      padding: 5%;
+      color: #EEE;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+      /* color-scheme: dark; */
+    }
+    body {
+      background: #222;
+    }
+    input, button, textarea {
+      border: black solid 1px;
+      border-radius: 2px;
+      box-shadow: 0px 0px 5px black;
+      padding: 5px;
+    }
+    textarea {
+      width: 35vw;
+      height: 80vh;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>Html to URL</h1>
+  <h2>Convert Html To URL!</h2>
+  <button id="trig0e" style="display:block">Run</button>
+  <textarea id="inp0e"></textarea>
+  <textarea id="out0e"></textarea>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    let inp0 = document.getElementById("inp0e");
+    let trig0 = document.getElementById("trig0e");
+    let out0 = document.getElementById("out0e");
+    function trig0f(e) {
+      let inpv = inp0.value;
+      
+      inpv = inpv.replace("<!DOCTYPE html>","");
+      let output = "data:text/html;charset=utf-8,%0A" + encodeURIComponent(inpv);
+      
+      out0.value = output;
+      return;
+    }
+    
+    trig0.addEventListener("click", trig0f);
+    inp0.addEventListener("keydown", (e)=>{if(e.key == "Enter" && !e.shiftKey){e.preventDefault();trig0f(e)}});
+  </script>
+</body>
+
+</html>
