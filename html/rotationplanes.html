@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Rotation Planes Calculator</title>
+  <style>
+    html {
+      padding: 5%;
+      color: #EEE;
+      font-family: Courier New;
+      font-size: 20px
+    }
+
+    body {
+      background: #222
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Rotation Planes</h1>
+  <input type="text" id="inp" placeholder="dimensions"></input>
+  <button id="trigger">Trigger</button>
+  <textarea style="width: 80vw; height: 80vh" id="out"></textarea>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    let inp = document.getElementById("inp");
+    let trig = document.getElementById("trigger");
+    let out = document.getElementById("out");
+    trig.addEventListener("click", (e) => {
+      let inpv = parseInt(inp.value);
+      let rpl = 0;
+      for(let i=0;i<inpv;i++){rpl += i};
+      out.value = rpl.toString();
+    });
+  </script>
+</body>
+
+</html>
