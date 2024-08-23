@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Frost Playground</title>
+  <style>
+    html {
+      color: #EEE;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+      /* color-scheme: dark; */
+    }
+    body {
+      padding: 0;
+      margin: 0;
+      background: #222;
+      overflow-x: hidden;
+    }
+    input, button, textarea, iframe {
+      border: black solid 1px;
+      border-radius: 2px;
+      box-shadow: 0px 0px 5px black;
+      padding: 5px;
+    }
+    textarea {
+       height: 80vh;
+       width: 80vw;
+    }
+    .input {height:25vh;}
+    #inputs {display:flex;width: 100vw;}
+    iframe {
+      padding: 0 !important;
+      margin: 0 !important;
+      resize: both;
+      width: 100vw;
+      height: 100vh;
+      background: white;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <div id="inputs">
+  <textarea id="htmlie" class="input" spellcheck="false" placeholder="HTML" ></textarea>
+  <textarea id="cssie" class="input" spellcheck="false" placeholder="CSS"></textarea>
+  <textarea id="jsie" class="input" spellcheck="false" placeholder="JS"></textarea>
+  </div>
+  <iframe id="playframe" srcdoc="<div style='font-family:Arial'><h1>Frost Playground</h1><p>Your code will show up here</p></div>"></iframe>
+  <div id="buttons">
+  <button id="trig0e">Run</button>
+  <button id="trig1e">Fullscreen</button>
+  <button id="trig2e">Download</button>
+  <button id="trig3e">ToURL</button>
+  </div>
+  <textarea id="console"></textarea>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    let console = document.getElementById("console");
+    let trig0 = document.getElementById("trig0e");
+    let trig1 = document.getElementById("trig1e");
+    let trig2 = document.getElementById("trig2e");
+    let trig3 = document.getElementById("trig3e");
+    let htmli = document.getElementById("htmlie");
+    let cssi = document.getElementById("cssie");
+    let jsin = document.getElementById("jsie");
+    let playframe = document.getElementById("playframe");
+    let inps = document.getElementsByClassName("input");
+    for(let i=0;i<inps.length;i++){inps[i].addEventListener("input", trig0f);}
+    function trig0f(e) {
+      playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`
+      //playframe.srcdoc = htmli.value + "<style>" + cssi.value + "</style>" + "<script>" + jsin.value + "<\/script>";
+      //alert(playframe.srcdoc);
+      return;
+    }
+    function dwnl(e, txt, name) {
+      let dwnelem = document.createElement("a");
+      dwnelem.download = name;
+      dwnelem.type = "text/html";
+      let dwndata = new Blob([txt]);
+      dwnelem.href = URL.createObjectURL(dwndata);
+      document.body.appendChild(dwnelem);
+      dwnelem.click();
+      dwnelem.remove();
+    }
+    function fulls(e) {
+      document.body.addEventListener("keydown", e=>{if(e.key == "Escape"){playframe.style="";}});
+      playframe.style = "position:fixed;z-index:max(infinity);width:100vw;height:100vh;left:0;top:0;";
+    }
+    document.body.addEventListener("keydown", (e)=>{if(e.key == "s" && e.ctrlKey){e.preventDefault();dwnl(e,`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`,"Code-FrostPlayground.html")}});
+    trig0.addEventListener("click", trig0f);
+    trig1.addEventListener("click", fulls)
+    trig2.addEventListener("click", (e)=>{dwnl(e,`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`,"Code-FrostPlayground.html")});
+    trig3.addEventListener("click", (e)=>{dwnl(e,"data:text/html;charset=utf-8,%0A" + encodeURIComponent(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`),"CodeURL-FrostPlayground.txt");});
+    //inp0.addEventListener("keydown", (e)=>{if(e.key == "Enter"){e.preventDefault();trig0f(e)}});
+    window.onbeforeunload = function(){
+      if(htmli.value != "" || cssi.value != "" || jsin.value != ""){return 'Are you sure you have saved your work?';}else{return;}
+    };
+  </script>
+</body>
+</html>
