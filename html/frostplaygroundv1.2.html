@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Frost Playground</title>
+  <style>
+    html {
+      color: #EEE;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+     
+    }
+    body {
+      padding: 0;
+      margin: 0;
+      background: #222;
+      overflow-x: hidden;
+      color-scheme: dark;
+      transition: background .1s linear
+    }
+    input, button, textarea, iframe {
+      border: black solid 1px;
+      border-radius: 2px;
+      box-shadow: 0px 0px 2px black;
+      padding: 5px;
+    }
+    textarea {
+       height: 80vh;
+       width: 80vw;
+    }
+    .input {height:100vh;width: 100vw;resize:none;}
+    .flexsect {display:flex;width:100vw}
+    iframe {
+      padding: 0 !important;
+      margin: 0 !important;
+      /*resize: both;
+      height: 100vh;*/
+      width: 100vw;
+      background: white;
+    }
+    #closebtn {
+      position: fixed;
+      right:0;
+      font-size:20px;
+      display:none;
+      z-index: max(infinity);
+    }
+    /*#framecont {position:fixed;left:0;top:0;width:100vw;height:100vh;}*/
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <button id="closebtn">×</button>
+  <div id="topbtn"><button id="trig5e" value="true">Toggle HTML</button><button id="trig6e" value="true">Toggle CSS</button><button id="trig7e" value="true">Toggle JS</button><button id="trig8e" value="true">Toggle Theme</button><button id="trig1e">Fullscreen</button></div>
+  <div class="flexsect">
+  <textarea id="htmlie" class="input" spellcheck="false" placeholder="HTML" ></textarea>
+  <textarea id="cssie" class="input" spellcheck="false" placeholder="CSS"></textarea>
+  <textarea id="jsie" class="input" spellcheck="false" placeholder="JS"></textarea>
+  <iframe id="playframe" srcdoc="<div style='font-family:Arial'><h1>Frost Playground</h1><p>Your code will show up here</p></div>"></iframe>
+  </div>
+  <div id="buttons">
+  <button id="trig0e">Run</button>
+  <button id="trig2e">Download</button>
+  <button id="trig3e">ToURL</button>
+  <button id="trig4e">Clear Console</button>
+  </div>
+  <textarea id="consolee"></textarea>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    let consolee = document.getElementById("consolee");
+    let trig0 = document.getElementById("trig0e");
+    let trig1 = document.getElementById("trig1e");
+    let trig2 = document.getElementById("trig2e");
+    let trig3 = document.getElementById("trig3e");
+    let trig4 = document.getElementById("trig4e");
+    let trig5 = document.getElementById("trig5e");
+    let trig6 = document.getElementById("trig6e");
+    let trig7 = document.getElementById("trig7e");
+    let trig8 = document.getElementById("trig8e");
+    let htmli = document.getElementById("htmlie");
+    let cssi = document.getElementById("cssie");
+    let jsin = document.getElementById("jsie");
+    let playframe = document.getElementById("playframe");
+    let inps = document.getElementsByClassName("input");
+    for(let i=0;i<inps.length;i++){
+      inps[i].addEventListener("input", trig0f);
+      //https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
+      inps[i].addEventListener("keydown",e=>{try{
+      if(e.key=="Tab"){
+      e.preventDefault();
+      inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\t" + inps[i].value.substring(inps[i].selectionEnd);
+      inps[i].selectionStart += 1;
+      inps[i].selectionEnd = inps[i].selectionStart;
+      } else if(e.key=="Enter"){
+        e.preventDefault()
+        let spos = st = en = inps[i].selectionStart;
+        //console.log(spos);
+        for(let j=spos;j>=0&&inps[i].value[j]!="\n";--j){st=j};
+        for(let j=spos;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
+        //console.log(inps[i].value.substring(st,en));
+        let as = "";
+        for(let j=0;j<countl(inps[i].value.substring(st,en),"\t");j++){as+="\t"};
+        inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\n" + as + inps[i].value.substring(inps[i].selectionEnd)
+        inps[i].selectionStart += as.length+1;
+        inps[i].selectionEnd = inps[i].selectionStart;
+      }
+      }catch(e){alert(e)}})
+    };
+    function trig0f(e) {
+      playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";},error: function (m){this.panel.value += "Error:" + m + "\\n";},warn: function (m){this.panel.value += "Warn:" + m + "\\n";},clear: function (){this.panel.value = ""}};try{${jsin.value}}catch(e){console.error(e)}<\/script><\/html>`
+      //alert(playframe.srcdoc);
+      //playframe.srcdoc = htmli.value + "<style>" + cssi.value + "</style>" + "<script>" + jsin.value + "<\/script>";
+      /*let clog = playframe.contentWindow.console.log;
+      playframe.contentWindow.console.log = (msg) => {
+        alert(msg);
+        clog.apply(playframe.contentWindow.console, arguments);
+      };*/
+      /*playframe.contentWindow.console.addEventListener("log", function (value) {
+         alert(value);
+      });*/
+      return;
+    }
+    function dwnl(e, txt, name) {
+      let dwnelem = document.createElement("a");
+      dwnelem.download = name;
+      dwnelem.type = "text/html";
+      let dwndata = new Blob([txt]);
+      dwnelem.href = URL.createObjectURL(dwndata);
+      document.body.appendChild(dwnelem);
+      dwnelem.click();
+      dwnelem.remove();
+    }
+    function fulls(e) {
+      //document.body.addEventListener("keydown", e=>{if(e.key == "Escape"){playframe.style="";}});
+      document.getElementById("closebtn").addEventListener("click",e=>{playframe.style="";document.getElementById("closebtn").style=""})
+      playframe.style = "position:fixed;z-index:calc(max(infinity)-1);width:100vw;height:100vh;left:0;top:0;";
+      document.getElementById("closebtn").style="display:inline";
+    }
+    document.body.addEventListener("keydown", (e)=>{if(e.key == "s" && e.ctrlKey){e.preventDefault();dwnl(e,`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`,"Code-FrostPlayground.html")}});
+    trig0.addEventListener("click", trig0f);
+    trig1.addEventListener("click", fulls)
+    trig2.addEventListener("click", (e)=>{dwnl(e,`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`,"Code-FrostPlayground.html")});
+    trig3.addEventListener("click", (e)=>{dwnl(e,"data:text/html;charset=utf-8,%0A" + encodeURIComponent(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`),"CodeURL-FrostPlayground.txt");});
+    trig4.addEventListener("click",(e)=>{playframe.contentWindow.console.clear()})
+    //inp0.addEventListener("keydown", (e)=>{if(e.key == "Enter"){e.preventDefault();trig0f(e)}});
+    trig5.addEventListener("click",(e)=>{if(trig5.value == "true"){htmli.style="display: none";trig5.value="false"}else{htmli.style="";trig5.value="true"};});
+    trig6.addEventListener("click",(e)=>{if(trig6.value == "true"){cssi.style="display: none";trig6.value="false"}else{cssi.style="";trig6.value="true"};});
+    trig7.addEventListener("click",(e)=>{if(trig7.value == "true"){jsin.style="display: none";trig7.value="false"}else{jsin.style="";trig7.value="true"};});
+    trig8.addEventListener("click",(e)=>{if(trig8.value == "true"){document.body.style="color-scheme: light;background: #FFF;color:black";trig8.value="false"}else{document.body.style="";trig8.value="true"};});
+    window.onbeforeunload = function(){
+      if(htmli.value != "" || cssi.value != "" || jsin.value != ""){return 'Are you sure you have saved your work?';}else{return;}
+    };
+    function countl(s,l){
+      let c = 0;
+      for(let i=0;i<s.length;i++){if(s[i]==l){c++}}
+      return c;
+    }
+  </script>
+</body>
+</html>
