@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>String Array Maker</title>
+  <style>
+    html {
+      padding: 5%;
+      color: #EEE;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+      /* color-scheme: dark; */
+    }
+
+    body {
+      background: #222;
+    }
+
+    input, button, textarea {
+      border: black solid 1px;
+      border-radius: 2px;
+      box-shadow: 0px 0px 5px black;
+      padding: 5px;
+    }
+
+    textarea {
+       height: 80vh;
+       width: 80vw;
+    }
+    input {
+      width: 80vw;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>String Array Maker</h1>
+  <h2>split your strings!</h2>
+  <input type="text" id="inp0e"></input>
+  <input type="text" id="inp1e"></input>
+  <button id="trig0e">Run</button>
+  <textarea id="out0e"></textarea>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    let inp0 = document.getElementById("inp0e");
+    let trig0 = document.getElementById("trig0e");
+    let out0 = document.getElementById("out0e");
+    function trig0f(e) {
+      let inpv = inp0.value;
+
+      let output = '["' + inpv.split(document.getElementById("inp1e").value).join('","') + '"]';
+
+      out0.value = output;
+      return;
+    }
+
+    trig0.addEventListener("click", trig0f);
+    inp0.addEventListener("keydown", (e)=>{if(e.key == "Enter"){e.preventDefault();trig0f(e)}});
+  </script>
+</body>
+
+</html> 
