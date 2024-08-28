@@ -107,11 +107,7 @@
       trig0f(e);
     });
     
-    inp0.addEventListener("keydown", (e)=>{
-      if(e.key == "Enter"){
-        e.preventDefault();trig0f(e)
-      }
-    })
+    inp0.addEventListener("keydown", trig0f)
     document.addEventListener("keydown", e=>{
       if(e.key=="ArrowUp"){
         e.preventDefault();
