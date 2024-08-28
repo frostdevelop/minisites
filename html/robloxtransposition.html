@@ -5,7 +5,8 @@
   <title>Roblox Transposition</title>
   <style>
     html {
-      padding: 5%;
+      padding-left: 5%;
+      padding-top: 5%;
       color: #EEE;
       font-family: Courier New, monospace;
       font-size: 20px;
@@ -25,7 +26,7 @@
 
     textarea {
        height: 80vh;
-       width: 30vw;
+       width: 40vw;
     }
     input {
       width: 80vw;
@@ -38,24 +39,32 @@
 <body lang="en">
   <h1>Roblox Transposition Tool</h1>
   <h1 id="inp1e">0</h1>
+  <h2 id="disp0e">Uncap: 0 Cap: 0</h2>
+  <h2 id="disp1e">NULL</h2>
   <div>
   <button id="trig0e">Add</button>
   <button id="trig1e">Sub</button>
   </div>
-  <textarea id="inp0e"></textarea>
-  <textarea id="out0e"></textarea>
+  <textarea id="inp0e" spellcheck="false"></textarea>
+  <textarea id="out0e" spellcheck="false"></textarea>
   <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
     let inp0 = document.getElementById("inp0e");
     let inp1 = document.getElementById("inp1e");
+    let disp0 = document.getElementById("disp0e");
+    let disp1 = document.getElementById("disp1e");
     let trig0 = document.getElementById("trig0e");
     let trig1 = document.getElementById("trig1e");
     let out0 = document.getElementById("out0e");
     let order = ["1","!","2","@","3","4","$","5","%","6","^","7","8","*","9","(","0","q","Q","w","W","e","E","r","t","T","y","Y","u","i","I","o","O","p","P","a","s","S","d","D","f","g","G","h","H","j","J","k","l","L","z","Z","x","c","C","v","V","b","B","n","m"];
+    let adown = ["1","2","3","4","5","6","7","8","9","0","q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m"];
+    let aup = ["!","@","$","%","^","*","(","Q","W","E","R","T","Y","I","O","P","S","D","G","H","J","L","Z","C","V","B"];
     function trig0f(e) {
       let inpv = inp0.value;
       let output = "";
       let err = false;
+      let dcount = 0;
+      let ucount = 0;
       for(let i=0;i<inpv.length;i++){
         let ind = order.indexOf(inpv[i]);
         if(ind!=-1){
@@ -63,6 +72,8 @@
           //console.log(nind)
           if(nind>=0 && nind<order.length){
             output += order[nind];
+            dcount += adown.indexOf(order[nind]) != -1 ? 1 : 0;
+            ucount += aup.indexOf(order[nind]) != -1 ? 1 : 0;
           }else{
             err = true;
             output+=inpv[i];
@@ -75,6 +86,15 @@
         alert("Error")
       }
       out0.value = output;
+      disp0.innerText = "Uncap: " + dcount + " Cap: " + ucount;
+      if(dcount == 0){
+        disp1.innerText = "Upper";
+      }else if(ucount == 0){
+        disp1.innerText = "Lower";
+      }else{
+        disp1.innerText = "Fluctuation";
+      }
+      
       return;
     }
 
