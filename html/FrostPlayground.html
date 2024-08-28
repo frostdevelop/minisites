@@ -27,11 +27,10 @@
        height: 80vh;
        width: 80vw;
     }
-    .input {
-      height:100vh;
-      width:100vw;
+    textarea:focus{
+       outline: 0;
     }
-    .flexsect {display:flex;height:100vh;}
+    .flexsect {display:flex;height:calc(100vh - 32px);width:100vw;}
     iframe {
       padding: 0 !important;
       margin: 0 !important;
@@ -40,11 +39,44 @@
       background: white;
     }
     .sect{
+      display: inline-block;
+      box-sizing: content-box;
+      border: black solid 1px;
       padding: 0 !important;
       margin: 0 !important;
-      width: 100vw;
+      flex-grow: 1;
+      flex-shrink: 1;
       height: 100%;
-      resize:horizontal;
+      width: auto;
+      resize: horizontal;
+      line-height: 14px;
+      font-size: 12px;
+      overflow:auto;
+    }
+    .sect textarea{
+      border-radius: 0;
+      font-size: 12px;
+      display: flex;
+      width: 100%;
+      height: inherit !important;
+      flex-shrink: 1;
+      flex-grow: 1;
+      resize: none;
+      margin: 0;
+      padding: 0;
+      border: none;
+      line-height: 14px;
+      overflow-y: hidden;
+    }
+    .sect iframe {
+      border-radius: 0;
+      display: flex;
+      width: 100%;
+      height: 100%;
+      border: none;
+      resize: none !important;
+      margin: 0;
+      padding: 0;
     }
     #closebtn {
       position: fixed;
@@ -53,9 +85,31 @@
       display:none;
       z-index: max(infinity);
     }
-    #txt0e {
+    input[type="text"] {
       display: block;
       width: 80vw;
+    }
+    #topbtn {
+      display: flex;
+      align-content: center;
+      justify-content: center;
+    }
+    .sect .lnnumb{
+      color: #5ac91e;
+      width: 20px;
+      text-align: right;
+      text-shadow: 0px 0px 5px black;
+    }
+    .sect .lnnumb span{
+      counter-increment: lnnumb;
+      display: block;
+    }
+    .sect .lnnumb span::before{
+      content: counter(lnnumb);
+    }
+    .edcontainer {
+      display: flex;
+      min-height: 100%;
     }
     /*#framecont {position:fixed;left:0;top:0;width:100vw;height:100vh;}*/
   </style>
@@ -67,10 +121,33 @@
   <button id="closebtn">×</button>
   <div id="topbtn"><button id="trig5e" value="true">Toggle HTML</button><button id="trig6e" value="true">Toggle CSS</button><button id="trig7e" value="true">Toggle JS</button><button id="trig8e" value="true">Toggle Theme</button><button id="trig1e">Fullscreen</button></div>
   <div class="flexsect">
-  <textarea id="htmlie" class="input sect" spellcheck="false" placeholder="HTML" ></textarea>
-  <textarea id="cssie" class="input sect" spellcheck="false" placeholder="CSS"></textarea>
-  <textarea id="jsie" class="input sect" spellcheck="false" placeholder="JS"></textarea>
+  <div class="sect">
+  <div class="edcontainer">
+  <div class="lnnumb">
+  <span></span>
+  </div>
+  <textarea id="htmlie" class="input" spellcheck="false" placeholder="HTML" ></textarea>
+  </div>
+  </div>
+  <div class="sect">
+  <div class="edcontainer">
+  <div class="lnnumb">
+  <span></span>
+  </div>
+  <textarea id="cssie" class="input" spellcheck="false" placeholder="CSS"></textarea>
+  </div>
+  </div>
+  <div class="sect">
+  <div class="edcontainer">
+  <div class="lnnumb">
+  <span></span>
+  </div>
+  <textarea id="jsie" class="input" spellcheck="false" placeholder="JS"></textarea>
+  </div>
+  </div>
+  <div class="sect frame">
   <iframe id="playframe" class="sect" srcdoc="<div style='font-family:Arial'><h1>Frost Playground</h1><p>Your code will show up here</p></div>"></iframe>
+  </div>
   </div>
   <div id="buttons">
   <button id="trig0e">Run</button>
@@ -93,7 +170,7 @@
   </select>
   </div>
   <textarea id="consolee" disabled="true"></textarea>
-  <input id="txt0e" placeholder="Command"></input>
+  <input id="txt0e" placeholder="Command" type="text"></input>
   <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
     let consolee = document.getElementById("consolee");
@@ -116,6 +193,7 @@
     let jsin = document.getElementById("jsie");
     let playframe = document.getElementById("playframe");
     let inps = document.getElementsByClassName("input");
+    let nums = document.getElementsByClassName("lnnumb");
     
     //Textarea loops
     for(let i=0;i<inps.length;i++){
@@ -149,6 +227,19 @@ as+=lndata[j]}else{break}
       }
       })
     };
+    
+    //lnnumb loop 
+    // https://stackoverflow.com/questions/1995370/adding-line-numbers-to-html-textarea
+    for(let i=0;i<nums.length;i++){
+      nums[i].parentNode.children[1].addEventListener("keyup",e=>{
+        let span = document.createElement("span");
+        nums[i].innerHTML = "";
+        for(let j=0;j<nums[i].parentNode.children[1].value.split("\n").length;j++){
+          nums[i].appendChild(span);
+          span = span.cloneNode();
+        }
+      })
+    }
     
     function trig0f(e) {
       playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";},error: function (m){this.panel.value += "Error:" + m + "\\n";},warn: function (m){this.panel.value += "Warn:" + m + "\\n";},clear: function (){this.panel.value = "console cleared\\n"}};try{${jsin.value}}catch(e){console.error(e)}<\/script><\/html>`
@@ -187,9 +278,9 @@ as+=lndata[j]}else{break}
     trig3.addEventListener("click", (e)=>{dwnl(e,"data:text/html;charset=utf-8,%0A" + encodeURIComponent(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`),"CodeURL-FrostPlayground.txt");});
     trig4.addEventListener("click",(e)=>{playframe.contentWindow.console.clear()})
     //inp0.addEventListener("keydown", (e)=>{if(e.key == "Enter"){e.preventDefault();trig0f(e)}});
-    trig5.addEventListener("click",(e)=>{if(trig5.value == "true"){htmli.style="display: none";trig5.value="false"}else{htmli.style="";trig5.value="true"};});
-    trig6.addEventListener("click",(e)=>{if(trig6.value == "true"){cssi.style="display: none";trig6.value="false"}else{cssi.style="";trig6.value="true"};});
-    trig7.addEventListener("click",(e)=>{if(trig7.value == "true"){jsin.style="display: none";trig7.value="false"}else{jsin.style="";trig7.value="true"};});
+    trig5.addEventListener("click",(e)=>{if(trig5.value == "true"){htmli.parentNode.parentNode.style="display: none";trig5.value="false"}else{htmli.parentNode.parentNode.style="";trig5.value="true"};});
+    trig6.addEventListener("click",(e)=>{if(trig6.value == "true"){cssi.parentNode.parentNode.style="display: none";trig6.value="false"}else{cssi.parentNode.parentNode.style="";trig6.value="true"};});
+    trig7.addEventListener("click",(e)=>{if(trig7.value == "true"){jsin.parentNode.parentNode.style="display: none";trig7.value="false"}else{jsin.parentNode.parentNode.style="";trig7.value="true"};});
     trig8.addEventListener("click",(e)=>{if(trig8.value == "true"){document.body.style="color-scheme: light;background: #FFF;color:black";trig8.value="false"}else{document.body.style="";trig8.value="true"};});
     sel1.addEventListener("input",e=>{
        for(let i=0;i<inps.length;i++){
