@@ -1,0 +1,189 @@
+<!DOCTYPE html><html><head>
+  <title>TextPadv1.1</title>
+  <style>
+    html {
+      padding: 0 5%;
+      margin: 0;
+      color: #EEE;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+      color-scheme: dark;
+      font-size: 15px;
+    }
+
+    body {
+      background: #222;
+      padding: 0;
+      margin: 0;
+      margin-top: 5px;
+    }
+
+    input, button, select{
+      border: #444 outset 2px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.8);
+      padding: 5px;
+      background: #111;
+      font-size: 15px;
+    }
+    
+    button:active {
+      border: #444 inset 2px;
+    }
+    
+    input {
+      width: 40vw;
+    }
+
+    textarea {
+      min-height: 100%;
+      width: calc(100% - 30px);
+      overflow-y: hidden;
+      padding: 0;
+      border-radius: 0;
+      border: none;
+      font-size: inherit;
+      line-height: inherit;
+      resize: none;
+    }
+    
+    .ed textarea:focus {
+      outline: none;
+    }
+    
+    .ed {
+      display: flex;
+      min-height: 100%;
+      width: 100%;
+      font-size: 13px;
+      line-height: calc(1em+1px);
+    }
+    
+    .edcont {
+      display: block;
+      height: 80vh;
+      width: 90vw;
+      background: #221;
+      margin: 10px 0;
+      padding: 0;
+      border: 1px solid black;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.8);
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    
+    .lnnumb{
+      color: #5ac91e;
+      width: 30px;
+      text-align: right;
+      text-shadow: 0px 0px 5px black;
+    }
+    .lnnumb span{
+      counter-increment: lnnumb;
+      display: block;
+    }
+    .lnnumb span::before{
+      content: counter(lnnumb);
+    }
+    .inps {
+      margin: 5px 0;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <div class="edcont">
+  <div class="ed">
+  <div class="lnnumb">
+  <span></span>
+  </div>
+  <textarea id="inp0e" style="white-space: nowrap"></textarea>
+  </div>
+  </div>
+  <div class="inps">
+  <input type="text" placeholder="Export - Textpad" id="inp1e"></input>
+  <input type="number" value="13" id="inp2e"></input>
+  </div>
+  <div id="buttons" class="inps">
+  <button id="trig0e">Download</button>
+  <button id="trig1e">Upload</button>
+  Wrap:
+  <select id="sel1">
+    <option value="nw">None</option>
+    <option value="bw">Break</option>
+    <option value="ww">Word</option>
+    <option value="ab">Break All</option>
+  </select>
+  <input type="file" style="display: none;" id="fi0e"></input>
+  </div>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    let inp0 = document.getElementById("inp0e");
+    let inp1 = document.getElementById("inp1e");
+    let inp2 = document.getElementById("inp2e");
+    let trig0 = document.getElementById("trig0e");
+    let trig1 = document.getElementById("trig1e");
+    let fi0 = document.getElementById("fi0e");
+    let sel1 = document.getElementById("sel1");
+    let nums = document.getElementsByClassName("lnnumb")
+    
+    for(let i=0;i<nums.length;i++){
+      nums[i].parentNode.children[1].addEventListener("keyup",e=>{
+        let span = document.createElement("span");
+        nums[i].innerHTML = "";
+        for(let j=0;j<nums[i].parentNode.children[1].value.split("\n").length;j++){
+          nums[i].appendChild(span);
+          span = span.cloneNode();
+        }
+      })
+    }
+    
+    function trig0f(e) {
+      let dwnelem = document.createElement("a");
+      if(inp1.value.includes(".")){
+        dwnelem.download = inp1.value == "" ? "Export - Textpad.txt" : inp1.value;
+      }else{
+        dwnelem.download = inp1.value == "" ? "Export - Textpad.txt" : inp1.value + ".txt";
+      }
+      dwnelem.type = "text/html";
+      let dwndata = new Blob([inp0.value]);
+      dwnelem.href = URL.createObjectURL(dwndata);
+      document.body.appendChild(dwnelem);
+      dwnelem.click();
+      dwnelem.remove();
+      return;
+    }
+    function uploadfile(e){
+      const fr = new FileReader;
+      fr.onload = ()=>{inp0.value=fr.result}
+      fr.readAsText(this.files[0]);
+    }
+    
+    sel1.addEventListener("input",e=>{
+      switch(sel1.value){
+      case "ww":
+        inp0.style="word-wrap:normal;"
+        break;
+      case "bw":
+        inp0.style="word-wrap:break-word;";
+        break;
+      case "ab":
+        inp0.style="word-break: break-all;";
+        break;
+      default:
+        inp0.style="white-space: nowrap;";
+        break;
+       }
+    });
+    
+    trig0.addEventListener("click", trig0f);
+    trig1.addEventListener("click", e=>{fi0.click()});
+    inp0.addEventListener("keydown", (e)=>{if(e.key == "s" && e.ctrlKey){e.preventDefault();trig0f(e)}});
+    fi0.addEventListener("change",uploadfile);
+    inp2.addEventListener("change",e=>{inp0.parentNode.style = "font-size: " + inp2.value + "px"})
+  </script>
+</body>
+</html>
