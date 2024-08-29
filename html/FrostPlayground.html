@@ -67,6 +67,7 @@
       border: none;
       line-height: 14px;
       overflow-y: hidden;
+      white-space: nowrap;
     }
     .sect iframe {
       border-radius: 0;
@@ -157,16 +158,16 @@
   <input type="checkbox" checked id="chk0">Autoindent</input>
   Indent:
   <select id="sel0">
-    <option value="2s">2space</option>
-    <option value="1s">1space</option>
-    <option value="1t">1tab</option>
+    <option value="  ">2space</option>
+    <option value=" ">1space</option>
+    <option value="\t">1tab</option>
   </select>
   Wrap:
   <select id="sel1">
+    <option value="nw">None</option>
     <option value="bw">Break</option>
     <option value="ww">Word</option>
     <option value="ab">Break All</option>
-    <option value="nw">None</option>
   </select>
   </div>
   <textarea id="consolee" disabled="true"></textarea>
@@ -194,20 +195,86 @@
     let playframe = document.getElementById("playframe");
     let inps = document.getElementsByClassName("input");
     let nums = document.getElementsByClassName("lnnumb");
-    
+    let savechars = [":",";","!","+","=","-","Enter","Backspace","?",".",">","<","*","//","&","|"];
+    var inphistory = new Array(inps.length).fill().map(()=>[[],[]]);
     //Textarea loops
     for(let i=0;i<inps.length;i++){
       inps[i].addEventListener("input", trig0f);
+      inps[i].addEventListener("input", e=>{
+        inphistory[i][1].length = 0;
+        switch(e.data){
+          case "(":
+          storeHistory(i);
+          document.execCommand("insertText",false,")");
+          inps[i].selectionStart = inps[i].selectionStart-1;
+          inps[i].selectionEnd=inps[i].selectionStart;
+          break;
+          case "[":
+          storeHistory(i);
+          document.execCommand("insertText",false,"]");
+          inps[i].selectionStart = inps[i].selectionStart-1;
+          inps[i].selectionEnd=inps[i].selectionStart;
+          break;
+          case "{":
+          storeHistory(i);
+          document.execCommand("insertText",false,"}");
+          inps[i].selectionStart = inps[i].selectionStart-1;
+          inps[i].selectionEnd=inps[i].selectionStart;
+          break;
+        }
+        if(e.data == '"' || e.data == "'" || e.data == ""){
+          storeHistory(i);
+          let orig = inps[i].selectionStart;
+          inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + e.data + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
+          inps[i].selectionStart = orig;
+          inps[i].selectionEnd=inps[i].selectionStart
+        }else if(e.inputType == "insertFromPaste" || e.inputType == "deleteByCut"){
+          storeHistory(i);
+        }
+      })
       //https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
       inps[i].addEventListener("keydown",e=>{
-      if(e.key=="Tab"){
-      let oslt = inps[i].selectionStart;
-      e.preventDefault();
-      inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\t" + inps[i].value.substring(inps[i].selectionEnd);
-      inps[i].selectionStart = oslt+1;
-      inps[i].selectionEnd = inps[i].selectionStart;
-      } else if(e.key=="Enter" && chk0.checked){
+        if(e.key=="Tab" && !e.shiftKey){
+        e.preventDefault();
+        storeHistory(i);
+        let spos = st = en = inps[i].selectionStart;
+        for(let j=spos-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
+        for(let j=spos;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
+        let lndata = inps[i].value.substring(st,en+1);
+        //inps[i].value = inps[i].value.substring(0,st) + inps[i].value.substring(en+1,inps[i].value.length);
+        let oi = "";
+        for(let j=0;j<lndata.length;j++){
+          if(lndata[j]==" " || lndata[j]=="\t"){oi+=lndata[j]}else{break}
+        }
+        let eni = lndata.substring(oi.length,lndata.length);
+        let strel = spos-(st+oi.length);
+        oi = oi + sel0.value;
+        inps[i].value = inps[i].value.substring(0,st) + oi + eni + inps[i].value.substring(en+1,inps[i].value.length);
+        strel = strel < 0 ? 0 : strel;
+        inps[i].selectionStart = st + oi.length + strel;
+        inps[i].selectionEnd = inps[i].selectionStart;
+        } else if(e.key=="Tab" && e.shiftKey){
         e.preventDefault()
+        storeHistory(i);
+        let spos = st = en = inps[i].selectionStart;
+        for(let j=spos-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
+        for(let j=spos;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
+        let lndata = inps[i].value.substring(st,en+1);
+        //inps[i].value = inps[i].value.substring(0,st) + inps[i].value.substring(en+1,inps[i].value.length);
+        let oi = "";
+        for(let j=0;j<lndata.length;j++){
+          if(lndata[j]==" " || lndata[j]=="\t"){oi+=lndata[j]}else{break}
+        }
+        let eni = lndata.substring(oi.length,lndata.length);
+        let strel = spos-(st+oi.length);
+        oi = oi.replace(sel0.value,"");
+        inps[i].value = inps[i].value.substring(0,st) + oi + eni + inps[i].value.substring(en+1,inps[i].value.length);
+        strel = strel < 0 ? 0 : strel;
+        inps[i].selectionStart = st + oi.length + strel;
+        inps[i].selectionEnd = inps[i].selectionStart;
+        } else if(e.key=="Enter" && chk0.checked){
+        e.preventDefault()
+        storeHistory(i);
         let spos = st = en = inps[i].selectionStart;
         //console.log(spos);
         for(let j=spos-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
@@ -215,16 +282,30 @@
         //console.log(inps[i].value.substring(st,en));
         let as = "";
         let lndata = inps[i].value.substring(st,en);
-        //for(let j=0;j<countl(inps[i].value.substring(st,en),"\t");j++){as+="\t"};
+        //for(let j=0;j<countl(inps[i].value.substring(st,en+1),"\t");j++){as+="\t"};
         for(let j=0;j<lndata.length;j++){
-          if(lndata[j]==" " || lndata[j]=="\t"){
-as+=lndata[j]}else{break}
+          if(lndata[j]==" " || lndata[j]=="\t"){as+=lndata[j]}else{break}
+        }
+        if(inps[i].value[inps[i].selectionStart-1]=="{"){
+          as += sel0.value;
+        }else if(inps[i].value[inps[i].selectionStart-1]==">" && inps[i].value[inps[i].selectionStart]=="<"){
+          as += sel0.value;
         }
         //check for { or } here.
         inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\n" + as + inps[i].value.substring(inps[i].selectionEnd)
         inps[i].selectionStart = spos+as.length+1;
         inps[i].selectionEnd = inps[i].selectionStart;
-      }
+        }else if(e.key=="Z" && e.ctrlKey){
+          e.preventDefault();
+          if(inphistory[i][1].length > 0){
+            inphistory[i][0].push([inps[i].value,inps[i].selectionStart]);
+            [inps[i].value,inps[i].selectionStart] = inphistory[i][1].pop();
+            inps[i].selectionEnd = inps[i].selectionStart;
+          }
+        }else if(e.key=="z" && e.ctrlKey){
+          e.preventDefault();
+          loadHistory(i);
+        }else if(savechars.includes(e.key)){storeHistory(i)}
       })
     };
     
@@ -255,6 +336,24 @@ as+=lndata[j]}else{break}
       });*/
       return;
     }
+    
+    function storeHistory(index){
+      inphistory[index][0].push([inps[index].value,inps[index].selectionStart]);
+      return;
+    }
+    
+    function loadHistory(index){  
+      if(inphistory[index][0].length > 0){
+        inphistory[index][1].push([inps[index].value,inps[index].selectionStart]);
+        [inps[index].value,inps[index].selectionStart] = inphistory[index][0].pop();
+        inps[index].selectionEnd = inps[index].selectionStart;
+      }else if(inps[index].value != ""){
+        inphistory[index][1].push([inps[index].value,inps[index].selectionStart]);
+        inps[index].value = ""
+      }
+      return;
+    }
+    
     function dwnl(e, txt, name) {
       let dwnelem = document.createElement("a");
       dwnelem.download = name;
