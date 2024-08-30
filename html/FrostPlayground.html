@@ -47,7 +47,7 @@
       flex-grow: 1;
       flex-shrink: 1;
       height: 100%;
-      width: auto;
+      width: 100%;
       resize: horizontal;
       line-height: 14px;
       font-size: 12px;
@@ -95,6 +95,9 @@
       align-content: center;
       justify-content: center;
     }
+    #topbtn button {
+      width: 100%;
+    }
     .sect .lnnumb{
       color: #5ac91e;
       width: 20px;
@@ -112,6 +115,33 @@
       display: flex;
       min-height: 100%;
     }
+    .finrep {
+      display: grid;
+      grid-template-columns: 25% 25% 25% 25%;
+      grid-template-rows: 60% 40%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      transition: height 0.2s ease, opacity 0.2s ease;
+    }
+    .finrep.hid {
+      opacity: 0;
+      height: 0%;
+    }
+    .finrep.sho {
+      opacity: 1;
+      height: 10%;
+    }
+    .finrep input, .finrep button{
+      width: 100%;
+      grid-column: span 2;
+      padding: 0;
+      margin: 0;
+      border: none;
+    }
+    .finrep button {
+      grid-column: span 1;
+    }
     /*#framecont {position:fixed;left:0;top:0;width:100vw;height:100vh;}*/
   </style>
   <meta charset="utf-8">
@@ -123,6 +153,12 @@
   <div id="topbtn"><button id="trig5e" value="true">Toggle HTML</button><button id="trig6e" value="true">Toggle CSS</button><button id="trig7e" value="true">Toggle JS</button><button id="trig8e" value="true">Toggle Theme</button><button id="trig1e">Fullscreen</button></div>
   <div class="flexsect">
   <div class="sect">
+  <div class="finrep hid">
+    <input type="text" placeholder="Find"></input>
+    <input type="text" placeholder="Replace"></input>
+    <button class="repbtn">Replace</button>
+    <button class="close">Close</button>
+  </div>
   <div class="edcontainer">
   <div class="lnnumb">
   <span></span>
@@ -131,6 +167,12 @@
   </div>
   </div>
   <div class="sect">
+  <div class="finrep hid">
+    <input type="text" placeholder="Find"></input>
+    <input type="text" placeholder="Replace"></input>
+    <button class="repbtn">Replace</button>
+    <button class="close">Close</button>
+  </div>
   <div class="edcontainer">
   <div class="lnnumb">
   <span></span>
@@ -139,6 +181,12 @@
   </div>
   </div>
   <div class="sect">
+  <div class="finrep hid">
+    <input type="text" placeholder="Find"></input>
+    <input type="text" placeholder="Replace"></input>
+    <button class="repbtn">Replace</button>
+    <button class="close">Close</button>
+  </div>
   <div class="edcontainer">
   <div class="lnnumb">
   <span></span>
@@ -199,6 +247,7 @@
     var inphistory = new Array(inps.length).fill().map(()=>[[],[]]);
     //Textarea loops
     for(let i=0;i<inps.length;i++){
+      let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];
       inps[i].addEventListener("input", trig0f);
       inps[i].addEventListener("input", e=>{
         inphistory[i][1].length = 0;
@@ -305,8 +354,21 @@
         }else if(e.key=="z" && e.ctrlKey){
           e.preventDefault();
           loadHistory(i);
+        }else if(e.key=="h" && e.ctrlKey){
+          e.preventDefault();
+          if(finrep.classList.contains("hid")){
+            finrep.classList.add("sho");
+            finrep.classList.remove("hid");
+          }else{
+            finrep.classList.remove("sho");
+            finrep.classList.add("hid");
+          }
         }else if(savechars.includes(e.key)){storeHistory(i)}
-      })
+      });
+      finrep.getElementsByClassName("close")[0].addEventListener("click",e=>{
+        finrep.classList.remove("sho");
+        finrep.classList.add("hid");
+      });
     };
     
     //lnnumb loop 
