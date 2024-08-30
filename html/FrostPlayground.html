@@ -154,8 +154,8 @@
   <div class="flexsect">
   <div class="sect">
   <div class="finrep hid">
-    <input type="text" placeholder="Find"></input>
-    <input type="text" placeholder="Replace"></input>
+    <input type="text" placeholder="Find" class="finputfr"></input>
+    <input type="text" placeholder="Replace" class="rinputfr"></input>
     <button class="repbtn">Replace</button>
     <button class="close">Close</button>
   </div>
@@ -248,6 +248,9 @@
     //Textarea loops
     for(let i=0;i<inps.length;i++){
       let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];
+      let finput = finrep.getElementsByClassName("finputfr")[0];
+      let rinput = finrep.getElementsByClassName("rinputfr")[0];
+      
       inps[i].addEventListener("input", trig0f);
       inps[i].addEventListener("input", e=>{
         inphistory[i][1].length = 0;
@@ -368,6 +371,14 @@
       finrep.getElementsByClassName("close")[0].addEventListener("click",e=>{
         finrep.classList.remove("sho");
         finrep.classList.add("hid");
+      });
+      finrep.getElementsByClassName("repbtn")[0].addEventListener("click",e=>{
+        storeHistory(i);
+        let rf = finput.value == '\\n' ? '\n' : finput.value;
+        rf = rf == '\\t' ? '\t' : rf;
+        let rr = rinput.value == '\\n' ? '\n' : rinput.value;
+        rr = rr == '\\t' ? '\t' : rr;
+        inps[i].value = inps[i].value.replaceAll(rf,rr);
       });
     };
     
