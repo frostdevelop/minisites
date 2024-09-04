@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Textstats</title>
+  <style>
+    html {
+      padding: 5%;
+      color: #EEE;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+      /* color-scheme: dark; */
+    }
+
+    body {
+      background: #222;
+    }
+
+    input, button, textarea {
+      border: black solid 1px;
+      border-radius: 2px;
+      box-shadow: 0px 0px 5px black;
+      padding: 5px;
+    }
+
+    textarea {
+       height: 80vh;
+       width: 80vw;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>Textstats</h1>
+  <h2>Check the stats of your text!</h2>
+  <textarea id="inp0e"></textarea>
+  <h3 id="out0e">Character count: 0</h3>
+  <h3 id="out1e">Word count: 0</h3>
+  <h3 id="out2e">Line count: 0</h3>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    let inp0 = document.getElementById("inp0e");
+    let out0 = document.getElementById("out0e");
+    let out1 = document.getElementById("out1e");
+    let out2 = document.getElementById("out2e");
+    function trig0f(e) {
+      let inpv = inp0.value;
+      out0.innerText = "Character count: " + inpv.length;
+      out1.innerText = "Word count: " + inpv.split(" ").length;
+      out2.innerText = "Line count: " + inpv.split("\n").length; 
+      return;
+    }
+    inp0.addEventListener("input", trig0f);
+  </script>
+</body>
+</html>
