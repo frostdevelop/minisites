@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JavaScript Key Tool</title>
+  <style>
+    html {
+      padding: 5%;
+      color: #EEE;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+      /* color-scheme: dark; */
+    }
+
+    body {
+      background: #222;
+    }
+
+    input, button, textarea {
+      border: black solid 1px;
+      border-radius: 2px;
+      box-shadow: 0px 0px 5px black;
+      padding: 5px;
+    }
+
+    textarea {
+       height: 80vh;
+       width: 80vw;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>JavaScript Key Tool</h1>
+  <h2>Get keycodes!</h2>
+  <hr>
+  <h3 id="out0e">Event.code: NULL</h2>
+  <h3 id="out1e">Event.key: NULL</h2>
+  <h3 id="out2e">Event.keyCode: NULL</h2>
+  <h3 id="out7e">Event.location: NULL</h2>
+  <h3 id="out8e">Event.which: NULL</h2>
+  <h3 id="out3e">Event.ctrlKey: NULL</h2>
+  <h3 id="out4e">Event.shiftKey: NULL</h2>
+  <h3 id="out5e">Event.metaKey: NULL</h2>
+  <h3 id="out6e">Event.altKey: NULL</h2>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    let out0 = document.getElementById("out0e");
+    let out1 = document.getElementById("out1e");
+    let out2 = document.getElementById("out2e");
+    let out3 = document.getElementById("out3e");
+    let out4 = document.getElementById("out4e");
+    let out5 = document.getElementById("out5e");
+    let out6 = document.getElementById("out6e");
+    let out7 = document.getElementById("out7e");
+    let out8 = document.getElementById("out8e");
+    document.body.addEventListener("keydown",e=>{
+      e.preventDefault();
+      out0.innerText = "Event.code: " + e.code;
+      out1.innerText = "Event.key: " + e.key;
+      out2.innerText = "Event.keyCode: " + e.keyCode;
+      out3.innerText = "Event.ctrlKey: " + e.ctrlKey;
+      out4.innerText = "Event.shiftKey: " + e.shiftKey;
+      out5.innerText = "Event.metaKey: " + e.metaKey;
+      out6.innerText = "Event.altKey: " + e.altKey;
+      out7.innerText = "Event.location: " + e.location;
+      out8.innerText = "Event.which: " + e.which;
+      console.log(JSON.stringify(e))
+    })
+  </script>
+</body>
+</html>
