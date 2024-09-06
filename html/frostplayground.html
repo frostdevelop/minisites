@@ -99,6 +99,9 @@
       align-content: center;
       justify-content: center;
     }
+    #topbtn button {
+      width: 100%;
+    }
     .sect .lnnumb{
       color: #5ac91e;
       width: 20px;
@@ -287,7 +290,8 @@
       font-weight: normal;
       margin: 0 0 20px 0;
     }
-    #consolee,#txt0e,#topbtn button {width: 100%;}
+    #consolee,
+    #txt0e {width: 100%;}
     .cnscont {
       display: flex;
       flex-direction: column;
@@ -478,23 +482,25 @@
     //mar: class def
     class fileSys {
       constructor (container,filesid,filekeyid){
-        this.uilist = container;
+        this.container = container;
         this.files = JSON.parse(localStorage.getItem(filesid));
         this.filekey = JSON.parse(localStorage.getItem(filekeyid));
         this.filesid = filesid;
         this.filekeyid = filekeyid;
+        this.sectors = new Array(this.filekey.length);
+        this.update();
       }
-      renderPosts(){
+      renderPosts(i){
         //todo
-        for(let j=files[i].length-1;j>=0;j--){
+        for(let j=this.files[i].length-1;j>=0;j--){
           //you cant eventlistner pseudoelements >~<
-          let timef = files[i][j][0];
+          let timef = this.files[i][j][0];
           let date = document.createElement("div");
           date.classList.add("filedate");
-          date.innerText = new Date(files[i][j][0]).toUTCString();
+          date.innerText = new Date(this.files[i][j][0]).toUTCString();
           date.addEventListener("click",e=>{
-            setEnv(keys[i],files[i][j][1],files[i][j][2],files[i][j][3]);
-            intCloseLocalStorage(null);
+            setEnv(this.filekey[i],this.files[i][j][1],this.files[i][j][2],this.files[i][j][3]);
+            this._closeLocalStorage(e);
           });
           let ndel = delsvg.cloneNode();
           ndel.innerHTML = delsvg.innerHTML;
@@ -505,18 +511,18 @@
             if(yn == "y"){
               date.remove();
               let indexofelem = 0;
-              for(let k=0;k<files[i].length;k++){
-                if(files[i][k][0] == timef) indexofelem = k;
+              for(let k=0;k<this.files[i].length;k++){
+                if(this.files[i][k][0] == timef) indexofelem = k;
               }
-              files[i].splice(indexofelem,1);
-              if(files[i].length == 0) {
-                keys.splice(i,1);
-                files.splice(i,1);
-                sectcont.remove();
+              this.files[i].splice(indexofelem,1);
+              if(this.files[i].length == 0) {
+                this.filekey.splice(i,1);
+                this.files.splice(i,1);
+                this.sectors[i].remove();
               };
-              //alert(keys);
-              localStorage.setItem("saves",JSON.stringify(files))
-              localStorage.setItem("saveskey",JSON.stringify(keys))
+              //alert(this.filekey);
+              localStorage.setItem(this.filesid,JSON.stringify(this.files))
+              localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey))
             }
           })
           date.appendChild(ndel);
@@ -525,12 +531,11 @@
       }
       update(){
         //todo
-        this.uilist.innerHTML = "";
-        
+        this.container.innerHTML = "";
         if(!(this.filekey == null)){
           for(let i=0;i<this.filekey.length;i++){
-            let sectcont = document.createElement("div");
-            sectcont.classList.add("filesect");
+            this.sectors[i] = document.createElement("div");
+            this.sectors[i].classList.add("filesect");
             let head = document.createElement("input");
             let keyfor = this.filekey[i];
             let datediv = document.createElement("div");
@@ -539,15 +544,15 @@
             head.value = keyfor;
             head.classList.add("filetitle");
             head.addEventListener("keydown",e=>{
-              //set filekey
+              //set filekey (turn into function later?)
+              //Add button for update aswell
               if(e.key == "Enter"){
-                //alert(keyfor)
                 head.value = head.value || "Untitled";
                 if(this.filekey.indexOf(head.value) == -1){
                   this.filekey[this.filekey.indexOf(keyfor)] = head.value;
                   keyfor = head.value;
                   localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey));
-                } else {
+                } else if(!(head.value == keyfor)){
                   let yn = prompt("Are you sure you want to merge? (y/n)").toLowerCase();
                   if(yn == "y"){
                     //Create a loop for date sorting. (use time field).
@@ -564,7 +569,7 @@
                       return a[0]-b[0];
                     });
                     //Style
-                    sectcont.remove();
+                    this.sectors[i].remove();
                     let nstysec = null;
                     for(let j=0;j<saves.children.length;j++){
                       let chilsec = saves.children[j];
@@ -582,7 +587,7 @@
                       date.innerText = new Date(this.files[nind][j][0]).toUTCString();
                       date.addEventListener("click",e=>{
                         setEnv(this.filekey[nind],this.files[nind][j][1],this.files[nind][j][2],this.files[nind][j][3]);
-                        intCloseLocalStorage(null);
+                        this._closeLocalStorage(e);
                       });
                       let ndel = delsvg.cloneNode();
                       ndel.innerHTML = delsvg.innerHTML;
@@ -600,7 +605,7 @@
                           if(this.files[nind].length == 0) {
                             this.filekey.splice(i,1);
                             this.files.splice(i,1);
-                            sectcont.remove();
+                            this.sectors[i].remove();
                           };
                           //alert(this.filekey);
                           localStorage.setItem(this.filesid,JSON.stringify(this.files))
@@ -616,36 +621,18 @@
                 }
               }
             });
-            /*
-            //Causes a prompt loop??? D:
-            head.addEventListener("blur",e=>{
-              //set filekey (turn into function later?)
-              if(filekey.indexOf(head.value) == -1){
-                filekey[filekey.indexOf(keyfor)] = head.value;
-                keyfor = head.value;
-                localStorage.setItem("saveskey",JSON.stringify(filekey));
-              } else {
-                let yn = prompt("Are you sure you want to merge? (y/n)").toLowerCase();
-                if(yn == "y"){
-                  alert("pass")
-                } else {
-                  head.value = keyfor;
-                }
-              }
-            });
-            */
-            sectcont.appendChild(head);
-            sectcont.appendChild(datediv);
+            this.sectors[i].appendChild(head);
+            this.sectors[i].appendChild(datediv);
             //mar:render
-            for(let j=files[i].length-1;j>=0;j--){
+            for(let j=this.files[i].length-1;j>=0;j--){
               //you cant eventlistner pseudoelements >~<
-              let timef = files[i][j][0];
+              let timef = this.files[i][j][0];
               let date = document.createElement("div");
               date.classList.add("filedate");
-              date.innerText = new Date(files[i][j][0]).toUTCString();
+              date.innerText = new Date(this.files[i][j][0]).toUTCString();
               date.addEventListener("click",e=>{
-                setEnv(filekey[i],files[i][j][1],files[i][j][2],files[i][j][3]);
-                intCloseLocalStorage(null);
+                setEnv(this.filekey[i],this.files[i][j][1],this.files[i][j][2],this.files[i][j][3]);
+                this._closeLocalStorage(e);
               });
               let ndel = delsvg.cloneNode();
               ndel.innerHTML = delsvg.innerHTML;
@@ -655,33 +642,40 @@
                 let yn = prompt("Are you sure you want to delete? (y/n)").toLowerCase();
                 if(yn == "y"){
                   date.remove();
-                  let indexofsect = filekey.indexOf(keyfor);
+                  let indexofsect = this.filekey.indexOf(keyfor);
                   let indexofelem = 0;
-                  for(let k=0;k<files[indexofsect].length;k++){
-                    if(files[indexofsect][k][0] == timef) indexofelem = k;
+                  for(let k=0;k<this.files[indexofsect].length;k++){
+                    if(this.files[indexofsect][k][0] == timef) indexofelem = k;
                   }
-                  files[indexofsect].splice(indexofelem,1);
-                  if(files[indexofsect].length == 0) {
-                    filekey.splice(indexofsect,1);
-                    files.splice(indexofsect,1);
-                    sectcont.remove();
+                  this.files[indexofsect].splice(indexofelem,1);
+                  if(this.files[indexofsect].length == 0) {
+                    this.filekey.splice(indexofsect,1);
+                    this.files.splice(indexofsect,1);
+                    this.sectors[i].remove();
                   };
                   //alert(filekey);
-                  localStorage.setItem("saves",JSON.stringify(files))
-                  localStorage.setItem("saveskey",JSON.stringify(filekey))
+                  localStorage.setItem(this.filesid,JSON.stringify(files))
+                  localStorage.setItem(this.filekeyid,JSON.stringify(filekey))
                 }
               })
               date.appendChild(ndel);
               datediv.appendChild(date);
             }
-            this.container.appendChild(sectcont);
-            sectcont.appendChild(document.createElement("hr"));
+            this.container.appendChild(this.sectors[i]);
+            this.sectors[i].appendChild(document.createElement("hr"));
           }
         }
-        document.getElementById("closebtn").addEventListener("click",intCloseLocalStorage);
+        document.getElementById("closebtn").addEventListener("click",this._closeLocalStorage);
         document.getElementById("closebtn").style="display:inline";
         document.addEventListener("keydown",intEscFiles);
-      }
+      };
+      _closeLocalStorage(e) {
+        this.container.classList.add("hid");
+        this.container.classList.remove("sho");
+        document.getElementById("closebtn").style="";
+        document.getElementById("closebtn").removeEventListener("click",this._closeLocalStorage);
+        document.body.removeEventListener("keydown",intEscFiles);
+      };
     };
     class menuSys {
       constructor (menubar) {
@@ -701,6 +695,10 @@
       }
     };
     let menub = new menuSys(document.getElementById('menubar'));
+    //inpr: it thinks that it's still doing ctrl o instead of only updating
+    try{
+    //let savedb = new fileSys(saves,"saves","saveskey");
+    }catch(e){alert(e.stack)}
     //Textarea loops
     for(let i=0;i<inps.length;i++){
       let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];
@@ -882,7 +880,7 @@
     
     function trig0f(e) {
       playframe.click();
-      playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";},error: function (m){this.panel.value += "Error:" + m + "\\n";},warn: function (m){this.panel.value += "Warn:" + m + "\\n";},info: function (m){this.panel.value += "Info:" + m + "\\n";},debug: function (m){this.panel.value += "Debug:" + m + "\\n";},clear: function (){this.panel.value = "console cleared\\n"}};try{${jsin.value}}catch(e){console.error(e)}<\/script><\/html>`
+      playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";},error: function (m){this.panel.value += "Error:" + m + "\\n";},warn: function (m){this.panel.value += "Warn:" + m + "\\n";},info: function (m){this.panel.value += "Info:" + m + "\\n";},debug: function (m){this.panel.value += "Debug:" + m + "\\n";},clear: function (){this.panel.value = "console cleared\\n"}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`
       //alert(playframe.srcdoc);
       //playframe.srcdoc = htmli.value + "<style>" + cssi.value + "</style>" + "<script>" + jsin.value + "<\/script>";
       /*let clog = playframe.contentWindow.console.log;
@@ -946,7 +944,6 @@
       document.getElementById("closebtn").style="";
       document.getElementById("closebtn").removeEventListener("click",intCloseLocalStorage);
       document.body.removeEventListener("keydown",intEscFiles);
-      playframe.contentWindow.document.removeEventListener("keydown",intEscFiles);
     }
     function savefil(){
       dwnl(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`,filen.value == "" ? "Untitled-FrostPlayground.html" : filen.value + "-FrostPlayground.html")
@@ -1152,6 +1149,7 @@
     trig2.addEventListener("click", (e)=>{savefil()});
     trig3.addEventListener("click", (e)=>{dwnl("data:text/html;charset=utf-8,%0A" + encodeURIComponent(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`),"CodeURL-FrostPlayground.txt");});
     trig4.addEventListener("click",(e)=>{playframe.contentWindow.console.clear()})
+    //inp0.addEventListener("keydown", (e)=>{if(e.key == "Enter"){e.preventDefault();trig0f(e)}});
     trig5.addEventListener("click",(e)=>{htmli.parentNode.parentNode.classList.toggle("hid")});
     trig6.addEventListener("click",(e)=>{cssi.parentNode.parentNode.classList.toggle("hid")});
     trig7.addEventListener("click",(e)=>{jsin.parentNode.parentNode.classList.toggle("hid")});
@@ -1180,7 +1178,7 @@
     if(e.key=="Enter"){
       e.preventDefault();
       consolee.value += ">" + txt0.value + "\n";
-      let ret = playframe.contentWindow.eval(`var console = {panel:parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";},error: function (m){this.panel.value += "Error:" + m + "\\n";},warn: function (m){this.panel.value += "Warn:" + m + "\\n";},clear: function (){this.panel.value = "console cleared\\n"}};try{${txt0.value}}catch(e){console.error(e)};`) + "\n";
+      let ret = playframe.contentWindow.eval(`var console = {panel:parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";},error: function (m){this.panel.value += "Error:" + m + "\\n";},warn: function (m){this.panel.value += "Warn:" + m + "\\n";},clear: function (){this.panel.value = "console cleared\\n"}};try{${txt0.value}}catch(e){console.error(e.stack)};`) + "\n";
       consolee.value += ret;
       txt0.value = "";
     }
@@ -1208,15 +1206,17 @@
         });
         uploader.click();
       }
-    }); 
+    })
+    
     window.onbeforeunload = function(){
       if(htmli.value != "" || cssi.value != "" || jsin.value != ""){return 'Are you sure you have saved your work?';}else{return;}
     };
     function countl(s,l){
       let c = 0;
-      for(let i=0;i<s.length;i++){s[i]==l && c++};
+      for(let i=0;i<s.length;i++){s[i]==l && c++}
       return c;
     }
+    
   </script>
 </body>
 </html>
