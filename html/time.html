@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Timer</title>
+  <style>
+    html {
+      color: #EEE;
+      font-family: monospace;
+      /* color-scheme: dark; */
+    }
+    body {
+      background: #222;
+      margin: 0;
+      padding: 0;
+    }
+    .maincont {
+      position: absolute;
+      text-align: center;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+    }
+    .maincont h1, h2{
+      margin: 0;
+      font-weight: 600;
+      font-size: 14vmax;
+    }
+    .maincont h2 {
+      font-family: Arial;
+      font-size: 6vmax;
+    }
+    .btmcont {
+      text-align: center;
+    }
+    .btmcont h2{
+      font-family: Arial;
+      font-size: 10vmax;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <!-- Copyright Pacifiky 2024 All rights reserved -->
+  <div class="maincont">
+    <h1 id="out0e"></h1>
+    <h2 id="out1e"></h2>
+  </div>
+  <div class="btmcont">
+  <h2 id="out2e">0</h2>
+  </div>
+  <script>
+    const out0 = document.getElementById("out0e");
+    const out1 = document.getElementById("out1e");
+    const out2 = document.getElementById("out2e");
+    const origtime = Date.now();
+    //todo click
+    function updclock(){
+      let time = new Date();
+      out0.innerText = (time.getHours() > 12 ? (time.getHours()-12).toString().padStart(2, '0') : time.getHours().toString().padStart(2, '0'))+":"+time.getMinutes().toString().padStart(2, '0')+":"+time.getSeconds().toString().padStart(2, '0')+":"+time.getMilliseconds().toString().padStart(3, '0')
+      out1.innerText = time.getHours() > 12 ? "Post Meridiem" : "Ante Meridiem";
+      out2.innerText = Math.floor((Date.now()-origtime)/1000);
+    }
+    setInterval(updclock,1)
+  </script>
+</body>
+</html>
