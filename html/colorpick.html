@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Color Picker</title>
+  <style>
+    html {
+      padding: 2vh 5vw;
+      color: #EEE;
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      color-scheme: dark;
+    }
+
+    body {
+      background: #222;
+    }
+    
+    input {
+      border: none;
+      border-radius: 2px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      padding: 0;
+      margin: 5px 0;
+      height: 5vmax;
+    }
+
+    input[type="color"] {
+      width: 5vmax;
+      background: none;
+    }
+
+    #disp {
+      width:40vmax;
+      height:40vmax;
+      border-radius: 5px;
+      background: black;
+      margin: 5px 0;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+    #out0e {font-size: 10vmax; margin: 0;text-shadow: 0 10px 30px rgba(0,0,0,0.8);}
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>Color Picker</h1>
+  <h2>Pick colors for CSS!</h2>
+  <div id="dispcontrol">
+    <input type="color"/>
+    <input placeholder="Color" type="text"/>
+  </div>
+  <div id="disp"></div>
+  <h3 id="out0e">Null</h3>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    let out0 = document.getElementById("out0e");
+    let disp = document.getElementById("disp");
+    const controls = document.getElementById("dispcontrol").children;
+    function trig0f(e) {
+      disp.style.background = this.value;
+      controls[1].value = this.value;
+      controls[0].value = this.value;
+      out0.innerText = this.value;
+      return;
+    }
+    controls[0].addEventListener("change", trig0f);
+    controls[1].addEventListener("change", trig0f)
+  </script>
+</body>
+</html>
