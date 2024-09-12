@@ -3,33 +3,51 @@
 <head>
   <title>Frost Playground</title>
   <style>
-    html {
-      color: #EEE;
+    body {
+      color: white;
       font-family: Courier New, monospace;
       font-size: 20px;
-    }
-    body {
       padding: 0;
       margin: 0;
       background: #222;
       overflow-x: hidden;
       color-scheme: dark;
-      transition: background .1s linear
+      transition: background .1s linear;
+      --layer0: #000;
+      --layer1: #111;
+      --layer2: #222;
+      --layer3: #444;
+      --layer4: #555;
+      --top0: white;
+      --top1: #eee;
+      --top2: #888;
+    }
+    body.light {
+      color: black;
+      color-scheme: light;
+      background: #eee;
+      --layer0: #fff;
+      --layer1: #ddd;
+      --layer2: #aaa;
+      --layer3: #bbb;
+      --layer4: #eee;
+      --top0: black;
+      --top1: #111;
+      --top2: #333;
     }
     input, button, textarea, iframe {
-      border: black solid 1px;
+      border: rgba(0,0,0,0.2) solid 1px;
       border-radius: 2px
-      box-shadow: 0px 0px 2px black;
+      box-shadow: 0px 0px 2px rgba(0,0,0,0.5);
       padding: 5px;
     }
-    textarea {
-       height: 80vh;
-       width: 80vw;
+    hr {
+      border-color: currentcolor;
     }
     textarea:focus, input:focus{
        outline: 0;
     }
-    .flexsect {display:flex;height:calc(84vh - 30px);width:100vw;}
+    .flexsect {display:flex;height:calc(96vh - 2px);width:100vw;}
     iframe {
       padding: 0 !important;
       margin: 0 !important;
@@ -40,7 +58,7 @@
     .sect{
       display: inline-block;
       box-sizing: content-box;
-      border: black solid 1px;
+      border: rgba(0,0,0,0.2) solid 1px;
       padding: 0 !important;
       margin: 0 !important;
       flex-grow: 1;
@@ -68,6 +86,7 @@
       line-height: 14px;
       overflow-y: hidden;
       overflow-x: auto;
+      background: var(--layer1);
     }
     .sect iframe {
       border-radius: 0;
@@ -75,7 +94,6 @@
       width: 100%;
       height: 100%;
       border: none;
-      resize: none !important;
       margin: 0;
       padding: 0;
     }
@@ -95,18 +113,20 @@
       width: 30vw;
     }
     #topbtn {
+      position: absolute;
       display: flex;
       align-content: center;
       justify-content: center;
-    }
-    #topbtn button {
-      width: 100%;
+      height: 4vh;
+      width: 70vw;
+      left: 50%;
+      transform: translate(-50%,0);
     }
     .sect .lnnumb{
       color: #5ac91e;
       width: 20px;
       text-align: right;
-      text-shadow: 0px 0px 5px black;
+      text-shadow: 0px 0px 5px rgba(0,0,0,0.5);
     }
     .sect .lnnumb span{
       counter-increment: lnnumb;
@@ -153,7 +173,7 @@
       font-family: Arial;
       /*flex-direction: column;*/
       width: 100vw;
-      background: #222;
+      background: var(--layer2);
       position:fixed;z-index:9000;height:100vh;left:0;top:0;
       overflow-y: auto;
       overflow-x: hidden;
@@ -170,9 +190,9 @@
     #saves .filesect .header .filetitle {
       padding: 5px;
       margin: 10px 10px 10px 0;
-      background: #111;
-      box-shadow: none;
-      border: none;
+      background: var(--layer1);
+      box-shadow: 0 5px 5px rgba(0,0,0,0.4);
+      border: 2px rgba(0,0,0,0.3) solid;
       font-size: 25px;
       border-radius: 0 10px 10px 0;
     }
@@ -181,12 +201,11 @@
       display: flex;
       transition: background .1s linear;
     }
-    #saves .filedate:hover,#menubar .menuitem .menutrigger:hover,#menubar .menuitem .menudd .menuddi:not([disabled]):hover,#pref .contentmodal .item:hover{
+    #saves .filedate:hover,#menubar .menuitem .menutrigger:hover,#menubar .menuitem .menudd .menuddi:not([disabled]):hover,.pagemodal .contentmodal .item:hover{
       background: rgba(255,255,255,0.2);
     }
     #saves .filedate .del {
       width: 20px;
-      filter: invert(0.8);
       margin-left: auto;
       margin-right: 20px;
       transition: transform .2s ease;
@@ -210,18 +229,18 @@
     }
     #menubar .menuitem .menudd {
       display: block;
-      background: #444;
+      background: var(--layer3);
       position: absolute;
       min-width: 15vw;
       max-width: 20vw;
-      box-shadow: 0 0 5px black;
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
       border-radius: 5px;
       overflow-x: hidden;
-      border: 1px solid black;
+      border: 1px solid rgba(255,255,255,0.2);
       transition: opacity .1s linear, transform .1s linear;
     }
     #menubar .menuitem .menudd .menuddi {
-      background: #555;
+      background: var(--layer4);
       width: 100%;
       text-align: left;
       box-shadow: none;
@@ -272,19 +291,20 @@
       transition: background .1s linear, transform .1s linear;
       background: rgba(0,0,0,0.3);
     }
-    .closebtn:hover {background: #555;transform: rotate(90deg)}
+    .closebtn:hover {background: var(--layer4);transform: rotate(90deg)}
     dialog .topmodal .close {
       margin-left: auto;
       margin-right: 0;
       display: block;
     }
-    #pref {min-width: 70vw;}
-    #pref .contentmodal {
+    .pagemodal {min-width: 70vw;overflow:hidden;}
+    .pagemodal .contentmodal {
       display: flex;
       flex-direction: column;
-      height: 60vh
+      height: 60vh;
+      overflow: auto;
     }
-    #pref .contentmodal .item {
+    .pagemodal .contentmodal .item {
       transition: background .1s linear;
     }
     dialog .headermodal h2 {
@@ -292,16 +312,25 @@
       margin: 0 0 20px 0;
     }
     #consolee,
-    #txt0e {width: 100%;}
+    #txt0e,
+    #topbtn button {width: 100%;}
     .cnscont {
       display: flex;
       flex-direction: column;
-      width: 100vw;
-      height: 12vh;
+      height: 100%;
+      /*resize: vertical;*/
+      overflow:hidden;
+      box-shadow: 0 0 5px rgba(0,0,0,0.8);
+      transition: opacity .2s ease, height .2s ease;
     } 
     .cnscont .cnsinput {
       display: flex;
-      height: 4vh;
+      height: 10%;
+    }
+    .cnscont.hid {
+      height: 0px;
+      opacity: 0;
+      pointer-events: none;
     }
     .sbtn {
       font-size: 15px;
@@ -316,21 +345,19 @@
     .gbtn {
       background: linear-gradient(135deg,#33ff33,#11c011);
       box-shadow: 2px 2px 8px rgba(0,0,0,0.8),-2px -2px 8px #33ff33;
-      border: none;
-      margin: 6px;
     }
     .gbtn:hover {background: linear-gradient(-45deg,#33ff33,#11c011);}
     .gbtn:active {box-shadow: inset 2px 2px 8px rgba(0,0,0,0.8),inset -2px -2px 8px #33ff33;}
     .rbtn {
       background: linear-gradient(135deg,#f95353,#a51212);
       box-shadow: 2px 2px 8px rgba(0,0,0,0.8),-2px -2px 8px #f95353;
-      border: none;
-      margin: 6px;
     }
+    .gbtn,.rbtn {border: none;margin: 6px;}
     .rbtn:hover {background: linear-gradient(-45deg,#f95353,#a51212);}
     .rbtn:active {box-shadow: inset 2px 2px 8px rgba(0,0,0,0.8), inset -2px -2px 8px #f95353;}
-    .cnscont .cnsinput button {width: 10em;}
     .sect.hid,#svgcontainer {display: none;}
+    .frame {display: flex;flex-direction:column;}
+    #playframe {resize: vertical;height: 100%;overflow:auto;}
     #menubar .menuitem .menudd.hid {pointer-events:none;opacity:0;transform:scale(0.9);}
     #menubar .menuitem .menudd.sho {pointer-events:auto;opacity:1;}
     /*#framecont {position:fixed;left:0;top:0;width:100vw;height:100vh;}*/
@@ -343,7 +370,65 @@
   <button id="closebtn" class="closebtn">×</button>
   <div id="overlays">
     <div id="saves" class="hid"></div>
-    <dialog id="pref">
+    <dialog id="helpmodal" class='pagemodal'>
+      <div class='topmodal'>
+        <button class='close closebtn'>×</button>
+      </div>
+      <div class="headermodal">
+        <h2>Help</h2>
+      </div>
+      <hr/>
+      <div class='contentmodal'>
+        <h3>Introduction</h3>
+        Greetings programmers!<br/>
+        So you've decided to get my ABSOLUTELY WONDERFUL ONLINE IDE!<br/>
+        (Or offline if you downloaded it)<br/>
+        Anyways here's a list of keyboard shortcuts that you should use:
+        <h3>Shortcuts</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Shortcut</th>
+              <th>Context</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ctrl+?</td>
+              <td>Global</td>
+              <td>Open help (obviously)</td>
+            </tr>
+            <tr>
+              <td>Ctrl+o</td>
+              <td>Global</td>
+              <td>Open save manager</td>
+            </tr>
+            <tr>
+              <td>Ctrl+e</td>
+              <td>Global</td>
+              <td>Download current code</td>
+            </tr>
+            <tr>
+              <td>Ctrl+s</td>
+              <td>Global</td>
+              <td>Save to Browser (save manager)</td>
+            </tr>
+            <tr>
+              <td>Ctrl+p</td>
+              <td>Global</td>
+              <td>Open preferences</td>
+            </tr>
+            <tr>
+              <td>Ctrl+h</td>
+              <td>A field</td>
+              <td>Open find&replace</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </dialog>
+    <dialog id="pref" class='pagemodal'>
       <div class='topmodal'>
         <button class='close closebtn'>×</button>
       </div>
@@ -376,9 +461,10 @@
         Name: <input type="text" class="smol" placeholder="Untitled" id="fne"></input>
       </div>
       </div>
-      <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+      <footer>Copyright 2024 Pacifiky. All rights reserved.<br/>Thank you Aaron for testing!</footer>
     </dialog>
   </div>
+  <div id="topbtn"><button id="trig5e">HTML</button><button id="trig6e">CSS</button><button id="trig7e">JS</button><button id="trig9e" value="true">Console</button><button id="trig8e" value="true">Theme</button><button id="trig1e">Fullscreen</button></div>
   <div id="menubar">
     <div class="menuitem">
       <button class="menutrigger">File</button>
@@ -399,13 +485,14 @@
       <button class="menutrigger">Edit</button>
       <div class="menudd hid" id="editmenu">
         <button class="menuddi" id="trig0e">Run</button>
+        <button class="menuddi" id="trig16e">Replace (ctrl+h)</button>
         <hr/>
         <button class="menuddi" id="trig14e">Preferences (ctrl+p)</button>
+        <button class="menuddi" id="trig17e">Help (ctrl+?)</button>
         <button class="menuddi" id="trig15e" disabled>Plugins</button>
       </div>
     </div>
   </div>
-  <div id="topbtn"><button id="trig5e">Toggle HTML</button><button id="trig6e">Toggle CSS</button><button id="trig7e">Toggle JS</button><button id="trig8e" value="true">Toggle Theme</button><button id="trig1e">Fullscreen</button></div>
   <div class="flexsect">
   <div class="sect">
   <div class="finrep hid">
@@ -450,39 +537,41 @@
   </div>
   </div>
   <div class="sect frame">
-  <iframe id="playframe" class="sect" srcdoc="<div style='font-family:Arial'><h1>Frost Playground</h1><p>Your code will show up here</p></div>"></iframe>
-  </div>
-  </div>
+  <iframe id="playframe" srcdoc="<div style='font-family:Arial'><h1>Frost Playground</h1><p>Your code will show up here</p></div>"></iframe>
   <div class="cnscont">
   <textarea id="consolee" disabled="true"></textarea>
   <div class="cnsinput">
   <input id="txt0e" placeholder="Command" type="text" spellcheck="false"></input>
-  <button id="trig4e">Clear Console</button>
+  <button id="trig4e">Clear</button>
+  </div>
+  </div>
   </div>
   </div>
   <div id="svgcontainer">
     <svg id="trashsvg" class="svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="11" y="10" width="2" height="11" rx="1" fill="black"/>
-    <rect x="4" y="7" width="16" height="16" rx="1" stroke="black" stroke-width="2"/>
-    <rect x="2" y="3" width="20" height="4" rx="1" stroke="black" stroke-width="2"/>
-    <rect x="7" y="10" width="2" height="11" rx="1" fill="black"/>
-    <rect x="15" y="10" width="2" height="11" rx="1" fill="black"/>
+    <rect x="11" y="10" width="2" height="11" rx="1" fill="currentcolor"/>
+    <rect x="4" y="7" width="16" height="16" rx="1" stroke="currentcolor" stroke-width="2"/>
+    <rect x="2" y="3" width="20" height="4" rx="1" stroke="currentcolor" stroke-width="2"/>
+    <rect x="7" y="10" width="2" height="11" rx="1" fill="currentcolor"/>
+    <rect x="15" y="10" width="2" height="11" rx="1" fill="currentcolor"/>
     <mask id="mask0_2282_1246" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="0" width="8" height="2">
     <rect x="8" width="8" height="2" fill="#D9D9D9"/>
     </mask>
     <g mask="url(#mask0_2282_1246)">
-    <rect x="10" width="4" height="4" rx="2" fill="black"/>
+    <rect x="10" width="4" height="4" rx="2" fill="currentcolor"/>
     </g>
     </svg>
   </div>
   <script>
     //mar:topscript
+    const pagem = document.getElementsByClassName("pagemodal");
     const consolee = document.getElementById("consolee");
     const filebtn = document.getElementById("filemenu").getElementsByClassName("menuddi");
     const editbtn = document.getElementById("editmenu").getElementsByClassName("menuddi");
     const topbtn = document.getElementById("topbtn").children;
     const trig4 = document.getElementById("trig4e");
     const pref = document.getElementById("pref");
+    const help = document.getElementById("helpmodal");
     const chk0 = document.getElementById("chk0");
     const sel0 = document.getElementById("sel0");
     const sel1 = document.getElementById("sel1");
@@ -501,8 +590,8 @@
     class fileSys {
       constructor (container,filesid,filekeyid){
         this.container = container;
-        this.files = JSON.parse(localStorage.getItem(filesid));
-        this.filekey = JSON.parse(localStorage.getItem(filekeyid));
+        this.files = JSON.parse(localStorage.getItem(filesid)) || [];
+        this.filekey = JSON.parse(localStorage.getItem(filekeyid)) || [];
         this.filesid = filesid;
         this.filekeyid = filekeyid;
         this.sectors = new Array(this.filekey.length);
@@ -521,6 +610,10 @@
           date.innerText = new Date(this.files[i][j][0]).toUTCString();
           date.addEventListener("click",e=>{
             setEnv(this.filekey[i],this.files[i][j][1],this.files[i][j][2],this.files[i][j][3]);
+            trig0f(null);
+            intUpdLn.call(htmli);
+            intUpdLn.call(cssi);
+            intUpdLn.call(jsin);
             this._closeLocalStorage(e);
           });
           let ndel = delsvg.cloneNode();
@@ -699,13 +792,15 @@
     let menub = new menuSys(document.getElementById('menubar'));
     try{
     var savedb = new fileSys(document.getElementById("saves"),"saves","saveskey");
-    }catch(e){console.log(e.stack)}
+    }catch(e){alert(e.stack)}
     //Textarea loops
     for(let i=0;i<inps.length;i++){
       let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];
       let finput = finrep.getElementsByClassName("finputfr")[0];
       let rinput = finrep.getElementsByClassName("rinputfr")[0];
       
+      inps[i].addEventListener("keyup",intUpdLn);
+      inps[i].addEventListener("input",intUpdLn);
       inps[i].addEventListener("input", trig0f);
       inps[i].addEventListener("input", e=>{
         inphistory[i][1].length = 0;
@@ -842,6 +937,10 @@
             inphistory[i][0].push([inps[i].value,inps[i].selectionStart]);
             [inps[i].value,inps[i].selectionStart] = inphistory[i][1].pop();
             inps[i].selectionEnd = inps[i].selectionStart;
+            trig0f(null);
+            intUpdLn.call(htmli);
+            intUpdLn.call(cssi);
+            intUpdLn.call(jsin);
           }
         }else if(e.key=="z" && e.ctrlKey){
           e.preventDefault();
@@ -864,21 +963,17 @@
         rr = rr == '\\t' ? '\t' : rr;
         inps[i].value = inps[i].value.replaceAll(rf,rr);
       });
-    };
-    
-    //lnnumb loop 
-    // https://stackoverflow.com/questions/1995370/adding-line-numbers-to-html-textarea
-    for(let i=0;i<nums.length;i++){
-      nums[i].parentNode.children[1].addEventListener("keyup",e=>{
-        let span = document.createElement("span");
-        nums[i].innerHTML = "";
-        for(let j=0;j<nums[i].parentNode.children[1].value.split("\n").length;j++){
-          nums[i].appendChild(span);
-          span = span.cloneNode();
-        }
-        })
     }
-    
+    // https://stackoverflow.com/questions/1995370/adding-line-numbers-to-html-textarea
+    function intUpdLn(e){
+      let num = this.parentNode.getElementsByClassName("lnnumb")[0];
+      let span = document.createElement("span");
+      num.innerHTML = "";
+      for(let j=0;j<this.value.split("\n").length;j++){
+        num.appendChild(span);
+        span = span.cloneNode();
+      }
+    }
     function trig0f(e) {
       playframe.click();
       playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";},error: function (m){this.panel.value += "Error:" + m + "\\n";},warn: function (m){this.panel.value += "Warn:" + m + "\\n";},info: function (m){this.panel.value += "Info:" + m + "\\n";},debug: function (m){this.panel.value += "Debug:" + m + "\\n";},clear: function (){this.panel.value = "console cleared\\n"}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`
@@ -889,7 +984,7 @@
       filen.value = name;
       htmli.value = html;
       cssi.value = css;
-      jsie.value = js;
+      jsin.value = js;
     }
     
     function storeHistory(index){
@@ -902,9 +997,17 @@
         inphistory[index][1].push([inps[index].value,inps[index].selectionStart]);
         [inps[index].value,inps[index].selectionStart] = inphistory[index][0].pop();
         inps[index].selectionEnd = inps[index].selectionStart;
+        trig0f(null);
+        intUpdLn.call(htmli);
+        intUpdLn.call(cssi);
+        intUpdLn.call(jsin);
       }else if(inps[index].value != ""){
         inphistory[index][1].push([inps[index].value,inps[index].selectionStart]);
         inps[index].value = ""
+        trig0f(null);
+        intUpdLn.call(htmli);
+        intUpdLn.call(cssi);
+        intUpdLn.call(jsin);
       }
       return;
     }
@@ -938,7 +1041,9 @@
       else if(e.key == "o" && e.ctrlKey){
         e.preventDefault();
         if(document.getElementById("saves").classList.contains("hid")){
+          try{
           savedb.openUI();
+          }catch(e){alert(e.stack)}
         } else {
           savedb._closeLocalStorage(null);
         }
@@ -948,22 +1053,31 @@
       } else if(e.key == "p" && e.ctrlKey) {
         e.preventDefault();
         if(!(pref.open)){pref.showModal()}else{pref.close()};
+      } else if(e.key == "/" && e.ctrlKey) {
+        e.preventDefault();
+        if(!(help.open)){help.showModal()}else{help.close()};
       }
     });
     window.addEventListener("load",e=>{
     editbtn[0].addEventListener("click", trig0f);
-    topbtn[4].addEventListener("click", fulls);
+    topbtn[5].addEventListener("click", fulls);
     filebtn[0].addEventListener("click", (e)=>{savefil()});
     filebtn[1].addEventListener("click", (e)=>{dwnl("data:text/html;charset=utf-8,%0A" + encodeURIComponent(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`),"CodeURL-FrostPlayground.txt");});
     trig4.addEventListener("click",(e)=>{playframe.contentWindow.console.clear()})
     topbtn[0].addEventListener("click",(e)=>{htmli.parentNode.parentNode.classList.toggle("hid")});
     topbtn[1].addEventListener("click",(e)=>{cssi.parentNode.parentNode.classList.toggle("hid")});
     topbtn[2].addEventListener("click",(e)=>{jsin.parentNode.parentNode.classList.toggle("hid")});
-    topbtn[3].addEventListener("click",(e)=>{if(topbtn[3].value == "true"){document.body.style="color-scheme: light;background: #FFF;color:black";topbtn[3].value="false"}else{document.body.style="";topbtn[3].value="true"};});
+    topbtn[3].addEventListener("click",e=>{playframe.parentNode.getElementsByClassName("cnscont")[0].classList.toggle("hid")})
+    /*topbtn[4].addEventListener("click",(e)=>{if(topbtn[4].value == "true"){document.body.style="color-scheme: light;background: #FFF;color:black";topbtn[4].value="false"}else{document.body.style="";topbtn[4].value="true"};});*/
+    topbtn[4].addEventListener("click",e=>{document.body.classList.toggle("light")})
     filebtn[4].addEventListener("click",e=>savedb.saveTo())
     filebtn[5].addEventListener("click",e=>savedb.openUI())
-    editbtn[1].addEventListener("click",e=>pref.showModal())
-      pref.getElementsByClassName("close")[0].addEventListener("click",e=>{pref.close()});
+    editbtn[2].addEventListener("click",e=>pref.showModal())
+    editbtn[3].addEventListener("click",e=>help.showModal())
+    editbtn[1].addEventListener("click",e=>{for(let i=0;i<inps.length;i++){let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];finrep.classList.toggle("hid");finrep.classList.toggle("sho")}})
+    for(let i=0;i<pagem.length;i++){
+      pagem[i].getElementsByClassName("close")[0].addEventListener("click",e=>{pagem[i].close()});
+    }  
     sel1.addEventListener("input",e=>{
        for(let i=0;i<inps.length;i++){
          switch(sel1.value){
@@ -1007,6 +1121,9 @@
             let jsondata = JSON.parse(fr.result);
             localStorage.setItem("saveskey",JSON.stringify(jsondata[0]));
             localStorage.setItem("saves",JSON.stringify(jsondata[1]));
+            savedb.filekey = jsondata[0];
+            savedb.files = jsondata[1];
+            savedb.update();
             }catch(e){alert("File Error: " + e)}
           }
           fr.readAsText(uploader.files[0]);
@@ -1016,7 +1133,6 @@
       }
     })
     })
-    
     window.onbeforeunload = function(){
       if(htmli.value != "" || cssi.value != "" || jsin.value != ""){return 'Are you sure you have saved your work?';}else{return;}
     };
@@ -1025,7 +1141,6 @@
       for(let i=0;i<s.length;i++){s[i]==l && c++}
       return c;
     }
-    
   </script>
 </body>
 </html>
