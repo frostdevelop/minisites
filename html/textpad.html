@@ -1,23 +1,9 @@
 <!DOCTYPE html><html><head>
-  <title>TextPadv1.1</title>
+  <title>TextPadv1.2</title>
   <style>
-    html {
-      padding: 0 5%;
-      margin: 0;
-      color: #EEE;
-      font-family: Courier New, monospace;
-      font-size: 20px;
-      color-scheme: dark;
-      font-size: 15px;
-    }
-
     body {
-      background: #222;
-      padding: 0;
-      margin: 0;
-      margin-top: 5px;
+      background: #222;padding: 0 5%;margin: 0;color: #EEE;font-family: Courier New, monospace;color-scheme: dark;font-size: 15px;margin-top: 5px
     }
-
     input, button, select{
       border: #444 outset 2px;
       border-radius: 5px;
@@ -26,7 +12,6 @@
       background: #111;
       font-size: 15px;
     }
-    
     button:active {
       border: #444 inset 2px;
     }
@@ -34,7 +19,6 @@
     input {
       width: 40vw;
     }
-
     textarea {
       min-height: 100%;
       width: calc(100% - 30px);
@@ -46,11 +30,9 @@
       line-height: inherit;
       resize: none;
     }
-    
     .ed textarea:focus {
       outline: none;
     }
-    
     .ed {
       display: flex;
       min-height: 100%;
@@ -58,7 +40,6 @@
       font-size: 13px;
       line-height: calc(1em+1px);
     }
-    
     .edcont {
       display: block;
       height: 80vh;
@@ -72,7 +53,6 @@
       overflow-x: hidden;
       overflow-y: auto;
     }
-    
     .lnnumb{
       color: #5ac91e;
       width: 30px;
@@ -128,26 +108,10 @@
     let trig1 = document.getElementById("trig1e");
     let fi0 = document.getElementById("fi0e");
     let sel1 = document.getElementById("sel1");
-    let nums = document.getElementsByClassName("lnnumb")
-    
-    for(let i=0;i<nums.length;i++){
-      nums[i].parentNode.children[1].addEventListener("keyup",e=>{
-        let span = document.createElement("span");
-        nums[i].innerHTML = "";
-        for(let j=0;j<nums[i].parentNode.children[1].value.split("\n").length;j++){
-          nums[i].appendChild(span);
-          span = span.cloneNode();
-        }
-      })
-    }
-    
+    let nums = document.getElementsByClassName("lnnumb")[0];
     function trig0f(e) {
       let dwnelem = document.createElement("a");
-      if(inp1.value.includes(".")){
-        dwnelem.download = inp1.value == "" ? "Export - Textpad.txt" : inp1.value;
-      }else{
-        dwnelem.download = inp1.value == "" ? "Export - Textpad.txt" : inp1.value + ".txt";
-      }
+      if(inp1.value.includes(".")){dwnelem.download = inp1.value == "" ? "Export - Textpad.txt" : inp1.value;}else{dwnelem.download = inp1.value == "" ? "Export - Textpad.txt" : inp1.value + ".txt";}
       dwnelem.type = "text/html";
       let dwndata = new Blob([inp0.value]);
       dwnelem.href = URL.createObjectURL(dwndata);
@@ -155,17 +119,16 @@
       dwnelem.click();
       dwnelem.remove();
       return;
-    }
+    };
     function uploadfile(e){
       const fr = new FileReader;
-      fr.onload = ()=>{inp0.value=fr.result}
+      fr.onload = ()=>{inp0.value=fr.result;updNum(null)};
       fr.readAsText(this.files[0]);
-    }
-    
+    };
     sel1.addEventListener("input",e=>{
       switch(sel1.value){
       case "ww":
-        inp0.style="word-wrap:normal;"
+        inp0.style="word-wrap:normal;";
         break;
       case "bw":
         inp0.style="word-wrap:break-word;";
@@ -178,10 +141,19 @@
         break;
        }
     });
-    
+    function updNum(e) {
+      let span = document.createElement("span");
+      nums.innerHTML = "";
+      for(let j=0;j<inp0.value.split("\n").length;j++){
+        nums.appendChild(span);
+        span = span.cloneNode();
+      };
+    };
     trig0.addEventListener("click", trig0f);
     trig1.addEventListener("click", e=>{fi0.click()});
     inp0.addEventListener("keydown", (e)=>{if(e.key == "s" && e.ctrlKey){e.preventDefault();trig0f(e)}});
+    inp0.addEventListener("input",updNum);
+    inp0.addEventListener("keyup",updNum);
     fi0.addEventListener("change",uploadfile);
     inp2.addEventListener("change",e=>{inp0.parentNode.style = "font-size: " + inp2.value + "px"})
   </script>
