@@ -597,8 +597,6 @@
         this.sectors = new Array(this.filekey.length);
         this._closeLocalStorage = this._closeLocalStorage.bind(this); 
         this._closeLocalStorageKey = this._closeLocalStorageKey.bind(this);
-        //this.update = this.update.bind(this);
-        this.update();
       }
       renderPosts(i,datediv,keyfor){
         //todo (Making object variables? // finished this stuff)
@@ -645,6 +643,7 @@
       }
       openUI(){
         if(this.container.classList.contains("hid")){
+          this.update();
           document.getElementById("closebtn").addEventListener("click",this._closeLocalStorage);
           document.getElementById("closebtn").style="display:inline";
           document.addEventListener("keydown",this._closeLocalStorageKey);
@@ -656,6 +655,8 @@
       }
       update(){
         //todo figure out wht not updating after localStorage?
+        this.files = JSON.parse(localStorage.getItem(this.filesid)) || [];
+        this.filekey = JSON.parse(localStorage.getItem(this.filekeyid)) || [];
         this.container.innerHTML = "";
         if(!(this.filekey == null)){
           for(let i=0;i<this.filekey.length;i++){
@@ -769,7 +770,6 @@
         }
         localStorage.setItem(this.filesid,JSON.stringify(this.files));
         localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey));
-        this.update();
       };
     };
     class menuSys {
@@ -790,9 +790,7 @@
       }
     };
     let menub = new menuSys(document.getElementById('menubar'));
-    try{
     var savedb = new fileSys(document.getElementById("saves"),"saves","saveskey");
-    }catch(e){alert(e.stack)}
     //Textarea loops
     for(let i=0;i<inps.length;i++){
       let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];
@@ -1041,9 +1039,7 @@
       else if(e.key == "o" && e.ctrlKey){
         e.preventDefault();
         if(document.getElementById("saves").classList.contains("hid")){
-          try{
           savedb.openUI();
-          }catch(e){alert(e.stack)}
         } else {
           savedb._closeLocalStorage(null);
         }
@@ -1121,9 +1117,6 @@
             let jsondata = JSON.parse(fr.result);
             localStorage.setItem("saveskey",JSON.stringify(jsondata[0]));
             localStorage.setItem("saves",JSON.stringify(jsondata[1]));
-            savedb.filekey = jsondata[0];
-            savedb.files = jsondata[1];
-            savedb.update();
             }catch(e){alert("File Error: " + e)}
           }
           fr.readAsText(uploader.files[0]);
