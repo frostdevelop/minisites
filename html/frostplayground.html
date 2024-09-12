@@ -314,12 +314,13 @@
     #consolee,
     #txt0e,
     #topbtn button {width: 100%;}
+    #consolee {overflow: auto;}
     .cnscont {
       display: flex;
       flex-direction: column;
       height: 100%;
       /*resize: vertical;*/
-      overflow:hidden;
+      overflow:auto;
       box-shadow: 0 0 5px rgba(0,0,0,0.8);
       transition: opacity .2s ease, height .2s ease;
     } 
@@ -539,7 +540,7 @@
   <div class="sect frame">
   <iframe id="playframe" srcdoc="<div style='font-family:Arial'><h1>Frost Playground</h1><p>Your code will show up here</p></div>"></iframe>
   <div class="cnscont">
-  <textarea id="consolee" disabled="true"></textarea>
+  <textarea id="consolee" readonly></textarea>
   <div class="cnsinput">
   <input id="txt0e" placeholder="Command" type="text" spellcheck="false"></input>
   <button id="trig4e">Clear</button>
@@ -974,7 +975,7 @@
     }
     function trig0f(e) {
       playframe.click();
-      playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";},error: function (m){this.panel.value += "Error:" + m + "\\n";},warn: function (m){this.panel.value += "Warn:" + m + "\\n";},info: function (m){this.panel.value += "Info:" + m + "\\n";},debug: function (m){this.panel.value += "Debug:" + m + "\\n";},clear: function (){this.panel.value = "console cleared\\n"}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`
+      playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";this.panel.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){this.panel.value = "console cleared\\n"}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`
       return;
     }
     
@@ -1096,7 +1097,7 @@
     if(e.key=="Enter"){
       e.preventDefault();
       consolee.value += ">" + txt0.value + "\n";
-      let ret = playframe.contentWindow.eval(`var console = {panel:parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";},error: function (m){this.panel.value += "Error:" + m + "\\n";},warn: function (m){this.panel.value += "Warn:" + m + "\\n";},clear: function (){this.panel.value = "console cleared\\n"}};try{${txt0.value}}catch(e){console.error(e.stack)};`) + "\n";
+      let ret = playframe.contentWindow.eval(`var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";this.panel.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){this.panel.value = "console cleared\\n"}};try{${txt0.value}}catch(e){console.error(e.stack)};`) + "\n";
       consolee.value += ret;
       txt0.value = "";
     }
