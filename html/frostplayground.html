@@ -362,6 +362,15 @@
     #menubar .menuitem .menudd.hid {pointer-events:none;opacity:0;transform:scale(0.9);}
     #menubar .menuitem .menudd.sho {pointer-events:auto;opacity:1;}
     /*#framecont {position:fixed;left:0;top:0;width:100vw;height:100vh;}*/
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+      border: 2px solid rgba(0,0,0,0.5);
+      margin-left: auto;
+      margin-right: auto;
+    }
+    th {border: 1px solid green;}
+    td {border: 1px solid rgba(0,0,0,0.5);}
   </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
@@ -381,10 +390,12 @@
       <hr/>
       <div class='contentmodal'>
         <h3>Introduction</h3>
+        <p>
         Greetings programmers!<br/>
         So you've decided to get my ABSOLUTELY WONDERFUL ONLINE IDE!<br/>
         (Or offline if you downloaded it)<br/>
-        Anyways here's a list of keyboard shortcuts that you should use:
+        Anyways here's a list of keyboard shortcuts that you should use (and a guide under it):
+        </p>
         <h3>Shortcuts</h3>
         <table>
           <thead>
@@ -427,6 +438,53 @@
             </tr>
           </tbody>
         </table>
+        <h3>Guide</h3>
+        <h4>How to use the editor!</h4>
+        <p>
+          So when you came to this webapp, you wre greeted 4 different sections. 
+          Three of which are for coding.<br/>
+          To the very left, you have your HTML field,
+          to the left-middle, you have the css,
+          to the right-middle, you have js, 
+          and to the very right, you have an iframe view and a console window!<br/>
+          In order to start the program, you can just start typing (or press run from the edit menu at the top.<br/>
+          But now that we have a program, how are we supposed to save it?
+        </p>
+        <h4>Savng</h4>
+        <p>
+          FrostPlayground gives 3 different methods of saving.</br>
+          If you want to save to your computer, use "Ctrl+e" or "Download' from the file menu.<br/>
+          If you want a data url for your application, click download url (only use for small applications) <br/>
+          If you're still testing and want to iteratively save it, use "Ctrl+s". Keep in mind that your browser is in charge of this data and it may be wiped randomly by your browser due to being temporary. Which brings us to our next topic!
+        </p>
+        <h4>Managing saves</h4>
+        <p>
+          So, you saved some program and want to get it back. So how are we supposed to do that?<br/>
+          In order to access the save management UI, you can press "Ctrl+o" or the "Load Save" item on the file menu. There you can rename the different files, delete saves, and merge them!<br/>
+          "But still, I don't want my saves to be wiped by my browser!" Well you're in luck because I created a feature based exactly on that! You can export (and import) your file database through the file menu! But why are all the files called "Untitled" and how do I change it?
+        </p>
+        <h4>Preferences</h4>
+        <p>
+          Say, you hate that there's NO WRAPPING! <br/>
+          Or want to turn off the autoindent! <br/>
+          Well, it's time to consult the preferences!
+          These have settings to allow autoindent control, the indent when you press tab and shift+tab, wrap, and the Save Name!
+          But what are all these controls for the text?
+        </p>
+        <h4>Text Hotkeys</h4>
+        <p>
+          In order to indent the current line, press tab (and un-indenting is shift+tab). There's also a hotkey for finding certain text and replacing it by pressing "Ctrl+h". When using quotes or parentheses, they will be automatically closed. When using a { it will also automatically indent.<br/>
+          To undo or redo, use "Ctrl+Z" to undo and "Ctrl+Shift+Z" or "Ctrl+Y" to redo! Keep in mind that if you modify while undoing, your redo history will be wiped.
+        </p>
+        <h4>Top Buttons</h4>
+        <p>
+          You may have noticed the 6 giant buttons with different names at the top.<br/>
+          The first four toggle the visibility of the HTML, CSS, JS, and the console window. Just click to make them disappear/reappear.
+          <br/>
+          After that, there's a theme button (if you want light mode...)
+          <br/>
+          And finally, we have the Fullscreen button which puts the iframe into Fullscreen!
+        </p>
       </div>
     </dialog>
     <dialog id="pref" class='pagemodal'>
@@ -439,11 +497,11 @@
       <hr/>
       <div class='contentmodal'>
       <div class='item'>
-      <input type="checkbox" checked id="chk0">Autoindent</input>
+        Name: <input type="text" class="smol iinput" placeholder="Untitled" id="fne"></input>
       </div>
       <div class='item'>
       Indent:
-      <select id="sel0">
+      <select id="sel0" class="iinput">
         <option value="  ">2space</option>
         <option value=" ">1space</option>
         <option value="&Tab;">1tab</option>
@@ -451,7 +509,7 @@
       </div>
       <div class='item'>
       Wrap:
-      <select id="sel1">
+      <select id="sel1" class="iinput">
         <option value="nw">None</option>
         <option value="bw">Break</option>
         <option value="ww">Word</option>
@@ -459,7 +517,13 @@
       </select>
       </div>
       <div class='item'>
-        Name: <input type="text" class="smol" placeholder="Untitled" id="fne"></input>
+      <input type="checkbox" class="iinput" checked id="chk0">Autoindent</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk1">Auto-Close Parentheses</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk2">Auto-Close Quotes</input>
       </div>
       </div>
       <footer>Copyright 2024 Pacifiky. All rights reserved.<br/>Thank you Aaron for testing!</footer>
@@ -573,17 +637,16 @@
     const trig4 = document.getElementById("trig4e");
     const pref = document.getElementById("pref");
     const help = document.getElementById("helpmodal");
-    const chk0 = document.getElementById("chk0");
-    const sel0 = document.getElementById("sel0");
-    const sel1 = document.getElementById("sel1");
     const txt0 = document.getElementById("txt0e");
     const htmli = document.getElementById("htmlie");
     const cssi = document.getElementById("cssie");
     const jsin = document.getElementById("jsie");
-    const filen = document.getElementById("fne");
     const playframe = document.getElementById("playframe");
-    let inps = document.getElementsByClassName("input");
-    let nums = document.getElementsByClassName("lnnumb");
+    const prefite = pref.getElementsByClassName("contentmodal")[0].getElementsByClassName("item");
+    const prefinp = new Array(prefite.length);
+    for(let i=0;i<prefinp.length;i++){prefinp[i] = prefite[i].getElementsByClassName("iinput")[0]};
+    const inps = document.getElementsByClassName("input");
+    const nums = document.getElementsByClassName("lnnumb");
     const savechars = [":",";","!","+","=","-","Enter","Backspace","?",".",">","<","*","//","&","|"];
     var inphistory = new Array(inps.length).fill().map(()=>[[],[]]);
     const delsvg = document.getElementById("trashsvg");
@@ -756,7 +819,7 @@
       _closeLocalStorageKey(e) {e.key == "Escape" && this._closeLocalStorage(e)};
       saveTo() {
         //todo
-        let rvalue = filen.value || "Untitled"; 
+        let rvalue = prefinp[0].value || "Untitled"; 
         if(this.files == null || this.filekey == null){
           this.files = [];
           this.filekey = [];
@@ -806,24 +869,30 @@
         switch(e.data){
           case "(":
           storeHistory(i);
+          if(prefinp[4].checked){
           document.execCommand("insertText",false,")");
           inps[i].selectionStart = inps[i].selectionStart-1;
           inps[i].selectionEnd=inps[i].selectionStart;
+          }
           break;
           case "[":
           storeHistory(i);
+          if(prefinp[4].checked){
           document.execCommand("insertText",false,"]");
           inps[i].selectionStart = inps[i].selectionStart-1;
           inps[i].selectionEnd=inps[i].selectionStart;
+          }
           break;
           case "{":
           storeHistory(i);
+          if(prefinp[4].checked){
           document.execCommand("insertText",false,"}");
           inps[i].selectionStart = inps[i].selectionStart-1;
           inps[i].selectionEnd=inps[i].selectionStart;
+          }
           break;
         }
-        if(e.data == '"' || e.data == "'" || e.data == ""){
+        if((e.data == '"' || e.data == "'" || e.data == "`") && prefinp[5].checked){
           storeHistory(i);
           let orig = inps[i].selectionStart;
           inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + e.data + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
@@ -851,7 +920,7 @@
           }
           lines.push([plb,en+1]);
           for(let j=0;j<lines.length;j++){
-            let lndata = inps[i].value.substring(lines[j][0]+j*sel0.value.length,lines[j][1]+j*sel0.value.length);
+            let lndata = inps[i].value.substring(lines[j][0]+j*prefinp[1].value.length,lines[j][1]+j*prefinp[1].value.length);
             //alert(lndata);
             //inps[i].value = inps[i].value.substring(0,st) + inps[i].value.substring(en+1,inps[i].value.length);
             let oi = "";
@@ -861,15 +930,15 @@
             let eni = lndata.substring(oi.length,lndata.length);
             //let strels = spos-(st+oi.length);
             //let strele = epos-(en+oi.length);
-            oi = oi + sel0.value;
-            inps[i].value = inps[i].value.substring(0,lines[j][0]+j*sel0.value.length) + oi + eni + inps[i].value.substring((lines[j][1]+j*sel0.value.length),inps[i].value.length);
+            oi = oi + prefinp[1].value;
+            inps[i].value = inps[i].value.substring(0,lines[j][0]+j*prefinp[1].value.length) + oi + eni + inps[i].value.substring((lines[j][1]+j*prefinp[1].value.length),inps[i].value.length);
             //strels = strels < 0 ? 0 : strels;
             //inps[i].selectionStart = st + oi.length + strels;
             //alert(inps[i].selectionStart);
             //inps[i].selectionEnd = inps[i].selectionStart;
           }
-          inps[i].selectionStart = spos+sel0.value.length;
-          inps[i].selectionEnd = epos+sel0.value.length*lines.length;
+          inps[i].selectionStart = spos+prefinp[1].value.length;
+          inps[i].selectionEnd = epos+prefinp[1].value.length*lines.length;
         } else if(e.key=="Tab" && e.shiftKey){
           e.preventDefault()
           storeHistory(i);
@@ -899,15 +968,15 @@
             let eni = lndata.substring(oi.length,lndata.length);
             //let strel = spos-(st+oi.length);
             let poi = oi.length;
-            oi = oi.replace(sel0.value,"");
+            oi = oi.replace(prefinp[1].value,"");
             if(oi.length-poi==0 && j==0) foil=false;
             inps[i].value = inps[i].value.substring(0,lines[j][0]+soil) + oi + eni + inps[i].value.substring(lines[j][1]+soil,inps[i].value.length);
             soil+=oi.length-poi;
             //strel = strel < 0 ? 0 : strel;
           }
-          inps[i].selectionStart = foil ? spos-sel0.value.length : spos;
+          inps[i].selectionStart = foil ? spos-prefinp[1].value.length : spos;
           inps[i].selectionEnd = epos+soil;
-        } else if(e.key=="Enter" && chk0.checked){
+        } else if(e.key=="Enter" && prefinp[3].checked){
           e.preventDefault()
           storeHistory(i);
           let spos = st = en = inps[i].selectionStart;
@@ -922,15 +991,15 @@
             if(lndata[j]==" " || lndata[j]=="\t"){as+=lndata[j]}else{break}
           }
           if(inps[i].value[inps[i].selectionStart-1]=="{"){
-            as += sel0.value;
+            as += prefinp[1].value;
           }else if(inps[i].value[inps[i].selectionStart-1]==">" && inps[i].value[inps[i].selectionStart]=="<"){
-            as += sel0.value;
+            as += prefinp[1].value;
           }
           //check for { or } here.
           inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\n" + as + inps[i].value.substring(inps[i].selectionEnd)
           inps[i].selectionStart = spos+as.length+1;
           inps[i].selectionEnd = inps[i].selectionStart;
-        }else if(e.key=="Z" && e.ctrlKey){
+        }else if((e.key=="Z" && e.ctrlKey) || (e.key=="y" && e.ctrlKey)){
           e.preventDefault();
           if(inphistory[i][1].length > 0){
             inphistory[i][0].push([inps[i].value,inps[i].selectionStart]);
@@ -980,7 +1049,7 @@
     }
     
     function setEnv(name,html,css,js){
-      filen.value = name;
+      prefinp[0].value = name;
       htmli.value = html;
       cssi.value = css;
       jsin.value = js;
@@ -1032,7 +1101,7 @@
     }
     function intEscFullFrame(e){e.key == "Escape" && intSetFullFrame(e);}
     function savefil(){
-      dwnl(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`,filen.value == "" ? "Untitled-FrostPlayground.html" : filen.value + "-FrostPlayground.html")
+      dwnl(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`,prefinp[0].value == "" ? "Untitled-FrostPlayground.html" : prefinp[0].value + "-FrostPlayground.html")
     }
     //mar:dcm
     document.body.addEventListener("keydown", (e)=>{
@@ -1075,9 +1144,9 @@
     for(let i=0;i<pagem.length;i++){
       pagem[i].getElementsByClassName("close")[0].addEventListener("click",e=>{pagem[i].close()});
     }  
-    sel1.addEventListener("input",e=>{
+    prefinp[2].addEventListener("input",e=>{
        for(let i=0;i<inps.length;i++){
-         switch(sel1.value){
+         switch(prefinp[2].value){
          case "ww":
            inps[i].style="word-wrap:normal;"
            break;
