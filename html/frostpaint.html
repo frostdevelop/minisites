@@ -6,25 +6,74 @@
     body {
       padding: 2vh 5vw;
       color: #EEE;
-      font-family: Courier New, monospace;
       font-size: 20px;
-      /*font-family: Arial, sans-serif;*/
-      /*color-scheme: dark;*/
+      font-family: Arial, sans-serif;
+      color-scheme: dark;
       text-shadow: 0 5px 20px rgba(0,0,0,0.8);
       background: #222;
     }
-
-    input, button, textarea {
-      border: black solid 1px;
-      border-radius: 2px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.8);
-      padding: 5px;
+    :root {
+      --hover: #4f4f4f;
+      --border: 1px;
+      --radius: 45px;
+      --height: 3px;
     }
-
-    textarea {
-       height: 80vh;
-       width: 80vw;
+    
+    input,select {
+      transition: box-shadow 500ms ease, border 500ms ease;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to left top, #121212, #292929);
+      color: currentcolor;
+      font-size: 13px;
+      padding: 10px;
+      margin: 2px;
+      border: var(--border) #292929 solid;
+      border-radius: var(--radius);
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);
     }
+    
+    select {background:#222}
+    
+    input:hover,select:hover {
+      border-color: var(--hover);
+    }
+    
+    input:active,select:active,input[type="text"]:focus {
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
+      border-color: rgba(0,0,0,0);
+      background: linear-gradient(to left top, #292929, #121212);
+    }
+    input:focus,select:focus {outline:none;}
+    .button {
+      display: inline-flex;
+      flex-direction: row;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to left top, #121212, #292929);
+      color: currentColor;
+      border: var(--border) #292929 solid;
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);
+      transition: box-shadow 500ms ease, border 500ms ease;
+      font-size: 13px;
+      padding: 8px;
+      margin: 4px;
+      border-radius: var(--radius);
+      width: 140px;
+    }
+    
+    .button:hover {
+      border-color: var(--hover);
+    }
+    
+    .button:active {
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
+      border-color: rgba(0,0,0,0);
+      background: linear-gradient(to left top, #292929, #121212);
+    }
+    input[type="color"] {padding:0;}
   </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
@@ -32,15 +81,14 @@
 
 <body lang="en">
   <h1>FrostPaint</h1>
-  <h2>Draw to your heart's content!</h2>
   <div id="controls">
   <input type="text" placeholder="File Name"></input>
-  <button>Save</button>
+  <button class="button">Save</button>
   <div class="topConpaint">
     <h3 class="ioutpaint">0,0</h3>
-    <button class="iconpaint">Clear</button>
-    <button class="iconpaint">Undo</button>
-    <button class="iconpaint">Redo</button>
+    <button class="iconpaint button">Clear</button>
+    <button class="iconpaint button">Undo</button>
+    <button class="iconpaint button">Redo</button>
   </div>
   <canvas style="height:500px;width:500px;background: white;" width="500px" height="500px"></canvas>
   <div class="conpaint">
@@ -54,6 +102,26 @@
     <canvas width="50px" height="50px" style="background:white;" class="strokedisplay"></canvas>
     <input type="range" min="0" max="500" value="10" class="iconpaint"></input>
     <input type="number" value="10" min="0" max="500" class="iconpaint"></input>
+    <input type="checkbox" class="iconpaint" id="fpaintEraseToggle"></input>
+    <label for="fpaintEraseToggle">Erase</label>
+    <select class="iconpaint">
+      <option value="source-over">Normal</option>
+      <option value="screen">Screen</option>
+      <option value="multiply">Multiply</option>
+      <option value="overlay">Overlay</option>
+      <option value="darken">Darken</option>
+      <option value="lighten">Lighten</option>
+      <option value="color-dodge">Color-Dodge</option>
+      <option value="color-burn">Color-Burn</option>
+      <option value="hard-light">Hard-Light</option>
+      <option value="soft-light">Soft-Light</option>
+      <option value="difference">Difference</option>
+      <option value="exclusion">Exclusion</option>
+      <option value="hue">Hue</option>
+      <option value="saturation">Saturation</option>
+      <option value="color">Color</option>
+      <option value="luminosity">Luminosity</option>
+    </select>
   </div>
   </div>
   <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
@@ -108,7 +176,11 @@
       paint(e) {
         this.topoup[0].innerText = e.offsetX + "," + e.offsetY;
         if(this.md && Math.sqrt((e.offsetX-this.prevloc[0])**2 + (e.offsetY-this.prevloc[1])**2) > this.step){
-          try{
+          if(this.inp[9].checked){
+            this.ctx.globalCompositeOperation = "destination-out";
+          } else {
+            this.ctx.globalCompositeOperation = this.inp[10].value;
+          }
           this.prevloc = [e.offsetX,e.offsetY];
           //this.ctx.fillStyle = this.clr;
           let stroke = this.ctx.createRadialGradient(e.offsetX,e.offsetY,0,e.offsetX,e.offsetY,this.strokesize);
@@ -116,7 +188,7 @@
           stroke.addColorStop(1,this.clr+"00");
           this.ctx.fillStyle = stroke;
           this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
-          }catch(e){alert(e.stack)};
+          this.ctx.globalCompositeOperation = "source-over";
         };
         return;
       }
