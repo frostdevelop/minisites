@@ -1089,6 +1089,7 @@
       document.body.appendChild(dwnelem);
       dwnelem.click();
       dwnelem.remove();
+      URL.revokeObjectURL(dwndata);
     }
     function fulls(e) {
       document.getElementById("closebtn").addEventListener("click",intSetFullFrame);
