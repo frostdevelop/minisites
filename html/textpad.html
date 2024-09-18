@@ -118,6 +118,7 @@
       document.body.appendChild(dwnelem);
       dwnelem.click();
       dwnelem.remove();
+      URL.revokeObjectURL(dwndata);
       return;
     };
     function uploadfile(e){
