@@ -14,11 +14,12 @@
     }
     textarea {
       display: block !important;
-      width: 80vw !important;
-      height: 13vh !important;
+      width: 85vw;
+      height: 13vh;
       /*margin-bottom: -10px !important;*/
-      resize: none;
+      resize: vertical;
     }
+    input[type="number"] {padding:8px;margin:2px;width:100px}
     /*Begin PacifikyNeoDark*/
     :root {
       --hover: #4f4f4f;
@@ -83,29 +84,68 @@
     }
     /*End PacifikyNeoDark*/
   </style>
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAD1JREFUOE/tkzEKAEAMwuL/H225/QqOHexcHEIi2yY4ScEXqIMrpzLc0dzXBohKCYPi9dTBvxFluJdyXpsBMedP46L43jAAAAAASUVORK5CYII=">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
 </head>
 
 <body lang="en">
   <div id="controls">
-  <canvas width="550" height="550" class="maincanvas" style="background:white" title="550x550 canvas"></canvas>
+  <canvas width="550" height="550" class="maincanvas" style="background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jvHz58n8GIoCOjg4RqhgYGEcNxBlOo2GIM2iGQLL5//8/UTnlypUrxOWUUQNxhtNoGOLOKYM+2QAAq6xondxhvh8AAAAASUVORK5CYII=')" title="550x550 canvas"></canvas>
   <textarea type="text" placeholder='Use "ctx" for context. (Canvas 550x550)'></textarea>
   <button class="button">Run</button>
-  <button class="button">Clear</button>
+  <button class="button">Reset</button>
+  <button class="button">Download</button>
+  <button class="button">Get URL</button>
+  <button class="button">Upload</button>
+  <input type="number" title="width" min="0" value="550"></input>
+  <input type="number" title="height" min="0" value="550"></input>
   </div>
   <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
     const controls = document.getElementById("controls").children;
     const maincanv = document.getElementsByClassName("maincanvas")[0];
+    maincanv.width = controls[6].value = (document.body.offsetWidth/100)*90
+    maincanv.height = controls[7].value = (document.body.offsetHeight/100)*75
+    updtitle();
     const ctx = maincanv.getContext("2d");
-    function trig0f(e) {
-      eval("try{"+controls[1].value+"}catch(e){alert(e.stack)}");
-      return;
+    function trig0f(e) {eval("try{"+controls[1].value+"}catch(e){alert(e.stack)}")}
+    function updtitle() {
+      const text = "Canvas " + maincanv.width.toString() + "x" + maincanv.height.toString();
+      maincanv.title = text;
+      controls[1].placeholder = 'Use "ctx" for context. ('+text+')';
+    }
+    function dwnl(n,d,t="") {
+      let dwnelem = document.createElement("a");
+      dwnelem.download = n;
+      dwnelem.href = d;
+      dwnelem.type = t;
+      dwnelem.click();
+      dwnelem.remove();
+    }
+    function uploadFil() {
+      const fin = document.createElement("input");
+      fin.setAttribute("type","file");
+      fin.setAttribute("accept","image/*");
+      fin.addEventListener("change",e=>{
+        const url = URL.createObjectURL(fin.files[0])
+        let img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          ctx.drawImage(img,0,0);
+        }
+        img.src = url;
+      })
+      fin.click();
     }
     controls[2].addEventListener("click", trig0f);
-    controls[3].addEventListener("click", e=>{ctx.clearRect(0,0,maincanv.width,maincanv.height)})
-    controls[1].addEventListener("change", e=>{e.preventDefault();trig0f(e)});
+    controls[3].addEventListener("click", e=>{ctx.clearRect(0,0,maincanv.width,maincanv.height)});
+    controls[4].addEventListener("click", e=>{dwnl("Canvas.png",maincanv.toDataURL(),"image/png")});
+    controls[5].addEventListener("click", e=>{let data = new Blob([maincanv.toDataURL()]);dwnl("CanvasDATAURL.txt",URL.createObjectURL(data),"text/html");URL.revokeObjectURL(data)});
+    //controls[1].addEventListener("change", e=>{e.preventDefault();trig0f(e)});
+    controls[6].addEventListener("click",uploadFil);
+    controls[7].addEventListener("input", e=>{maincanv.width = controls[7].value;updtitle()});
+    controls[8].addEventListener("input", e=>{maincanv.height = controls[8].value;updtitle()});
   </script>
 </body>
 </html>
