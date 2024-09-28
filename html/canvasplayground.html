@@ -4,7 +4,7 @@
   <title>CanvasPlayground</title>
   <style>
     body {
-      padding: 2vh 5vw;
+      padding: 0 5vw;
       color: #EEE;
       font-size: 20px;
       font-family: Arial, sans-serif;
@@ -12,22 +12,22 @@
       text-shadow: 0 5px 20px rgba(0,0,0,0.8);
       background: #222;
     }
-
-    input, button, textarea {
-      border: black solid 1px;
-      border-radius: 2px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.8);
-      padding: 5px;
+    textarea {
+      display: block !important;
+      width: 80vw !important;
+      height: 13vh !important;
+      /*margin-bottom: -10px !important;*/
+      resize: none;
     }
     /*Begin PacifikyNeoDark*/
     :root {
       --hover: #4f4f4f;
       --border: 1px;
-      --radius: 45px;
+      --radius: 30px;
       --height: 3px;
     }
     
-    input,select {
+    input,select,textarea {
       transition: box-shadow 500ms ease, border 500ms ease;
       font-family: Arial, sans-serif;
       background: linear-gradient(to left top, #121212, #292929);
@@ -46,12 +46,12 @@
       border-color: var(--hover);
     }
     
-    input:active,select:active,input[type="text"]:focus {
+    input:active,select:active,input[type="text"]:focus,textarea:focus {
       box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
       border-color: rgba(0,0,0,0);
       background: linear-gradient(to left top, #292929, #121212);
     }
-    input:focus,select:focus {outline:none;}
+    input:focus,select:focus,textarea:focus {outline:none;}
     .button {
       display: inline-flex;
       flex-direction: row;
@@ -88,21 +88,23 @@
 </head>
 
 <body lang="en">
-  <h1>CanvasPlayground</h1>
   <div id="controls">
-  <canvas width="500px" height="500px" class="maincanvas" style="background:white"></canvas>
-  <input type="text"></input>
+  <canvas width="550" height="550" class="maincanvas" style="background:white" title="550x550 canvas"></canvas>
+  <textarea type="text" placeholder='Use "ctx" for context. (Canvas 550x550)'></textarea>
   <button class="button">Run</button>
+  <button class="button">Clear</button>
   </div>
   <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
     const controls = document.getElementById("controls").children;
-    const ctx = document.getElementsByClassName("maincanvas")[0].getContext("2d");
+    const maincanv = document.getElementsByClassName("maincanvas")[0];
+    const ctx = maincanv.getContext("2d");
     function trig0f(e) {
-      eval("try{ctx."+controls[1].value+"}catch(e){alert(e.stack)}");
+      eval("try{"+controls[1].value+"}catch(e){alert(e.stack)}");
       return;
     }
     controls[2].addEventListener("click", trig0f);
+    controls[3].addEventListener("click", e=>{ctx.clearRect(0,0,maincanv.width,maincanv.height)})
     controls[1].addEventListener("change", e=>{e.preventDefault();trig0f(e)});
   </script>
 </body>
