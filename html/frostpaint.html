@@ -92,8 +92,8 @@
     <button class="iconpaint button">Redo</button>
     <button class="iconpaint button">Upload</button>
   </div>
-  <div class="canvascont" width="500px" height="500px">
-  <canvas width="500px" height="500px"></canvas>
+  <div class="canvascont">
+  <canvas width="500" height="500" style="width:500px;height:500px;"></canvas>
   </div>
   <div class="conpaint">
     <select class="iconpaint fp-tool-select" title="Tool">
@@ -106,6 +106,7 @@
       <option value="7">Round Rect</option>
       <option value="5">Text</option>
       <option value="6">Eyedropper</option>
+      <option value="9">Box Select</option>
     </select>
     <select class="iconpaint fp-stroke-select" title="Stroke">
       <option value="0">Draw</option>
@@ -149,6 +150,10 @@
       <option value="color">Color</option>
       <option value="luminosity">Luminosity</option>
     </select>
+    <select class="iconpaint fp-rendering-selection" title="Pixel Interpolation">
+      <option value="">Bilinear</option>
+      <option value="pixelated">Nearest</option>
+    </select>
     <input type="color" class="iconpaint fp-color"></input>
     <input type="range" min="0" max="100" class="iconpaint fp-size-slide" title="Size"></input>
     <input type="number" min="0" max="500" class="iconpaint fp-size-inp"></input>
@@ -182,7 +187,9 @@
         this.ccanvas.height = this.canvas.height;
         this.ccanvas.classList.add("pabs");
         this.canvas.parentNode.appendChild(this.ccanvas);
-        this.ccanvas.style = "pointer-events:none";
+        this.ccanvas.style.pointerEvents = "none";
+        this.ccanvas.style.width = this.canvas.style.width;
+        this.ccanvas.style.height = this.canvas.style.height;
         this.curcanvas = document.createElement("canvas");
         this.curcanvas.width = this.curcanvas.height = 100;
         this.ctx = this.canvas.getContext("2d");
@@ -200,6 +207,7 @@
         this.strokectx = this.strokedisp.getContext("2d");
         this.paint = this.paint.bind(this);
         this.clear = this.clear.bind(this);
+        this.updrend = this.updrend.bind(this);
         this.updfont = this.updfont.bind(this);
         this.updstroke = this.updstroke.bind(this);
         this._checkHistory = this._checkHistory.bind(this);
@@ -215,25 +223,24 @@
         this.history = [];
         this.history2 = [];
         this.canvas.parentNode.addEventListener("mousedown",e=>{this.md = true;
-          if(this.inp_tool_select.value == "6"){
-            document.body.style.cursor = "";
-            //this.inp_tool_select.value = "0";
-            const clr = this.rgb2hex(this.ctx.getImageData(e.offsetX,e.offsetY,1,1).data);
-            this.clr = clr;
-            this.inp_color.value = clr;
-            this.updstroke();
-          }else{
-            switch(parseInt(this.inp_tool_select.value)){
-              case 0:
-              case 3:
-              case 4:
-              case 1:
-              case 2:
-              case 7:
-              case 8:
-                this.savehistory();this.prevloc = [e.offsetX,e.offsetY];this.paint(e)
-                break;
-            }
+          switch(parseInt(this.inp_tool_select.value)){
+            case 0:
+            case 3:
+            case 4:
+            case 1:
+            case 2:
+            case 7:
+            case 8:
+            case 9:
+              this.savehistory();this.prevloc = [Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width))),Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)))];this.paint(e)
+              break;
+            case 6:
+              //this.inp_tool_select.value = "0";
+              const clr = this.rgb2hex(this.ctx.getImageData(e.offsetX,e.offsetY,1,1).data);
+              this.clr = clr;
+              this.inp_color.value = clr;
+              this.updstroke();
+              break;
           }
         });
         this.canvas.parentNode.addEventListener("mousemove",this.paint);
@@ -242,12 +249,14 @@
           this.savehistory();
           this.cctx.font = this.font;
           this.cctx.fillStyle = this.clr+this.opacity.toString(16);
-          let toinput = document.createElement("input");
-          toinput.type = "text";
+          const toinput = document.createElement("textarea");
           toinput.style = "opacity:0;position:fixed;pointer-events:none;";
           document.body.appendChild(toinput);
           toinput.focus();
-          toinput.addEventListener("input",f=>{this.cctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.cctx.fillText(toinput.value,e.offsetX,e.offsetY)});
+          toinput.addEventListener("input",f=>{this.cctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+            const lines = toinput.value.split("\n");
+            for(let i=0;i<lines.length;i++){this.cctx.fillText(lines[i],Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width))),Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)))+i*this.strokesize)};
+          });
           toinput.addEventListener("focusout",f=>{this.commit(this.inp_clip_check.checked);toinput.remove()});
         }});
         if(inp2){
@@ -278,6 +287,7 @@
         this.inp_radius_inp = inp.getElementsByClassName("fp-radius-inp")[0];
         this.inp_ff_select = inp.getElementsByClassName("fp-ff-select")[0];
         this.inp_clip_check = inp.getElementsByClassName("fp-clipping-check")[0];
+        this.inp_rend_select = inp.getElementsByClassName("fp-rendering-selection")[0];
         this.inp_size_inp.value = this.inp_size_slide.value = this.strokesize.toString();
         this.inp_soft_slide.value = this.inp_soft_inp.value = this.softness.toString();
         this.inp_opac_slide.value = this.inp_opac_inp.value = this.opacity.toString();
@@ -290,22 +300,26 @@
         this.inp_soft_inp.addEventListener("input",e=>{this.inp_soft_slide.value = this.inp_soft_inp.value;this.updsoft()});
         this.inp_opac_slide.addEventListener("input",e=>{this.inp_opac_inp.value = this.inp_opac_slide.value;this.updopac()});
         this.inp_opac_inp.addEventListener("input",e=>{this.inp_opac_slide.value = this.inp_opac_inp.value;this.updopac()});
-        this.inp_step_slide.addEventListener("input",e=>{this.inp_step_inp.value = this.inp_step_slide.value;this.updstep()});
-        this.inp_step_inp.addEventListener("input",e=>{this.inp_step_slide.value = this.inp_step_inp.value;this.updstep()});
+        this.inp_step_slide.addEventListener("input",e=>{this.inp_step_inp.value = this.inp_step_slide.value = Math.max(this.inp_step_slide.value,1);this.updstep()});
+        this.inp_step_inp.addEventListener("input",e=>{this.inp_step_slide.value = this.inp_step_inp.value = Math.max(this.inp_step_inp.value,1);this.updstep()});
         this.inp_radius_slide.addEventListener("input",e=>{this.inp_radius_inp.value = this.inp_radius_slide.value;this.updrad()});
         this.inp_radius_inp.addEventListener("input",e=>{this.inp_radius_slide.value = this.inp_radius_inp.value;this.updrad()});
-        this.inp_blendmode_select.addEventListener("input",e=>{this.ccanvas.style = "mix-blend-mode:" + this.inp_blendmode_select.value});
+        this.inp_blendmode_select.addEventListener("input",e=>{this.ccanvas.style.mixBlendMode = this.inp_blendmode_select.value});
         this.inp_flipx.addEventListener("click",this.flipx);
         this.inp_flipy.addEventListener("click",this.flipy);
         this.inp_ff_select.addEventListener("input",this.updfont);
         this.inp_stroke_type.addEventListener("input",this.updstroke);
         this.inp_tool_select.addEventListener("input",this.updcursor);
+        this.inp_rend_select.addEventListener("input",this.updrend);
+        this.updrend();
         }
         document.addEventListener("keydown",this._checkHistory);
         this.updstroke();
       }
       paint(e) {
-        this.topoup[0].innerText = e.offsetX + "," + e.offsetY;
+        const realX = Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width)));
+        const realY = Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)));
+        this.topoup[0].innerText = realX + "," + realY;
         if(this.md){
           let contextused = this.cctx;
           let alphaused = 255;
@@ -317,10 +331,10 @@
                 contextused = this.ctx;
                 alphaused = this.opacity;
               }
-              if(e.offsetX==this.prevloc[0] && e.offsetY==this.prevloc[1]){
+              if(realX==this.prevloc[0] && realY==this.prevloc[1]){
                 switch(parseInt(this.inp_stroke_type.value)){
                   case 0:
-                    let stroke = contextused.createRadialGradient(e.offsetX,e.offsetY,0,e.offsetX,e.offsetY,this.strokesize);
+                    let stroke = contextused.createRadialGradient(realX,realY,0,realX,realY,this.strokesize);
                     stroke.addColorStop(1-this.softness,this.clr+alphaused.toString(16).padEnd(2,"0"));
                     stroke.addColorStop(1,this.clr+"00");
                     contextused.fillStyle = stroke;
@@ -328,12 +342,12 @@
                     break;
                   case 1:
                     contextused.fillStyle = this.clr;
-                    contextused.fillRect(e.offsetX-this.strokesize/2,e.offsetY-this.strokesize/2,this.strokesize,this.strokesize);
+                    contextused.fillRect(realX-this.strokesize/2,realY-this.strokesize/2,this.strokesize,this.strokesize);
                     break;
                   case 2:
                     contextused.fillStyle = this.clr;
                     contextused.beginPath();
-                    contextused.arc(e.offsetX,e.offsetY,this.strokesize,0,2*Math.PI);
+                    contextused.arc(realX,realY,this.strokesize,0,2*Math.PI);
                     contextused.fill();
                     contextused.closePath();
                     break;
@@ -346,7 +360,7 @@
                 //add to ploc
                 //set ploc to last stroke.
                 if(this.inp_stroke_select.value == "1"){contextused.clearRect(0,0,this.canvas.width,this.canvas.height)};
-                let nvect = [e.offsetX-this.prevloc[0],e.offsetY-this.prevloc[1]];
+                let nvect = [realX-this.prevloc[0],realY-this.prevloc[1]];
                 const dist = Math.sqrt(nvect[0]**2 + nvect[1]**2);
                 nvect = nvect.map(i=>i/dist);
                 const amountofstep = Math.floor(dist/this.step);
@@ -379,19 +393,19 @@
             case 1:
               contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
               contextused.fillStyle = this.clr;
-              contextused.fillRect(this.prevloc[0],this.prevloc[1],e.offsetX-this.prevloc[0],e.offsetY-this.prevloc[1]);
+              contextused.fillRect(this.prevloc[0],this.prevloc[1],realX-this.prevloc[0],realY-this.prevloc[1]);
               break;
             case 4:
               contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
               contextused.fillStyle = this.clr;
-              const widthused = Math.max(e.offsetX-this.prevloc[0],e.offsetY-this.prevloc[1]);
+              const widthused = Math.max(realX-this.prevloc[0],realY-this.prevloc[1]);
               contextused.fillRect(this.prevloc[0],this.prevloc[1],widthused,widthused);
               break;
             case 2:
               contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
               contextused.fillStyle = this.clr;
               contextused.beginPath();
-              contextused.ellipse(this.prevloc[0],this.prevloc[1],Math.abs(e.offsetX-this.prevloc[0]),Math.abs(e.offsetY-this.prevloc[1]),0,0,Math.PI*2);
+              contextused.ellipse(this.prevloc[0],this.prevloc[1],Math.abs(realX-this.prevloc[0]),Math.abs(realY-this.prevloc[1]),0,0,Math.PI*2);
               contextused.fill();
               contextused.closePath();
               break;
@@ -399,7 +413,7 @@
               contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
               contextused.fillStyle = this.clr;
               contextused.beginPath();
-              contextused.arc(this.prevloc[0],this.prevloc[1],Math.max(e.offsetX-this.prevloc[0],e.offsetY-this.prevloc[1]),0,Math.PI*2);
+              contextused.arc(this.prevloc[0],this.prevloc[1],Math.max(realX-this.prevloc[0],realY-this.prevloc[1]),0,Math.PI*2);
               contextused.fill();
               contextused.closePath();
               break;
@@ -407,9 +421,14 @@
               contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
               contextused.fillStyle = this.clr;
               contextused.beginPath();
-              contextused.roundRect(this.prevloc[0],this.prevloc[1],e.offsetX-this.prevloc[0],e.offsetY-this.prevloc[1],this.radius);
+              contextused.roundRect(this.prevloc[0],this.prevloc[1],realX-this.prevloc[0],realY-this.prevloc[1],this.radius);
               contextused.fill();
               contextused.closePath();
+              break;
+            case 9:
+              contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
+              contextused.strokeStyle = this.clr;
+              contextused.strokeRect(this.prevloc[0],this.prevloc[1],realX-this.prevloc[0],realY-this.prevloc[1]);
               break;
           }
           this.ctx.globalCompositeOperation = "source-over";
@@ -450,6 +469,7 @@
       updstroke() {
         this.strokectx.clearRect(0,0,this.strokedisp.width,this.strokedisp.height);
         this.curctx.clearRect(0,0,100,100);
+        const realstroke = Math.floor(this.strokesize*(parseInt(this.canvas.style.height)/this.canvas.height));
         switch(parseInt(this.inp_stroke_type.value)){
           case 0:
             let stroke = this.strokectx.createRadialGradient(25,25,0,25,25,20);
@@ -458,7 +478,7 @@
             this.strokectx.fillStyle = stroke;
             this.strokectx.fillRect(0,0,this.strokedisp.width,this.strokedisp.height);
             /*
-            let curstroke = this.curctx.createRadialGradient(50,50,0,50,50,this.strokesize);
+            let curstroke = this.curctx.createRadialGradient(50,50,0,50,50,realstroke);
             curstroke.addColorStop(1-this.softness,this.clr+this.opacity.toString(16));
             curstroke.addColorStop(1,this.clr+"00");
             this.curctx.fillStyle = curstroke;
@@ -466,7 +486,7 @@
             */
             this.curctx.strokeStyle = this.clr+this.opacity.toString(16);
             this.curctx.beginPath();
-            this.curctx.arc(50,50,this.strokesize,0,2*Math.PI);
+            this.curctx.arc(50,50,realstroke,0,2*Math.PI);
             this.curctx.stroke();
             this.curctx.closePath();
             break;
@@ -474,7 +494,7 @@
             this.strokectx.fillStyle = this.clr+this.opacity.toString(16);
             this.strokectx.fillRect(25-15,25-15,30,30);
             this.curctx.strokeStyle = this.clr+this.opacity.toString(16);
-            this.curctx.strokeRect(50-this.strokesize/2,50-this.strokesize/2,this.strokesize,this.strokesize);
+            this.curctx.strokeRect(50-realstroke/2,50-realstroke/2,realstroke,realstroke);
             break;
           case 2:
             this.strokectx.fillStyle = this.clr+this.opacity.toString(16);
@@ -484,13 +504,14 @@
             this.strokectx.closePath();
             this.curctx.strokeStyle = this.clr+this.opacity.toString(16);
             this.curctx.beginPath();
-            this.curctx.arc(50,50,this.strokesize,0,2*Math.PI);
+            this.curctx.arc(50,50,realstroke,0,2*Math.PI);
             this.curctx.stroke();
             this.curctx.closePath();
             break;
         }
         this.updcursor();
       }
+      updrend() {this.canvas.style.imageRendering = this.ccanvas.style.imageRendering = this.inp_rend_select.value};
       updsoft() {
         this.softness = parseFloat(this.inp_soft_inp.value);
         this.updstroke();
@@ -523,6 +544,7 @@
           case 4:
           case 7:
           case 8:
+          case 9:
             this.canvas.parentNode.style.cursor = "crosshair";
             break;
           case 5:
