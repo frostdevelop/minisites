@@ -4,7 +4,7 @@
   <title>FrostPaint</title>
   <style>
     body {
-      padding: 2vh 5vw;
+      padding: 0 5vw;
       color: #EEE;
       font-size: 20px;
       font-family: Arial, sans-serif;
@@ -12,6 +12,7 @@
       text-shadow: 0 5px 20px rgba(0,0,0,0.8);
       background: #222;
     }
+    /*Begin PacifikyNeoDark*/
     :root {
       --hover: #4f4f4f;
       --border: 1px;
@@ -73,8 +74,9 @@
       border-color: rgba(0,0,0,0);
       background: linear-gradient(to left top, #292929, #121212);
     }
+    /*End PacifikyNeoDark*/
     .pabs {position:absolute;top:0;left:0;}
-    .canvascont {display: inline-block; background: white;position:relative;width:500px;height:500px}
+    .canvascont {display: inline-block; background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jvHz58n8GIoCOjg4RqhgYGEcNxBlOo2GIM2iGQLL5//8/UTnlypUrxOWUUQNxhtNoGOLOKYM+2QAAq6xondxhvh8AAAAASUVORK5CYII=");position:relative;width:500px;height:500px}
     input[type="color"] {padding:0;}
   </style>
   <meta charset="utf-8">
@@ -82,10 +84,7 @@
 </head>
 
 <body lang="en">
-  <h1>FrostPaint</h1>
   <div id="controls">
-  <input type="text" placeholder="File Name"></input>
-  <button class="button">Save</button>
   <div class="topConpaint">
     <h3 class="ioutpaint">0,0</h3>
     <button class="iconpaint button">Clear</button>
@@ -101,13 +100,36 @@
       <option value="0">Paint</option>
       <option value="3">Erase</option>
       <option value="1">Rectangle</option>
-      <option value="2">Circle</option>
       <option value="4">Square</option>
+      <option value="2">Elipse</option>
+      <option value="8">Circle</option>
+      <option value="7">Round Rect</option>
       <option value="5">Text</option>
+      <option value="6">Eyedropper</option>
     </select>
     <select class="iconpaint fp-stroke-select" title="Stroke">
       <option value="0">Draw</option>
       <option value="1">Line</option>
+      <option value="2">Blob</option>
+    </select>
+    <select class="iconpaint fp-stroke-type-s" title="Stroke">
+      <option value="0">Soft Circle</option>
+      <option value="2">Circle</option>
+      <option value="1">Square</option>
+    </select>
+    <select class="iconpaint fp-ff-select" title="Font">
+      <option value="sans-serif">Sans-serif</option>
+      <option value="serif">Serif</option>
+      <option value="monospace">Monospace</option>
+      <option value="cursive">Cursive</option>
+      <option value="Arial">Arial</option>
+      <option value="Verdana">Verdana</option>
+      <option value="Tahoma">Tahoma</option>
+      <option value="Times New Roman">Times NR</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Garamond">Garamond</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Brush Script MT">Brush S MT</option>
     </select>
     <select class="iconpaint fp-blendmode-select" title="Blend mode">
       <option value="source-over">Normal</option>
@@ -137,11 +159,14 @@
     <canvas width="50px" height="50px" style="background:white;" class="strokedisplay"></canvas>
     <input type="range" min="1" max="100" class="iconpaint fp-step-slide" title="Step"></input>
     <input type="number" min="1" max="500" class="iconpaint fp-step-inp"></input>
-    <input type="checkbox" class="iconpaint fp-eyedrop-check" id="fpaintEyeDropper"></input>
-    <label for="fpaintEyeDropper">Eyedropper</label>
+    <input type="range" min="0" max="50" class="iconpaint fp-radius-slide" title="Radius"></input>
+    <input type="number" min="0" max="500" class="iconpaint fp-radius-inp"></input>
     <button class="iconpaint button fp-flipx">FlipX</button>
     <button class="iconpaint button fp-flipy">FlipY</button>
   </div>
+  <input type="text" placeholder="File Name" class="filnameinp"></input>
+  <button class="button fildwnbtn">Save</button>
+  <button class="button urlopenbtn">URL</button>
   </div>
   <footer>Tested by Ayden<br/>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
@@ -156,8 +181,11 @@
         this.ccanvas.classList.add("pabs");
         this.canvas.parentNode.appendChild(this.ccanvas);
         this.ccanvas.style = "pointer-events:none";
+        this.curcanvas = document.createElement("canvas");
+        this.curcanvas.width = this.curcanvas.height = 100;
         this.ctx = this.canvas.getContext("2d");
         this.cctx = this.ccanvas.getContext("2d");
+        this.curctx = this.curcanvas.getContext("2d");
         this.clr = "#000000";
         this.md = false;
         this.softness = 1.0;
@@ -165,12 +193,17 @@
         this.strokesize = 30;
         this.strokedisp = inp.getElementsByClassName("strokedisplay")[0];
         this.step = 10;
+        this.radius = 20;
+        this.font = "30px sans-serif";
         this.strokectx = this.strokedisp.getContext("2d");
         this.paint = this.paint.bind(this);
         this.clear = this.clear.bind(this);
+        this.updfont = this.updfont.bind(this);
+        this.updstroke = this.updstroke.bind(this);
         this._checkHistory = this._checkHistory.bind(this);
         this.loadhistory2 = this.loadhistory2.bind(this);
         this.loadhistory = this.loadhistory.bind(this);
+        this.updcursor = this.updcursor.bind(this);
         this.savehistory = this.savehistory.bind(this);
         this.flipx = this.flipx.bind(this);
         this.flipy = this.flipy.bind(this);
@@ -180,25 +213,40 @@
         this.history = [];
         this.history2 = [];
         this.canvas.parentNode.addEventListener("mousedown",e=>{this.md = true;
-          switch(parseInt(this.inp_tool_select.value)){
-            case 0:
-            case 3:
-            case 1:
-              if(this.inp_eyedrop_check.checked){
-                document.body.style.cursor = "";
-                this.inp_eyedrop_check.checked = false;
-                const clr = this.rgb2hex(this.ctx.getImageData(e.offsetX,e.offsetY,1,1).data);
-                this.clr = clr;
-                this.inp_color.value = clr;
-                this.updstroke();
-              }else{this.savehistory();this.prevloc = [e.offsetX,e.offsetY];this.paint(e)}
-              break;
-            case 2:
-              break;
+          if(this.inp_tool_select.value == "6"){
+            document.body.style.cursor = "";
+            //this.inp_tool_select.value = "0";
+            const clr = this.rgb2hex(this.ctx.getImageData(e.offsetX,e.offsetY,1,1).data);
+            this.clr = clr;
+            this.inp_color.value = clr;
+            this.updstroke();
+          }else{
+            switch(parseInt(this.inp_tool_select.value)){
+              case 0:
+              case 3:
+              case 4:
+              case 1:
+              case 2:
+              case 7:
+              case 8:
+                this.savehistory();this.prevloc = [e.offsetX,e.offsetY];this.paint(e)
+                break;
+            }
           }
         });
-        this.canvas.parentNode.addEventListener("mousemove",this.paint)
-        this.canvas.parentNode.addEventListener("mouseup",e=>{this.md = false;this.commit()});
+        this.canvas.parentNode.addEventListener("mousemove",this.paint);
+        this.canvas.parentNode.addEventListener("mouseup",e=>{this.md = false;if(!(this.inp_tool_select.value=="5")){this.commit()}});
+        this.canvas.parentNode.addEventListener("click", e=>{if(this.inp_tool_select.value=="5"){
+          this.cctx.font = this.font;
+          this.cctx.fillStyle = this.clr+this.opacity.toString(16);
+          let toinput = document.createElement("input");
+          toinput.type = "text";
+          toinput.style = "opacity:0;position:fixed;pointer-events:none;";
+          document.body.appendChild(toinput);
+          toinput.focus();
+          toinput.addEventListener("input",f=>{this.cctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.cctx.fillText(toinput.value,e.offsetX,e.offsetY)});
+          toinput.addEventListener("focusout",f=>{this.commit();toinput.remove()});
+        }});
         if(inp2){
         this.topinp = inp2.getElementsByClassName("iconpaint");
         this.topoup = inp2.getElementsByClassName("ioutpaint");
@@ -219,27 +267,35 @@
         this.inp_step_slide = inp.getElementsByClassName("fp-step-slide")[0];
         this.inp_step_inp = inp.getElementsByClassName("fp-step-inp")[0];
         this.inp_blendmode_select = inp.getElementsByClassName("fp-blendmode-select")[0];
-        this.inp_eyedrop_check = inp.getElementsByClassName("fp-eyedrop-check")[0];
         this.inp_flipx = inp.getElementsByClassName("fp-flipx")[0];
         this.inp_flipy = inp.getElementsByClassName("fp-flipy")[0];
         this.inp_stroke_select = inp.getElementsByClassName("fp-stroke-select")[0];
+        this.inp_stroke_type = inp.getElementsByClassName("fp-stroke-type-s")[0];
+        this.inp_radius_slide = inp.getElementsByClassName("fp-radius-slide")[0];
+        this.inp_radius_inp = inp.getElementsByClassName("fp-radius-inp")[0];
+        this.inp_ff_select = inp.getElementsByClassName("fp-ff-select")[0];
         this.inp_size_inp.value = this.inp_size_slide.value = this.strokesize.toString();
         this.inp_soft_slide.value = this.inp_soft_inp.value = this.softness.toString();
         this.inp_opac_slide.value = this.inp_opac_inp.value = this.opacity.toString();
         this.inp_step_slide.value = this.inp_step_inp.value = this.step.toString();
-        this.inp_eyedrop_check.addEventListener("input",this.actEyedrop);
+        this.inp_radius_inp.value = this.inp_radius_slide.value = this.radius.toString();
         this.inp_color.addEventListener("input",e=>{this.clr = this.inp_color.value;this.updstroke();})
-        this.inp_size_slide.addEventListener("input",e=>{this.inp_size_inp.value = this.inp_size_slide.value;this.updsize()});
-        this.inp_size_inp.addEventListener("input",e=>{this.inp_size_slide.value = this.inp_size_inp.value;this.updsize()});
+        this.inp_size_slide.addEventListener("input",e=>{this.inp_size_inp.value = this.inp_size_slide.value;this.updsize();this.updfont()});
+        this.inp_size_inp.addEventListener("input",e=>{this.inp_size_slide.value = this.inp_size_inp.value;this.updsize();this.updfont()});
         this.inp_soft_slide.addEventListener("input",e=>{this.inp_soft_inp.value = this.inp_soft_slide.value;this.updsoft()});
         this.inp_soft_inp.addEventListener("input",e=>{this.inp_soft_slide.value = this.inp_soft_inp.value;this.updsoft()});
         this.inp_opac_slide.addEventListener("input",e=>{this.inp_opac_inp.value = this.inp_opac_slide.value;this.updopac()});
         this.inp_opac_inp.addEventListener("input",e=>{this.inp_opac_slide.value = this.inp_opac_inp.value;this.updopac()});
         this.inp_step_slide.addEventListener("input",e=>{this.inp_step_inp.value = this.inp_step_slide.value;this.updstep()});
         this.inp_step_inp.addEventListener("input",e=>{this.inp_step_slide.value = this.inp_step_inp.value;this.updstep()});
+        this.inp_radius_slide.addEventListener("input",e=>{this.inp_radius_inp.value = this.inp_radius_slide.value;this.updrad()});
+        this.inp_radius_inp.addEventListener("input",e=>{this.inp_radius_slide.value = this.inp_radius_inp.value;this.updrad()});
         this.inp_blendmode_select.addEventListener("input",e=>{this.ccanvas.style = "mix-blend-mode:" + this.inp_blendmode_select.value});
-        this.inp_flipx.addEventListener("click",this.flipx)
-        this.inp_flipy.addEventListener("click",this.flipy)
+        this.inp_flipx.addEventListener("click",this.flipx);
+        this.inp_flipy.addEventListener("click",this.flipy);
+        this.inp_ff_select.addEventListener("input",this.updfont);
+        this.inp_stroke_type.addEventListener("input",this.updstroke);
+        this.inp_tool_select.addEventListener("input",this.updcursor);
         }
         document.addEventListener("keydown",this._checkHistory);
         this.updstroke();
@@ -258,11 +314,26 @@
                 alphaused = this.opacity;
               }
               if(e.offsetX==this.prevloc[0] && e.offsetY==this.prevloc[1]){
-                let stroke = contextused.createRadialGradient(e.offsetX,e.offsetY,0,e.offsetX,e.offsetY,this.strokesize);
-                stroke.addColorStop(1-this.softness,this.clr+alphaused.toString(16).padEnd(2,"0"));
-                stroke.addColorStop(1,this.clr+"00");
-                contextused.fillStyle = stroke;
-                contextused.fillRect(0,0,this.canvas.width,this.canvas.height);
+                switch(parseInt(this.inp_stroke_type.value)){
+                  case 0:
+                    let stroke = contextused.createRadialGradient(e.offsetX,e.offsetY,0,e.offsetX,e.offsetY,this.strokesize);
+                    stroke.addColorStop(1-this.softness,this.clr+alphaused.toString(16).padEnd(2,"0"));
+                    stroke.addColorStop(1,this.clr+"00");
+                    contextused.fillStyle = stroke;
+                    contextused.fillRect(0,0,this.canvas.width,this.canvas.height);
+                    break;
+                  case 1:
+                    contextused.fillStyle = this.clr;
+                    contextused.fillRect(e.offsetX-this.strokesize/2,e.offsetY-this.strokesize/2,this.strokesize,this.strokesize);
+                    break;
+                  case 2:
+                    contextused.fillStyle = this.clr;
+                    contextused.beginPath();
+                    contextused.arc(e.offsetX,e.offsetY,this.strokesize,0,2*Math.PI);
+                    contextused.fill();
+                    contextused.closePath();
+                    break;
+                }
               } else {
                 //intdiv dist by 5 
                 //for the amount of 5ves go into the dist.
@@ -270,18 +341,34 @@
                 //use ^ var then mult by index (start at 1 on for loop)
                 //add to ploc
                 //set ploc to last stroke.
+                if(this.inp_stroke_select.value == "1"){contextused.clearRect(0,0,this.canvas.width,this.canvas.height)};
                 let nvect = [e.offsetX-this.prevloc[0],e.offsetY-this.prevloc[1]];
                 const dist = Math.sqrt(nvect[0]**2 + nvect[1]**2);
                 nvect = nvect.map(i=>i/dist);
                 const amountofstep = Math.floor(dist/this.step);
                 for(let i=1;i<=amountofstep;i++){
                   const npos = [this.prevloc[0]+nvect[0]*(this.step*i),this.prevloc[1]+nvect[1]*(this.step*i)];
-                  let stroke = contextused.createRadialGradient(npos[0],npos[1],0,npos[0],npos[1],this.strokesize);
-                  stroke.addColorStop(1-this.softness,this.clr+alphaused.toString(16).padEnd(2,"0"));
-                  stroke.addColorStop(1,this.clr+"00");
-                  contextused.fillStyle = stroke;
-                  contextused.fillRect(0,0,this.canvas.width,this.canvas.height);
-                  if(i==amountofstep){this.prevloc = npos};
+                  switch(parseInt(this.inp_stroke_type.value)){
+                    case 0:
+                      let stroke = contextused.createRadialGradient(npos[0],npos[1],0,npos[0],npos[1],this.strokesize);
+                      stroke.addColorStop(1-this.softness,this.clr+alphaused.toString(16).padEnd(2,"0"));
+                      stroke.addColorStop(1,this.clr+"00");
+                      contextused.fillStyle = stroke;
+                      contextused.fillRect(0,0,this.canvas.width,this.canvas.height);
+                      break;
+                    case 1:
+                      contextused.fillStyle = this.clr;
+                      contextused.fillRect(npos[0]-this.strokesize/2,npos[1]-this.strokesize/2,this.strokesize,this.strokesize);
+                      break;
+                    case 2:
+                      contextused.fillStyle = this.clr;
+                      contextused.beginPath();
+                      contextused.arc(npos[0],npos[1],this.strokesize,0,2*Math.PI);
+                      contextused.fill();
+                      contextused.closePath();
+                      break;
+                  }
+                  if(i==amountofstep && this.inp_stroke_select.value == "0"){this.prevloc = npos};
                 }
               }
               break;
@@ -290,20 +377,44 @@
               contextused.fillStyle = this.clr;
               contextused.fillRect(this.prevloc[0],this.prevloc[1],e.offsetX-this.prevloc[0],e.offsetY-this.prevloc[1]);
               break;
+            case 4:
+              contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
+              contextused.fillStyle = this.clr;
+              const widthused = Math.max(e.offsetX-this.prevloc[0],e.offsetY-this.prevloc[1]);
+              contextused.fillRect(this.prevloc[0],this.prevloc[1],widthused,widthused);
+              break;
+            case 2:
+              contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
+              contextused.fillStyle = this.clr;
+              contextused.beginPath();
+              contextused.ellipse(this.prevloc[0],this.prevloc[1],Math.abs(e.offsetX-this.prevloc[0]),Math.abs(e.offsetY-this.prevloc[1]),0,0,Math.PI*2);
+              contextused.fill();
+              contextused.closePath();
+              break;
+            case 8:
+              contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
+              contextused.fillStyle = this.clr;
+              contextused.beginPath();
+              contextused.arc(this.prevloc[0],this.prevloc[1],Math.max(e.offsetX-this.prevloc[0],e.offsetY-this.prevloc[1]),0,Math.PI*2);
+              contextused.fill();
+              contextused.closePath();
+              break;
+            case 7:
+              contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
+              contextused.fillStyle = this.clr;
+              contextused.beginPath();
+              contextused.roundRect(this.prevloc[0],this.prevloc[1],e.offsetX-this.prevloc[0],e.offsetY-this.prevloc[1],this.radius);
+              contextused.fill();
+              contextused.closePath();
+              break;
           }
           this.ctx.globalCompositeOperation = "source-over";
         };
         return;
       }
-      hex2rgb(s) {
-        return [parseInt(s.substring(1,3),16),parseInt(s.substring(3,5),16),parseInt(ss.substring(5,7),16)]
-      }
-      rgb2hex(a) {
-        return "#" + a[0].toString(16).padEnd(2,"0") + a[1].toString(16).padEnd(2,"0") + a[2].toString(16).padEnd(2,"0");
-      }
-      clear(e) {
-        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
-      }
+      hex2rgb(s) {return [parseInt(s.substring(1,3),16),parseInt(s.substring(3,5),16),parseInt(ss.substring(5,7),16)]}
+      rgb2hex(a) {return "#" + a[0].toString(16).padStart(2,"0") + a[1].toString(16).padStart(2,"0") + a[2].toString(16).padStart(2,"0")}
+      clear(e) {this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)}
       flipx(e) {
         this.savehistory();
         const oimg = this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height);
@@ -333,13 +444,48 @@
         return;
       }
       updstroke() {
-        this.strokectx.fillStyle = "#FFFFFF";
-        this.strokectx.fillRect(0,0,this.strokedisp.width,this.strokedisp.height);
-        let stroke = this.strokectx.createRadialGradient(25,25,0,25,25,20);
-        stroke.addColorStop(1-this.softness,this.clr+this.opacity.toString(16));
-        stroke.addColorStop(1,this.clr+"00");
-        this.strokectx.fillStyle = stroke;
-        this.strokectx.fillRect(0,0,this.strokedisp.width,this.strokedisp.height);
+        this.strokectx.clearRect(0,0,this.strokedisp.width,this.strokedisp.height);
+        this.curctx.clearRect(0,0,100,100);
+        switch(parseInt(this.inp_stroke_type.value)){
+          case 0:
+            let stroke = this.strokectx.createRadialGradient(25,25,0,25,25,20);
+            stroke.addColorStop(1-this.softness,this.clr+this.opacity.toString(16));
+            stroke.addColorStop(1,this.clr+"00");
+            this.strokectx.fillStyle = stroke;
+            this.strokectx.fillRect(0,0,this.strokedisp.width,this.strokedisp.height);
+            /*
+            let curstroke = this.curctx.createRadialGradient(50,50,0,50,50,this.strokesize);
+            curstroke.addColorStop(1-this.softness,this.clr+this.opacity.toString(16));
+            curstroke.addColorStop(1,this.clr+"00");
+            this.curctx.fillStyle = curstroke;
+            this.curctx.fillRect(0,0,100,100);
+            */
+            this.curctx.strokeStyle = this.clr+this.opacity.toString(16);
+            this.curctx.beginPath();
+            this.curctx.arc(50,50,this.strokesize,0,2*Math.PI);
+            this.curctx.stroke();
+            this.curctx.closePath();
+            break;
+          case 1:
+            this.strokectx.fillStyle = this.clr+this.opacity.toString(16);
+            this.strokectx.fillRect(25-15,25-15,30,30);
+            this.curctx.strokeStyle = this.clr+this.opacity.toString(16);
+            this.curctx.strokeRect(50-this.strokesize/2,50-this.strokesize/2,this.strokesize,this.strokesize);
+            break;
+          case 2:
+            this.strokectx.fillStyle = this.clr+this.opacity.toString(16);
+            this.strokectx.beginPath();
+            this.strokectx.arc(25,25,20,0,2*Math.PI);
+            this.strokectx.fill();
+            this.strokectx.closePath();
+            this.curctx.strokeStyle = this.clr+this.opacity.toString(16);
+            this.curctx.beginPath();
+            this.curctx.arc(50,50,this.strokesize,0,2*Math.PI);
+            this.curctx.stroke();
+            this.curctx.closePath();
+            break;
+        }
+        this.updcursor();
       }
       updsoft() {
         this.softness = parseFloat(this.inp_soft_slide.value);
@@ -347,6 +493,7 @@
       }
       updsize() {
         this.strokesize = parseInt(this.inp_size_slide.value);
+        this.updstroke();
       }
       updopac() {
         this.opacity = parseInt(this.inp_opac_slide.value);
@@ -355,6 +502,36 @@
       }
       updstep() {
         this.step = parseInt(this.inp_step_inp.value);
+      }
+      updrad() {
+        this.radius = parseInt(this.inp_radius_slide.value);
+      }
+      updfont() {
+        this.font = this.inp_size_slide.value+"px"+" "+this.inp_ff_select.value;
+      }
+      updcursor() {
+        switch(parseInt(this.inp_tool_select.value)){
+          case 6:
+            this.canvas.parentNode.style.cursor = 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAATxJREFUSEutluFtwjAQhb9swAhsUNgANmCDlg3KBmxAOwEwATBB6QQtE8AG0A3qh3ySFcWxneSkKD8Sf8/37i5OxbCx8LijYase/AnwBQh2Al4BE/gF5sCjq4DBRy0b3AHLLgJjv3PdU9FZ4Joi++edBLT2HdgkRG6uNtM+Fn37wsZ0lsCuVMD8/wQ+gDdgG1HQ81WJgMH3DrgOoG0iVa5ADC4dteqPs6PeVdkWpeAaNg2aimp2PeFST2WQCzfLZt66c86nohTeWOtYBoPAYxYNBm8SyIFrwDTJWRFalAO/+OHKgocZtMH13sFN5V8pPBTQ17E+obZL9bYy1cQWhxaqd9XH1sMhpBfcMlDBZFG9cL3hJqAzVddztH0MAjeBuz+gZdGLE9N5W9wtseKoBhJQqMj6G7CruKBNC/4BCYpO6UFp88AAAAAASUVORK5CYII=") 0 36,pointer';
+            break;
+          case 1:
+          case 2:
+          case 4:
+          case 7:
+          case 8:
+            this.canvas.parentNode.style.cursor = "crosshair";
+            break;
+          case 5:
+            this.canvas.parentNode.style.cursor = "text";
+            break;
+          case 0:
+          case 3:
+            this.canvas.parentNode.style.cursor = 'url("'+this.curcanvas.toDataURL()+'") 50 50,default';
+            break;
+          default:
+            this.canvas.parentNode.style.cursor = "default";
+            break;
+        }
       }
       savehistory() {
         this.history.push(this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height));
@@ -409,18 +586,29 @@
         document.body.style.cursor = "pointer";
       }
     }
-    const controls = document.getElementById("controls").children;
+    const controls = document.getElementById("controls");
     //try{
     let painter = new fpaint(document.getElementById("controls").getElementsByClassName("canvascont")[0].children[0],document.getElementById("controls").getElementsByClassName("conpaint")[0],document.getElementById("controls").getElementsByClassName("topConpaint")[0]);
     //}catch(e){alert(e)}
     function trig0f(e) {
       let dwnlin = document.createElement('a');
-      dwnlin.download = (controls[0].value || "Untitled") + ".png";
+      dwnlin.download = (controls.getElementsByClassName("filnameinp")[0].value || "Untitled") + "-FrostPaint.png";
       dwnlin.href = painter.canvas.toDataURL();
       dwnlin.click();
+      dwnlin.remove();
       return;
     }
-    controls[1].addEventListener("click", trig0f);
+    function trig1f(e) {
+      let dwnelem = document.createElement("a");
+      dwnelem.download = (controls.getElementsByClassName("filnameinp")[0].value || "Untitled") + "-FPURL.txt";
+      let dwndata = new Blob([painter.canvas.toDataURL()]);
+      dwnelem.href = URL.createObjectURL(dwndata);
+      dwnelem.click();
+      dwnelem.remove();
+      return;
+    }
+    controls.getElementsByClassName("fildwnbtn")[0].addEventListener("click", trig0f);
+    controls.getElementsByClassName("urlopenbtn")[0].addEventListener("click", trig1f);
   </script>
 </body>
 </html>
