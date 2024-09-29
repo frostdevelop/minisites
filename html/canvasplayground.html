@@ -105,7 +105,7 @@
   <script>
     const controls = document.getElementById("controls").children;
     const maincanv = document.getElementsByClassName("maincanvas")[0];
-    maincanv.width = controls[6].value = (document.body.offsetWidth/100)*90
+    maincanv.width = controls[6].value = controls[1].offsetWidth;
     maincanv.height = controls[7].value = (document.body.offsetHeight/100)*75
     updtitle();
     const ctx = maincanv.getContext("2d");
