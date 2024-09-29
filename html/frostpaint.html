@@ -161,6 +161,8 @@
     <input type="number" min="1" max="500" class="iconpaint fp-step-inp"></input>
     <input type="range" min="0" max="50" class="iconpaint fp-radius-slide" title="Radius"></input>
     <input type="number" min="0" max="500" class="iconpaint fp-radius-inp"></input>
+    <input type="checkbox" id="fpclipcheckbox" class="fp-clipping-check" title="Clip mask"></input>
+    <label for="fpclipcheckbox">Clipping mask</label>
     <button class="iconpaint button fp-flipx">FlipX</button>
     <button class="iconpaint button fp-flipy">FlipY</button>
   </div>
@@ -235,8 +237,9 @@
           }
         });
         this.canvas.parentNode.addEventListener("mousemove",this.paint);
-        this.canvas.parentNode.addEventListener("mouseup",e=>{this.md = false;if(!(this.inp_tool_select.value=="5")){this.commit()}});
+        this.canvas.parentNode.addEventListener("mouseup",e=>{this.md = false;if(!(this.inp_tool_select.value=="5")){this.commit(this.inp_clip_check.checked)}});
         this.canvas.parentNode.addEventListener("click", e=>{if(this.inp_tool_select.value=="5"){
+          this.savehistory();
           this.cctx.font = this.font;
           this.cctx.fillStyle = this.clr+this.opacity.toString(16);
           let toinput = document.createElement("input");
@@ -245,7 +248,7 @@
           document.body.appendChild(toinput);
           toinput.focus();
           toinput.addEventListener("input",f=>{this.cctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.cctx.fillText(toinput.value,e.offsetX,e.offsetY)});
-          toinput.addEventListener("focusout",f=>{this.commit();toinput.remove()});
+          toinput.addEventListener("focusout",f=>{this.commit(this.inp_clip_check.checked);toinput.remove()});
         }});
         if(inp2){
         this.topinp = inp2.getElementsByClassName("iconpaint");
@@ -274,6 +277,7 @@
         this.inp_radius_slide = inp.getElementsByClassName("fp-radius-slide")[0];
         this.inp_radius_inp = inp.getElementsByClassName("fp-radius-inp")[0];
         this.inp_ff_select = inp.getElementsByClassName("fp-ff-select")[0];
+        this.inp_clip_check = inp.getElementsByClassName("fp-clipping-check")[0];
         this.inp_size_inp.value = this.inp_size_slide.value = this.strokesize.toString();
         this.inp_soft_slide.value = this.inp_soft_inp.value = this.softness.toString();
         this.inp_opac_slide.value = this.inp_opac_inp.value = this.opacity.toString();
@@ -488,15 +492,15 @@
         this.updcursor();
       }
       updsoft() {
-        this.softness = parseFloat(this.inp_soft_slide.value);
+        this.softness = parseFloat(this.inp_soft_inp.value);
         this.updstroke();
       }
       updsize() {
-        this.strokesize = parseInt(this.inp_size_slide.value);
+        this.strokesize = parseInt(this.inp_size_inp.value);
         this.updstroke();
       }
       updopac() {
-        this.opacity = parseInt(this.inp_opac_slide.value);
+        this.opacity = parseInt(this.inp_opac_inp.value);
         this.ccanvas.style.opacity = this.opacity/255;
         this.updstroke();
       }
@@ -504,10 +508,10 @@
         this.step = parseInt(this.inp_step_inp.value);
       }
       updrad() {
-        this.radius = parseInt(this.inp_radius_slide.value);
+        this.radius = parseInt(this.inp_radius_inp.value);
       }
       updfont() {
-        this.font = this.inp_size_slide.value+"px"+" "+this.inp_ff_select.value;
+        this.font = this.strokesize+"px"+" "+this.inp_ff_select.value;
       }
       updcursor() {
         switch(parseInt(this.inp_tool_select.value)){
@@ -557,10 +561,23 @@
           this.loadhistory2();
         }
       }
-      commit() {
+      commit(clip=false) {
         this.ctx.globalAlpha = this.opacity/255;
         this.ctx.globalCompositeOperation = this.inp_blendmode_select.value;
-        this.ctx.drawImage(this.ccanvas,0,0);
+        //Add clip code
+        if(clip){
+          //let outdata = this.cctx.getImageData(0,0,this.canvas.width,this.canvas.height);
+          const inhdata = this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height);
+          //for(let i=0;i<inhdata.length/4;i++){if(inhdata.data[i*4+3]!=0){for(let j=0;j<2;j++){inhdata.data[i*4+j]=(1-outdata.data[i*4+3]/255)}}}
+          //for(let i=0;i<outdata.data.length/4;i++){outdata.data[i*4+3] = Math.max(outdata.data[i*4+3]-(255-inhdata.data[i*4+3]),0)};
+          //this.cctx.putImageData(outdata,0,0);
+          this.ctx.drawImage(this.ccanvas,0,0);
+          let ndata = this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height);
+          for(let i=0;i<inhdata.data.length/4;i++){ndata.data[i*4+3] = inhdata.data[i*4+3]}
+          this.ctx.putImageData(ndata,0,0);
+        }else{
+          this.ctx.drawImage(this.ccanvas,0,0);
+        }
         this.cctx.clearRect(0,0,this.ccanvas.width,this.ccanvas.height);
         this.ctx.globalAlpha = 1;
         this.ctx.globalCompositeOperation = "source-over";
@@ -576,7 +593,8 @@
           img.onload = () => {
             this.savehistory();
             URL.revokeObjectURL(url);
-            this.ctx.drawImage(img,0,0);
+            this.cctx.drawImage(img,0,0);
+            this.commit(this.inp_clip_check.checked);
           }
           img.src = url;
         })
