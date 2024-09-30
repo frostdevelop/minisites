@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LassoTool</title>
+  <style>
+    body {
+      padding: 0 5vw;
+      color: #EEE;
+      font-size: 20px;
+      font-family: Arial, sans-serif;
+      color-scheme: dark;
+      text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      background: #222;
+    }
+    input[type="number"] {padding:8px;margin:2px;width:100px}
+    /*Begin PacifikyNeoDark*/
+    :root {
+      --hover: #4f4f4f;
+      --border: 1px;
+      --radius: 30px;
+      --height: 3px;
+    }
+    
+    input,select,textarea {
+      transition: box-shadow 500ms ease, border 500ms ease;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to left top, #121212, #292929);
+      color: currentcolor;
+      font-size: 13px;
+      padding: 10px;
+      margin: 2px;
+      border: var(--border) #292929 solid;
+      border-radius: var(--radius);
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);
+    }
+    
+    select {background:#222}
+    
+    input:hover,select:hover {
+      border-color: var(--hover);
+    }
+    
+    input:active,select:active,input[type="text"]:focus,textarea:focus {
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
+      border-color: rgba(0,0,0,0);
+      background: linear-gradient(to left top, #292929, #121212);
+    }
+    input:focus,select:focus,textarea:focus {outline:none;}
+    .button {
+      display: inline-flex;
+      flex-direction: row;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to left top, #121212, #292929);
+      color: currentColor;
+      border: var(--border) #292929 solid;
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);
+      transition: box-shadow 500ms ease, border 500ms ease;
+      font-size: 13px;
+      padding: 8px;
+      margin: 4px;
+      border-radius: var(--radius);
+      min-width: 100px;
+    }
+    
+    .button:hover {
+      border-color: var(--hover);
+    }
+    
+    .button:active {
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
+      border-color: rgba(0,0,0,0);
+      background: linear-gradient(to left top, #292929, #121212);
+    }
+    /*End PacifikyNeoDark*/
+  </style>
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAD1JREFUOE/tkzEKAEAMwuL/H225/QqOHexcHEIi2yY4ScEXqIMrpzLc0dzXBohKCYPi9dTBvxFluJdyXpsBMedP46L43jAAAAAASUVORK5CYII=">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <div id="controls">
+  <canvas width="550" height="550" class="maincanvas" style="background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jvHz58n8GIoCOjg4RqhgYGEcNxBlOo2GIM2iGQLL5//8/UTnlypUrxOWUUQNxhtNoGOLOKYM+2QAAq6xondxhvh8AAAAASUVORK5CYII=')" title="550x550 canvas"></canvas>
+  <button class="button">Download</button>
+  <button class="button">Get URL</button>
+  <button class="button">Upload</button>
+  <input type="number" title="width" min="0" value="550"></input>
+  <input type="number" title="height" min="0" value="550"></input>
+  </div>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    class canvasInteract {
+      constructor(canv,interactables,beforeRender,actMouseDown,actMouseUp,actMouseMove){
+        this.canv = canv;
+        this.ctx = canv.getContext("2d");
+        this.active = null;
+        this.md = false;
+        this.interactables = interactables;
+        this.beforeRender = beforeRender;
+        this.actMouseDown = actMouseDown.bind(this);
+        this.actMouseMove = actMouseMove.bind(this);
+        this.actMouseUp = actMouseUp.bind(this);
+        this.canv.addEventListener("mousedown",this.actMouseDown);
+        this.canv.addEventListener("mouseup",this.actMouseUp);
+        this.canv.addEventListener("mousemove",this.actMouseMove)
+      }
+      renderInteract() {
+        this.beforeRender();
+        this.ctx.fillStyle = "blue";
+        for(let i=0;i<this.interactables.length;i++){
+          this.ctx.beginPath();
+          this.ctx.arc(this.interactables[i][0],this.interactables[i][1],5,0,Math.PI*2);
+          this.ctx.fill();
+        }
+      }
+    }
+    const controls = document.getElementById("controls").children;
+    //try{
+    const maincanv = new canvasInteract(document.getElementsByClassName("maincanvas")[0],[],
+      function(){
+        this.ctx.clearRect(0,0,this.canv.width,this.canv.height);
+        this.ctx.fill();
+        this.ctx.stroke();
+      },
+      function(e){
+        this.md=true;
+        this.ctx.beginPath();
+        this.ctx.moveTo(e.offsetX,e.offsetY);
+      },
+      function(e){
+        this.active=null;
+        this.md=false;
+        this.ctx.closePath();
+        this.ctx.clearRect(0,0,this.canv.width,this.canv.height);
+        this.ctx.fill();
+        this.ctx.stroke();
+      },
+      function(e){
+        if(this.md){
+          this.ctx.lineTo(e.offsetX,e.offsetY);
+          this.renderInteract();
+        }
+      }
+    );
+    //}catch(e){alert(e)}
+    maincanv.canv.width = controls[4].value = (document.body.offsetWidth/100)*90;
+    maincanv.canv.height = controls[5].value = (document.body.offsetHeight/100)*75;
+    function dwnl(n,d,t="") {
+      let dwnelem = document.createElement("a");
+      dwnelem.download = n;
+      dwnelem.href = d;
+      dwnelem.type = t;
+      dwnelem.click();
+      dwnelem.remove();
+    }
+    function uploadFil() {
+      const fin = document.createElement("input");
+      fin.setAttribute("type","file");
+      fin.setAttribute("accept","image/*");
+      fin.addEventListener("change",e=>{
+        const url = URL.createObjectURL(fin.files[0])
+        let img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          maincanv.ctx.drawImage(img,0,0);
+        }
+        img.src = url;
+      })
+      fin.click();
+    }
+    controls[1].addEventListener("click", e=>{dwnl("Canvas.png",maincanv.canv.toDataURL(),"image/png")});
+    controls[2].addEventListener("click", e=>{let data = new Blob([maincanv.canv.toDataURL()]);dwnl("CanvasDATAURL.txt",URL.createObjectURL(data),"text/html");URL.revokeObjectURL(data)});
+    controls[3].addEventListener("click",uploadFil);
+    controls[4].addEventListener("input", e=>{maincanv.canv.width = controls[4].value;maincanv.renderInteract()});
+    controls[5].addEventListener("input", e=>{maincanv.canv.height = controls[5].value;maincanv.renderInteract()});
+  </script>
+</body>
+</html>
