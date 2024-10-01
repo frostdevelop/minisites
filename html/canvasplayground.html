@@ -7,7 +7,7 @@
       padding: 0 5vw;
       color: #EEE;
       font-size: 20px;
-      font-family: Arial, sans-serif;
+      font-family: Tahoma, Arial, sans-serif;
       color-scheme: dark;
       text-shadow: 0 5px 20px rgba(0,0,0,0.8);
       background: #222;
@@ -15,36 +15,30 @@
     /*Begin PacifikyNeoDark*/
     :root {
       --hover: #4f4f4f;
-      --border: 1px;
+      --border: 2px;
       --radius: 45px;
-      --height: 3px;
+      --height: 6px;
     }
-    
+    input:focus,select:focus {outline:none;}
+    input:active,select:active,input[type="text"]:focus,.button:active {background: linear-gradient(to left top, #292929, #121212)};
+    .button,input,select {font-family: Tahoma, Arial, sans-serif;}
+    input:active,select:active,input[type="text"]:focus,.button:active {
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
+      border-color: rgba(0,0,0,0);
+    }
+    details,input,select,.button {border: var(--border) #292929 solid;box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);}
     input,select {
       transition: box-shadow 500ms ease, border 500ms ease;
-      font-family: Arial, sans-serif;
       background: linear-gradient(to left top, #121212, #292929);
       color: currentcolor;
       font-size: 13px;
       padding: 10px;
       margin: 2px;
-      border: var(--border) #292929 solid;
       border-radius: var(--radius);
-      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);
     }
-    
     select {background:#222}
-    
-    input:hover,select:hover {
-      border-color: var(--hover);
-    }
-    
-    input:active,select:active,input[type="text"]:focus {
-      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
-      border-color: rgba(0,0,0,0);
-      background: linear-gradient(to left top, #292929, #121212);
-    }
-    input:focus,select:focus {outline:none;}
+    input:hover,select:hover,.button:hover {border-color: var(--hover);}
+    .smallinput {width:10em}
     .button {
       display: inline-flex;
       flex-direction: row;
@@ -52,11 +46,8 @@
       align-content: center;
       align-items: center;
       cursor: pointer;
-      font-family: Arial, sans-serif;
       background: linear-gradient(to left top, #121212, #292929);
       color: currentColor;
-      border: var(--border) #292929 solid;
-      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);
       transition: box-shadow 500ms ease, border 500ms ease;
       font-size: 13px;
       padding: 8px;
@@ -64,20 +55,23 @@
       border-radius: var(--radius);
       min-width: 100px;
     }
-    
-    .button:hover {
-      border-color: var(--hover);
+    .smallbutton {min-width:5em;}
+    details {
+      border-radius: 20px;
+      padding: 10px;
+      margin: 10px;
+      /*background: linear-gradient(to left top, #121212, #292929);*/
     }
-    
-    .button:active {
-      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
-      border-color: rgba(0,0,0,0);
-      background: linear-gradient(to left top, #292929, #121212);
+    details[open] summary {
+      border-bottom: rgba(255,255,255,0.2) solid 2px;
+      margin-bottom: 10px;
     }
     /*End PacifikyNeoDark*/
     .pabs {position:absolute;top:0;left:0;}
-    .canvascont {display: inline-block; background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jvHz58n8GIoCOjg4RqhgYGEcNxBlOo2GIM2iGQLL5//8/UTnlypUrxOWUUQNxhtNoGOLOKYM+2QAAq6xondxhvh8AAAAASUVORK5CYII=");position:relative;width:500px;height:500px}
+    .canvascont {display: inline-block;position:relative;width:500px;height:500px}
+    .canvascont, .strokedisplay {background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jvHz58n8GIoCOjg4RqhgYGEcNxBlOo2GIM2iGQLL5//8/UTnlypUrxOWUUQNxhtNoGOLOKYM+2QAAq6xondxhvh8AAAAASUVORK5CYII=")}
     input[type="color"] {padding:0;}
+    .hid {opacity:0;position:fixed;pointer-events:none;}
   </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
@@ -108,6 +102,7 @@
       <option value="6">Eyedropper</option>
       <option value="9">Box Select</option>
       <option value="10">Elipse Sele</option>
+      <option value="11">Lasso Sele</option>
     </select>
     <select class="iconpaint fp-stroke-select" title="Stroke">
       <option value="0">Draw</option>
@@ -118,20 +113,6 @@
       <option value="0">Soft Circle</option>
       <option value="2">Circle</option>
       <option value="1">Square</option>
-    </select>
-    <select class="iconpaint fp-ff-select" title="Font">
-      <option value="sans-serif">Sans-serif</option>
-      <option value="serif">Serif</option>
-      <option value="monospace">Monospace</option>
-      <option value="cursive">Cursive</option>
-      <option value="Arial">Arial</option>
-      <option value="Verdana">Verdana</option>
-      <option value="Tahoma">Tahoma</option>
-      <option value="Times New Roman">Times NR</option>
-      <option value="Georgia">Georgia</option>
-      <option value="Garamond">Garamond</option>
-      <option value="Courier New">Courier New</option>
-      <option value="Brush Script MT">Brush S MT</option>
     </select>
     <select class="iconpaint fp-blendmode-select" title="Blend mode">
       <option value="source-over">Normal</option>
@@ -158,19 +139,70 @@
     <input type="color" class="iconpaint fp-color"></input>
     <input type="range" min="0" max="100" class="iconpaint fp-size-slide" title="Size"></input>
     <input type="number" min="0" max="500" class="iconpaint fp-size-inp"></input>
-    <input type="range" min="0" max="1" step="0.01" class="iconpaint fp-soft-slide" title="Softness"></input>
-    <input type="number" step="0.1" min="0" max="1" class="iconpaint fp-soft-inp"></input>
-    <input type="range" min="0" max="255" class="iconpaint fp-opac-slide" title="Opacity"></input>
-    <input type="number" min="0" max="255" class="iconpaint fp-opac-inp"></input>
-    <canvas width="50px" height="50px" style="background:white;" class="strokedisplay"></canvas>
-    <input type="range" min="1" max="100" class="iconpaint fp-step-slide" title="Step"></input>
-    <input type="number" min="1" max="500" class="iconpaint fp-step-inp"></input>
-    <input type="range" min="0" max="50" class="iconpaint fp-radius-slide" title="Radius"></input>
-    <input type="number" min="0" max="500" class="iconpaint fp-radius-inp"></input>
-    <input type="checkbox" id="fpclipcheckbox" class="fp-clipping-check" title="Clip mask"></input>
-    <label for="fpclipcheckbox">Clipping mask</label>
-    <input type="checkbox" id="fpselectadd" class="fp-selectadd-check" title="Add selections"></input>
-    <label for="fpselectadd">Add select</label>
+    <details class="fp-stroke-settings-cont" open>
+      <summary>Stroke Settings</summary>
+      <canvas width="50px" height="50px" class="strokedisplay"></canvas>
+      <input type="range" min="0" max="1" step="0.01" class="iconpaint fp-soft-slide" title="Softness"></input>
+      <input type="number" step="0.1" min="0" max="1" class="iconpaint fp-soft-inp"></input>
+      <input type="range" min="0" max="255" class="iconpaint fp-opac-slide" title="Opacity"></input>
+      <input type="number" min="0" max="255" class="iconpaint fp-opac-inp"></input>
+      <input type="range" min="1" max="100" class="iconpaint fp-step-slide" title="Step"></input>
+      <input type="number" min="1" max="500" class="iconpaint fp-step-inp"></input>
+    </details>
+    <details class="fp-clip-settings-cont">
+      <summary>Clip Settings</summary>
+      <input type="checkbox" id="fpclipcheckbox" class="fp-clipping-check" title="Clip mask"></input>
+      <label for="fpclipcheckbox">Clipping mask</label>
+      <input type="checkbox" id="fpselectadd" class="fp-selectadd-check" title="Add selections"></input>
+      <label for="fpselectadd">Add select</label>
+    </details>
+    <details class="fp-font-settings-cont">
+      <summary>Font Settings</summary>
+      <select class="iconpaint fp-ff-select" title="Font">
+        <option value="sans-serif">Sans-serif</option>
+        <option value="system-ui">System</option>
+        <option value="serif">Serif</option>
+        <option value="monospace">Monospace</option>
+        <option value="cursive">Cursive</option>
+        <option value="Arial">Arial</option>
+        <option value="Verdana">Verdana</option>
+        <option value="Tahoma">Tahoma</option>
+        <option value="Times New Roman">Times NR</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Garamond">Garamond</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Brush Script MT">Brush S MT</option>
+        <option value="Roboto">Roboto</option>
+      </select>
+      <input type="text" placeholder="Name" class="smallinput fp-fontname-inp"></input>
+      <select>
+        <option>URL</option>
+        <option>File</option>
+      </select>
+      <input type="text" placeholder="URL" class="smallinput fp-fonturl-inp"></input>
+      <button class="button smallbutton fp-loadf-btn">Load</button>
+      <select class="iconpaint fp-fv-select" title="Font variant">
+        <option value="normal">Normal</option>
+        <option value="small-caps">Small-caps</option>
+        <option value="all-small-caps">All-small</option>
+        <option value="petite-caps">Petite-caps</option>
+        <option value="all-petite-caps">All-petite</option>
+        <option value="unicase">Unicase</option>
+        <option value="titling-caps">Titling</option>
+      </select>
+      <select class="iconpaint fp-align-select" title="Text alignment">
+        <option value="left">Left</option>
+        <option value="center">Center</option>
+        <option value="right">Right</option>
+      </select>
+      <input type="range" min="0" max="2" step="0.01" class="iconpaint fp-line-slide" title="Leading"></input>
+      <input type="number" step="0.1" min="0" max="10" class="iconpaint fp-line-inp"></input>
+    </details>
+    <details class="fp-roundrect-settings-cont">
+      <summary>RoundRect Settings</summary>
+      <input type="range" min="0" max="50" class="iconpaint fp-radius-slide" title="Radius"></input>
+      <input type="number" min="0" max="500" class="iconpaint fp-radius-inp"></input>
+    </details>
     <button class="iconpaint button fp-flipx">FlipX</button>
     <button class="iconpaint button fp-flipy">FlipY</button>
   </div>
@@ -204,15 +236,17 @@
         this.curctx = this.curcanvas.getContext("2d");
         this.clr = "#000000";
         this.md = false;
-        this.selection = [false,new Path2D(),new Path2D()];
+        this.selection = [false,new Path2D()];
         this.nselection = [];
         this.softness = 1.0;
         this.opacity = 255;
+        this.linemult = 1.0;
         this.strokesize = 30;
         this.strokedisp = inp.getElementsByClassName("strokedisplay")[0];
         this.step = 10;
         this.radius = 20;
         this.font = "30px sans-serif";
+        this.fv = "normal";
         this.strokectx = this.strokedisp.getContext("2d");
         this.paint = this.paint.bind(this);
         this.clear = this.clear.bind(this);
@@ -222,8 +256,9 @@
         this._checkHistory = this._checkHistory.bind(this);
         this.loadhistory2 = this.loadhistory2.bind(this);
         this.loadhistory = this.loadhistory.bind(this);
-        this.updcursor = this.updcursor.bind(this);
+        this.updtool = this.updtool.bind(this);
         this.savehistory = this.savehistory.bind(this);
+        this.updfv = this.updfv.bind(this);
         this.flipx = this.flipx.bind(this);
         this.flipy = this.flipy.bind(this);
         this.uploadFil = this.uploadFil.bind(this);
@@ -243,6 +278,7 @@
             case 8:
             case 9:
             case 10:
+            case 11:
               this.savehistory();this.prevloc = [Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width))),Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)))];this.paint(e)
               break;
             case 6:
@@ -258,15 +294,16 @@
         this.canvas.parentNode.addEventListener("mouseup",e=>{this.md = false;if(!(this.inp_tool_select.value=="5")){this.commit()}});
         this.canvas.parentNode.addEventListener("click", e=>{if(this.inp_tool_select.value=="5"){
           this.savehistory();
+          this.cctx.fontVariantCaps = this.inp_fv_select.value;
           this.cctx.font = this.font;
           this.cctx.fillStyle = this.clr+this.opacity.toString(16);
           const toinput = document.createElement("textarea");
-          toinput.style = "opacity:0;position:fixed;pointer-events:none;";
+          toinput.classList.add("hid");
           document.body.appendChild(toinput);
           toinput.focus();
           toinput.addEventListener("input",f=>{this.cctx.clearRect(0,0,this.canvas.width,this.canvas.height);
             const lines = toinput.value.split("\n");
-            for(let i=0;i<lines.length;i++){this.cctx.fillText(lines[i],Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width))),Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)))+i*this.strokesize)};
+            for(let i=0;i<lines.length;i++){this.cctx.fillText(lines[i],Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width))),Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)))+i*(this.strokesize*this.linemult))};
           });
           toinput.addEventListener("focusout",f=>{this.commit();toinput.remove()});
         }});
@@ -297,13 +334,24 @@
         this.inp_radius_slide = inp.getElementsByClassName("fp-radius-slide")[0];
         this.inp_radius_inp = inp.getElementsByClassName("fp-radius-inp")[0];
         this.inp_ff_select = inp.getElementsByClassName("fp-ff-select")[0];
+        this.inp_fv_select = inp.getElementsByClassName("fp-fv-select")[0];
         this.inp_clip_check = inp.getElementsByClassName("fp-clipping-check")[0];
         this.inp_rend_select = inp.getElementsByClassName("fp-rendering-selection")[0];
+        this.inp_line_slide = inp.getElementsByClassName("fp-line-slide")[0];
+        this.inp_line_inp = inp.getElementsByClassName("fp-line-inp")[0];
+        this.cont_roundrect = inp.getElementsByClassName("fp-roundrect-settings-cont")[0];
+        this.cont_clip = inp.getElementsByClassName("fp-clip-settings-cont")[0];
+        this.cont_font = inp.getElementsByClassName("fp-font-settings-cont")[0];
+        this.cont_stroke = inp.getElementsByClassName("fp-stroke-settings-cont")[0];
+        this.inp_loadf_btn = inp.getElementsByClassName("fp-loadf-btn")[0];
+        this.inp_fonturl_inp = inp.getElementsByClassName("fp-fonturl-inp")[0];
+        this.inp_fontname_inp = inp.getElementsByClassName("fp-fontname-inp")[0];
         this.inp_size_inp.value = this.inp_size_slide.value = this.strokesize.toString();
         this.inp_soft_slide.value = this.inp_soft_inp.value = this.softness.toString();
         this.inp_opac_slide.value = this.inp_opac_inp.value = this.opacity.toString();
         this.inp_step_slide.value = this.inp_step_inp.value = this.step.toString();
         this.inp_radius_inp.value = this.inp_radius_slide.value = this.radius.toString();
+        this.inp_line_slide.value = this.inp_line_inp.value = this.linemult.toString();
         this.inp_color.addEventListener("input",e=>{this.clr = this.inp_color.value;this.updstroke();})
         this.inp_size_slide.addEventListener("input",e=>{this.inp_size_inp.value = this.inp_size_slide.value;this.updsize();this.updfont()});
         this.inp_size_inp.addEventListener("input",e=>{this.inp_size_slide.value = this.inp_size_inp.value;this.updsize();this.updfont()});
@@ -315,13 +363,17 @@
         this.inp_step_inp.addEventListener("input",e=>{this.inp_step_slide.value = this.inp_step_inp.value = Math.max(this.inp_step_inp.value,1);this.updstep()});
         this.inp_radius_slide.addEventListener("input",e=>{this.inp_radius_inp.value = this.inp_radius_slide.value;this.updrad()});
         this.inp_radius_inp.addEventListener("input",e=>{this.inp_radius_slide.value = this.inp_radius_inp.value;this.updrad()});
+        this.inp_line_slide.addEventListener("input",e=>{this.inp_line_inp.value = this.inp_line_slide.value;this.updlinem();});
+        this.inp_line_inp.addEventListener("input",e=>{this.inp_line_slide.value = this.inp_line_inp.value;this.updlinem();});
         this.inp_blendmode_select.addEventListener("input",e=>{this.ccanvas.style.mixBlendMode = this.inp_blendmode_select.value});
         this.inp_flipx.addEventListener("click",this.flipx);
         this.inp_flipy.addEventListener("click",this.flipy);
         this.inp_ff_select.addEventListener("input",this.updfont);
         this.inp_stroke_type.addEventListener("input",this.updstroke);
-        this.inp_tool_select.addEventListener("input",this.updcursor);
+        this.inp_tool_select.addEventListener("input",this.updtool);
         this.inp_rend_select.addEventListener("input",this.updrend);
+        this.inp_fv_select.addEventListener("input",this.updfv);
+        this.inp_loadf_btn.addEventListener("click",e=>{this.loadFont(this.inp_fontname_inp.value,this.inp_fonturl_inp.value)});
         this.updrend();
         }
         document.addEventListener("keydown",this._checkHistory);
@@ -441,22 +493,10 @@
                 this.selection[0] = true;
                 let cpath = new Path2D();
                 cpath.rect(this.prevloc[0],this.prevloc[1],realX-this.prevloc[0],realY-this.prevloc[1]);
-                let opath = new Path2D();
-                opath.rect(this.prevloc[0]-1,this.prevloc[1]-1,(realX-this.prevloc[0])+2,(realY-this.prevloc[1])+2);
-                this.nselection = [cpath,opath];
-                let ropath = new Path2D();
-                ropath.addPath(opath);
-                if(document.getElementsByClassName("fp-selectadd-check")[0].checked){ropath.addPath(this.selection[2])};
+                this.nselection = cpath;
                 //this.cctx.fillStyle="white";
                 //this.cctx.fill();
-                this.octx.clearRect(0,0,this.canvas.width,this.canvas.height);
-                this.octx.lineWidth = 2;
-                this.octx.setLineDash([]);
-                this.octx.strokeStyle = "white";
-                this.octx.stroke(ropath);
-                this.octx.setLineDash([10,10]);
-                this.octx.strokeStyle = "black";
-                this.octx.stroke(ropath);
+                this.renderSelect();
               }
               else {this.selection[0] = false};
               break;
@@ -465,21 +505,22 @@
                 this.selection[0] = true;
                 let cpath = new Path2D();
                 cpath.ellipse(this.prevloc[0],this.prevloc[1],Math.abs(realX-this.prevloc[0]),Math.abs(realY-this.prevloc[1]),0,0,Math.PI*2);
-                let opath = new Path2D();
-                opath.ellipse(this.prevloc[0],this.prevloc[1],Math.abs(realX-this.prevloc[0])+1,Math.abs(realY-this.prevloc[1])+1,0,0,Math.PI*2);
-                this.nselection = [cpath,opath];
-                let ropath = new Path2D();
-                ropath.addPath(opath);
-                if(document.getElementsByClassName("fp-selectadd-check")[0].checked){ropath.addPath(this.selection[2])};
+                this.nselection = cpath;
                 //if(document.getElementsByClassName("fp-selectadd-check")[0].checked){this.selection[1].addPath(clippath)}else{this.selection[1]=clippath;};
-                this.octx.clearRect(0,0,this.canvas.width,this.canvas.height);
-                this.octx.lineWidth = 2;
-                this.octx.setLineDash([]);
-                this.octx.strokeStyle = "white";
-                this.octx.stroke(ropath);
-                this.octx.setLineDash([10,10]);
-                this.octx.strokeStyle = "black";
-                this.octx.stroke(ropath);
+                this.renderSelect();
+              }
+              else {this.selection[0] = false};
+              break;
+            case 11:
+              if(!(this.prevloc[0]==realX && this.prevloc[1]==realY)){
+                this.selection[0] = true;
+                if(this.nselection.length == 0){
+                  this.nselection = new Path2D;
+                  this.nselection.moveTo(realX,realY);
+                }else{
+                  this.nselection.lineTo(realX,realY);
+                }
+                this.renderSelect();
               }
               else {this.selection[0] = false};
               break;
@@ -518,6 +559,13 @@
         }
         this.ctx.putImageData(nimg,0,0);
         return;
+      }
+      loadFont(name,url) {
+        const f = new FontFace(name,"url("+url+")");
+        document.fonts.add(f);
+        const op = document.createElement("option");
+        op.value = op.innerText = name;
+        this.inp_ff_select.appendChild(op);
       }
       updstroke() {
         this.strokectx.clearRect(0,0,this.strokedisp.width,this.strokedisp.height);
@@ -566,8 +614,9 @@
             this.curctx.closePath();
             break;
         }
-        this.updcursor();
+        this.updtool();
       }
+      updfv() {this.fv = this.inp_fv_select.value};
       updrend() {this.canvas.style.imageRendering = this.ccanvas.style.imageRendering = this.inp_rend_select.value};
       updsoft() {
         this.softness = parseFloat(this.inp_soft_inp.value);
@@ -591,7 +640,10 @@
       updfont() {
         this.font = this.strokesize+"px"+" "+this.inp_ff_select.value;
       }
-      updcursor() {
+      updlinem() {
+        this.linemult = parseFloat(this.inp_line_inp.value);
+      }
+      updtool() {
         switch(parseInt(this.inp_tool_select.value)){
           case 6:
             this.canvas.parentNode.style.cursor = 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAATxJREFUSEutluFtwjAQhb9swAhsUNgANmCDlg3KBmxAOwEwATBB6QQtE8AG0A3qh3ySFcWxneSkKD8Sf8/37i5OxbCx8LijYase/AnwBQh2Al4BE/gF5sCjq4DBRy0b3AHLLgJjv3PdU9FZ4Joi++edBLT2HdgkRG6uNtM+Fn37wsZ0lsCuVMD8/wQ+gDdgG1HQ81WJgMH3DrgOoG0iVa5ADC4dteqPs6PeVdkWpeAaNg2aimp2PeFST2WQCzfLZt66c86nohTeWOtYBoPAYxYNBm8SyIFrwDTJWRFalAO/+OHKgocZtMH13sFN5V8pPBTQ17E+obZL9bYy1cQWhxaqd9XH1sMhpBfcMlDBZFG9cL3hJqAzVddztH0MAjeBuz+gZdGLE9N5W9wtseKoBhJQqMj6G7CruKBNC/4BCYpO6UFp88AAAAAASUVORK5CYII=") 0 36,pointer';
@@ -602,13 +654,26 @@
           case 7:
           case 8:
           case 9:
+          case 11:
+          case 10:
+            if(this.inp_tool_select.value=="7"){
+              this.cont_stroke.open = false;
+              this.cont_roundrect.open = true;
+              this.cont_font.open = false;
+            }
             this.canvas.parentNode.style.cursor = "crosshair";
             break;
           case 5:
+            this.cont_stroke.open = false;
+            this.cont_roundrect.open = false;
+            this.cont_font.open = true;
             this.canvas.parentNode.style.cursor = "text";
             break;
           case 0:
           case 3:
+            this.cont_stroke.open = true;
+            this.cont_roundrect.open = false;
+            this.cont_font.open = false;
             this.canvas.parentNode.style.cursor = 'url("'+this.curcanvas.toDataURL()+'") 50 50,default';
             break;
           default:
@@ -640,19 +705,43 @@
           this.loadhistory2();
         }
       }
+      renderSelect(){
+        this.octx.save();
+        let ropath = new Path2D();
+        ropath.addPath(this.nselection);
+        if(document.getElementsByClassName("fp-selectadd-check")[0].checked){ropath.addPath(this.selection[1])};
+        this.octx.clearRect(0,0,this.canvas.width,this.canvas.height);
+        let cpath = new Path2D();
+        cpath.addPath(ropath);
+        cpath.rect(0,0,this.canvas.width,this.canvas.height);
+        this.octx.clip(cpath, "evenodd");
+        this.octx.lineWidth = 2;
+        this.octx.setLineDash([]);
+        this.octx.strokeStyle = "white";
+        this.octx.stroke(ropath);
+        this.octx.setLineDash([10,10]);
+        this.octx.strokeStyle = "black";
+        this.octx.stroke(ropath);
+        this.octx.restore();
+      }
       commit() {
         switch(parseInt(this.inp_tool_select.value)){
           case 9:
           case 10:
+          case 11:
+            if(this.inp_tool_select.value=="11"){
+              this.nselection.closePath();
+              this.renderSelect();
+            };
             this.ctx.restore();
             this.cctx.restore();
             this.ctx.save();
             this.cctx.save();
             if(this.selection[0]){
               if(document.getElementsByClassName("fp-selectadd-check")[0].checked){
-                this.selection[1].addPath(this.nselection[0]);this.selection[2].addPath(this.nselection[1]);
+                this.selection[1].addPath(this.nselection);
               }else{
-                this.selection[1]=this.nselection[0];this.selection[2]=this.nselection[1];
+                this.selection[1]=this.nselection;
               }
               this.nselection.length = 0;
               this.ctx.clip(this.selection[1]);
