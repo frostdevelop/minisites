@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TextComparer</title>
+  <style>
+    body {
+      color: white;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+      padding: 0;
+      margin: 0;
+      background: #222;
+      overflow-x: hidden;
+      color-scheme: dark;
+    }
+    .edcontainer .lnnumb{
+      color: #5ac91e;
+      width: 25px;
+      text-align: right;
+      text-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+    }
+    .edcontainer .lnnumb span{
+      counter-increment: lnnumb;
+      display: block;
+    }
+    .edcontainer .lnnumb span::before{
+      content: counter(lnnumb);
+    }
+    .edcontainer {
+      width: 100vw;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: row;
+      line-height: 14px;
+      font-size: 12px;
+      overflow-y:auto;
+      box-sizing:content-box;
+      overflow-x:hidden;
+    }
+    .edcontainer textarea{
+      border-radius: 0;
+      font-size: 12px;
+      display: flex;
+      width: 100%;
+      height: inherit !important;
+      flex-grow: 1;
+      flex-shrink: 1;
+      resize: none;
+      margin: 0;
+      padding: 0;
+      border: none;
+      line-height: 14px;
+      overflow-y: hidden;
+      overflow-x: auto;
+      background: #111;
+    }
+    textarea:focus{outline: 0}
+    .inpcont {display: contents}
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <div class="edcontainer">
+  <div class="inpcont">
+  <div class="lnnumb">
+  <span></span>
+  </div>
+  <textarea class="input" style="white-space: nowrap;" spellcheck="false" placeholder="One"></textarea>
+  </div>
+  <div class="inpcont">
+  <div class="lnnumb">
+  <span></span>
+  </div>
+  <textarea class="input" style="white-space: nowrap;" spellcheck="false" placeholder="Two"></textarea>
+  </div>
+  </div>
+  <script>
+    //Copyright Pacifiky 2024 All Rights Reserved
+    const inps = document.getElementsByClassName("input");
+    function intUpdLn(e){
+      let num = this.parentNode.getElementsByClassName("lnnumb")[0];
+      let span = document.createElement("span");
+      num.innerHTML = "";
+      for(let j=0;j<this.value.split("\n").length;j++){
+        num.appendChild(span);
+        span = span.cloneNode();
+      }
+    }
+    for(let i=0;i<inps.length;i++){
+      //inps[i].addEventListener("keyup",intUpdLn);
+      inps[i].addEventListener("input",intUpdLn);
+    }
+  </script>
+</body>
+</html>
