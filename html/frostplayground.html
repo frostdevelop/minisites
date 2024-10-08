@@ -525,11 +525,20 @@
       <div class='item'>
         <input type="checkbox" class="iinput" checked id="chk2">Auto-Close Quotes</input>
       </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk3">Auto-Update</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk4">Undo History</input>
+      </div>
+      <div class='item'>
+        <button class="iinput">Delete History</input>
+      </div>
       </div>
       <footer>Copyright 2024 Pacifiky. All rights reserved.<br/>Thank you Aaron for testing!</footer>
     </dialog>
   </div>
-  <div id="topbtn"><button id="trig5e">HTML</button><button id="trig6e">CSS</button><button id="trig7e">JS</button><button id="trig9e" value="true">Console</button><button id="trig8e" value="true">Theme</button><button id="trig1e">Fullscreen</button></div>
+  <div id="topbtn"><button id="trig5e">HTML</button><button id="trig6e">CSS</button><button id="trig7e">JS</button><button id="trig18e">Prev</button><button id="trig9e" value="true">Console</button><button id="trig8e" value="true">Theme</button><button id="trig1e">Fullscreen</button></div>
   <div id="menubar">
     <div class="menuitem">
       <button class="menutrigger">File</button>
@@ -648,6 +657,7 @@
     const inps = document.getElementsByClassName("input");
     const nums = document.getElementsByClassName("lnnumb");
     const savechars = [":",";","!","+","=","-","Enter","Backspace","?",".",">","<","*","//","&","|"];
+    let updateen = true;
     var inphistory = new Array(inps.length).fill().map(()=>[[],[]]);
     const delsvg = document.getElementById("trashsvg");
     //mar: class def
@@ -861,9 +871,8 @@
       let finput = finrep.getElementsByClassName("finputfr")[0];
       let rinput = finrep.getElementsByClassName("rinputfr")[0];
       
-      inps[i].addEventListener("keyup",intUpdLn);
-      inps[i].addEventListener("input",intUpdLn);
       inps[i].addEventListener("input", trig0f);
+      inps[i].addEventListener("input", intUpdLn);
       inps[i].addEventListener("input", e=>{
         inphistory[i][1].length = 0;
         switch(e.data){
@@ -999,6 +1008,7 @@
           inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\n" + as + inps[i].value.substring(inps[i].selectionEnd)
           inps[i].selectionStart = spos+as.length+1;
           inps[i].selectionEnd = inps[i].selectionStart;
+          intUpdLn.call(inps[i]);
         }else if((e.key=="Z" && e.ctrlKey) || (e.key=="y" && e.ctrlKey)){
           e.preventDefault();
           if(inphistory[i][1].length > 0){
@@ -1017,7 +1027,8 @@
           e.preventDefault();
           finrep.classList.toggle("hid");
           finrep.classList.toggle("sho");
-        }else if(savechars.includes(e.key)){storeHistory(i)}
+          //mar:cur
+        }else if(prefinp[7].checked && savechars.includes(e.key)){storeHistory(i)}
       });
       finrep.getElementsByClassName("close")[0].addEventListener("click",e=>{
         finrep.classList.remove("sho");
@@ -1043,8 +1054,10 @@
       }
     }
     function trig0f(e) {
-      playframe.click();
-      playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";this.panel.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){this.panel.value = "console cleared\\n"}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`
+      if(updateen){
+        playframe.click();
+        playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";this.panel.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){this.panel.value = "console cleared\\n"}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`;
+      }
       return;
     }
     
@@ -1056,7 +1069,9 @@
     }
     
     function storeHistory(index){
-      inphistory[index][0].push([inps[index].value,inps[index].selectionStart]);
+      if(prefinp[7].checked){
+        inphistory[index][0].push([inps[index].value,inps[index].selectionStart]);
+      }
       return;
     }
     
@@ -1089,7 +1104,6 @@
       document.body.appendChild(dwnelem);
       dwnelem.click();
       dwnelem.remove();
-      URL.revokeObjectURL(dwndata);
     }
     function fulls(e) {
       document.getElementById("closebtn").addEventListener("click",intSetFullFrame);
@@ -1119,7 +1133,7 @@
         savedb.saveTo();
       } else if(e.key == "p" && e.ctrlKey) {
         e.preventDefault();
-        if(!(pref.open)){pref.showModal()}else{pref.close()};
+        if(!(pref.open)){pref.showModal();prefinp[6].checked = updateen}else{pref.close()};
       } else if(e.key == "/" && e.ctrlKey) {
         e.preventDefault();
         if(!(help.open)){help.showModal()}else{help.close()};
@@ -1127,20 +1141,23 @@
     });
     window.addEventListener("load",e=>{
     editbtn[0].addEventListener("click", trig0f);
-    topbtn[5].addEventListener("click", fulls);
+    topbtn[6].addEventListener("click", fulls);
     filebtn[0].addEventListener("click", (e)=>{savefil()});
     filebtn[1].addEventListener("click", (e)=>{dwnl("data:text/html;charset=utf-8,%0A" + encodeURIComponent(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`),"CodeURL-FrostPlayground.txt");});
-    trig4.addEventListener("click",(e)=>{playframe.contentWindow.console.clear()})
+    trig4.addEventListener("click",(e)=>{playframe.contentWindow.console.clear()});
     topbtn[0].addEventListener("click",(e)=>{htmli.parentNode.parentNode.classList.toggle("hid")});
     topbtn[1].addEventListener("click",(e)=>{cssi.parentNode.parentNode.classList.toggle("hid")});
     topbtn[2].addEventListener("click",(e)=>{jsin.parentNode.parentNode.classList.toggle("hid")});
-    topbtn[3].addEventListener("click",e=>{playframe.parentNode.getElementsByClassName("cnscont")[0].classList.toggle("hid")})
-    /*topbtn[4].addEventListener("click",(e)=>{if(topbtn[4].value == "true"){document.body.style="color-scheme: light;background: #FFF;color:black";topbtn[4].value="false"}else{document.body.style="";topbtn[4].value="true"};});*/
-    topbtn[4].addEventListener("click",e=>{document.body.classList.toggle("light")})
-    filebtn[4].addEventListener("click",e=>savedb.saveTo())
-    filebtn[5].addEventListener("click",e=>savedb.openUI())
-    editbtn[2].addEventListener("click",e=>pref.showModal())
-    editbtn[3].addEventListener("click",e=>help.showModal())
+    topbtn[3].addEventListener("click",(e)=>{playframe.parentNode.classList.toggle("hid");
+    if(playframe.parentNode.classList.contains("hid")){updateen = false}else{updateen = true}});
+    topbtn[4].addEventListener("click",e=>{playframe.parentNode.getElementsByClassName("cnscont")[0].classList.toggle("hid")});
+    /*topbtn[5].addEventListener("click",(e)=>{if(topbtn[5].value == "true"){document.body.style="color-scheme: light;background: #FFF;color:black";topbtn[5].value="false"}else{document.body.style="";topbtn[5].value="true"};});*/
+    topbtn[5].addEventListener("click",e=>{document.body.classList.toggle("light")});
+    filebtn[4].addEventListener("click",e=>savedb.saveTo());
+    filebtn[5].addEventListener("click",e=>savedb.openUI());
+    editbtn[2].addEventListener("click",e=>pref.showModal());
+    editbtn[3].addEventListener("click",e=>help.showModal());
+    prefinp[8].addEventListener("click",e=>{inphistory[0].length = 0;inphistory[1].length = 0;});
     editbtn[1].addEventListener("click",e=>{for(let i=0;i<inps.length;i++){let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];finrep.classList.toggle("hid");finrep.classList.toggle("sho")}})
     for(let i=0;i<pagem.length;i++){
       pagem[i].getElementsByClassName("close")[0].addEventListener("click",e=>{pagem[i].close()});
@@ -1163,6 +1180,7 @@
          }
        }
     });
+    prefinp[6].addEventListener("input",e=>{updateen = prefinp[6].checked});
     txt0.addEventListener("keydown",e=>{
     if(e.key=="Enter"){
       e.preventDefault();
