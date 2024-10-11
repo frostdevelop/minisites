@@ -40,21 +40,27 @@
   <h3 id="out2e">Event.keyCode: NULL</h2>
   <h3 id="out7e">Event.location: NULL</h2>
   <h3 id="out8e">Event.which: NULL</h2>
+  <h3 id="out9e">Event.repeat: NULL</h2>
   <h3 id="out3e">Event.ctrlKey: NULL</h2>
   <h3 id="out4e">Event.shiftKey: NULL</h2>
   <h3 id="out5e">Event.metaKey: NULL</h2>
   <h3 id="out6e">Event.altKey: NULL</h2>
+  <h3 id="out10e">Event.charCode: NULL</h2>
+  <h3 id="out11e">Event.isComposing: NULL</h2>
   <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
-    let out0 = document.getElementById("out0e");
-    let out1 = document.getElementById("out1e");
-    let out2 = document.getElementById("out2e");
-    let out3 = document.getElementById("out3e");
-    let out4 = document.getElementById("out4e");
-    let out5 = document.getElementById("out5e");
-    let out6 = document.getElementById("out6e");
-    let out7 = document.getElementById("out7e");
-    let out8 = document.getElementById("out8e");
+    const out0 = document.getElementById("out0e");
+    const out1 = document.getElementById("out1e");
+    const out2 = document.getElementById("out2e");
+    const out3 = document.getElementById("out3e");
+    const out4 = document.getElementById("out4e");
+    const out5 = document.getElementById("out5e");
+    const out6 = document.getElementById("out6e");
+    const out7 = document.getElementById("out7e");
+    const out8 = document.getElementById("out8e");
+    const out9 = document.getElementById("out9e");
+    const out10 = document.getElementById("out10e");
+    const out11 = document.getElementById("out11e");
     document.body.addEventListener("keydown",e=>{
       e.preventDefault();
       out0.innerText = "Event.code: " + e.code;
@@ -66,6 +72,9 @@
       out6.innerText = "Event.altKey: " + e.altKey;
       out7.innerText = "Event.location: " + e.location;
       out8.innerText = "Event.which: " + e.which;
+      out9.innerText = "Event.repeat: " + e.repeat;
+      out10.innerText = "Event.charCode: " + e.charCode;
+      out11.innerText = "Event.isComposing: " + e.isComposing;
       console.log(JSON.stringify(e))
     })
   </script>
