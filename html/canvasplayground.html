@@ -26,7 +26,7 @@
       box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
       border-color: rgba(0,0,0,0);
     }
-    details,input,select,.button {border: var(--border) #292929 solid;box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);}
+    details,input,select,.button,.fp-grad-stop-cont-cont {border: var(--border) #292929 solid;box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);}
     input,select {
       transition: box-shadow 500ms ease, border 500ms ease;
       background: linear-gradient(to left top, #121212, #292929);
@@ -35,6 +35,7 @@
       padding: 10px;
       margin: 2px;
       border-radius: var(--radius);
+      min-width:0px;
     }
     select {background:#222}
     input:hover,select:hover,.button:hover {border-color: var(--hover);}
@@ -55,6 +56,20 @@
       border-radius: var(--radius);
       min-width: 100px;
     }
+    .iconbutton {
+      min-width: 0;
+      width: 45px;
+      height: 45px;
+      font-size: 30px;
+      border-radius: 50%;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+    .icon {
+      display: inline;
+      height: 25px;
+      width: 25px;
+    }
     .smallbutton {min-width:5em;}
     details {
       border-radius: 20px;
@@ -62,16 +77,45 @@
       margin: 10px;
       /*background: linear-gradient(to left top, #121212, #292929);*/
     }
-    details[open] summary {
+    details[open] > summary {
       border-bottom: rgba(255,255,255,0.2) solid 2px;
       margin-bottom: 10px;
     }
+    .gbtn {
+      background: linear-gradient(135deg,#33ff33,#11c011);
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.8),-2px -2px var(--height) #33ff33;
+      border-color:#11c011;
+    }
+    .gbtn:hover {border-color:#33ff33;}
+    .gbtn:active {background: linear-gradient(-45deg,#33ff33,#11c011);box-shadow: inset 2px 2px var(--height) rgba(0,0,0,0.8),inset -2px -2px var(--height) #33ff33;}
+    .rbtn {
+      background: linear-gradient(135deg,#f95353,#a51212);
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.8),-2px -2px var(--height) #f95353;
+      border-color: #a51212;
+    }
+    .rbtn:hover {border-color: #f95353}
+    .rbtn:active {background: linear-gradient(-45deg,#f95353,#a51212);box-shadow: inset 2px 2px var(--height) rgba(0,0,0,0.8), inset -2px -2px var(--height) #f95353;}
     /*End PacifikyNeoDark*/
+    .fp-toggle-cont > summary {
+      list-style-type: "☐ ";
+    }
+    .fp-toggle-cont[open] > summary {
+      list-style-type: "☒ ";
+    }
     .pabs {position:absolute;top:0;left:0;}
     .canvascont {display: inline-block;position:relative;width:500px;height:500px}
-    .canvascont, .strokedisplay {background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jvHz58n8GIoCOjg4RqhgYGEcNxBlOo2GIM2iGQLL5//8/UTnlypUrxOWUUQNxhtNoGOLOKYM+2QAAq6xondxhvh8AAAAASUVORK5CYII=")}
-    input[type="color"] {padding:0;}
+    .canvascont, .strokedisplay, .fp-grad-prev {background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jvHz58n8GIoCOjg4RqhgYGEcNxBlOo2GIM2iGQLL5//8/UTnlypUrxOWUUQNxhtNoGOLOKYM+2QAAq6xondxhvh8AAAAASUVORK5CYII=")}
+    input[type="color"] {padding:0;width:50px;height:35px;}
+    .inline {display:inline}
     .hid {opacity:0;position:fixed;pointer-events:none;}
+    .fp-tm-row {display:flex;flex-direction: row;}
+    .fp-tm-matrixsmol {width:60vw}
+    .insect {margin: 10px 0}
+    .flx-center {display:flex;flex-direction:column;align-content:center;justify-content:center;width:100%;justify-items:center;align-items:center;}
+    .fp-grad-stop-cont {display:flex;flex-direction:row;padding:10px;}
+    .fp-grad-stop-cont-cont {display:flex;flex-direction:column;border-radius:10px;margin:10px;}
+    .pad-5 {padding:10px;}
+    hr {width:95%;border-color: #3d3d3d;margin:0 auto;}
   </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
@@ -90,6 +134,7 @@
   <canvas width="500" height="500" style="width:500px;height:500px;"></canvas>
   </div>
   <div class="conpaint">
+    <!-- mar:tool -->
     <select class="iconpaint fp-tool-select" title="Tool">
       <option value="0">Paint</option>
       <option value="3">Erase</option>
@@ -103,6 +148,11 @@
       <option value="9">Box Select</option>
       <option value="10">Elipse Sele</option>
       <option value="11">Lasso Sele</option>
+      <option value="12">Translate</option>
+      <option value="13">Rotate</option>
+      <option value="14">Scale</option>
+      <option value="15">Gradient</option>
+      <option value="16">Bezier</option>
     </select>
     <select class="iconpaint fp-stroke-select" title="Stroke">
       <option value="0">Draw</option>
@@ -139,22 +189,28 @@
     <input type="color" class="iconpaint fp-color"></input>
     <input type="range" min="0" max="100" class="iconpaint fp-size-slide" title="Size"></input>
     <input type="number" min="0" max="500" class="iconpaint fp-size-inp"></input>
+    <input type="range" min="0" max="255" class="iconpaint fp-opac-slide" title="Opacity"></input>
+    <input type="number" min="0" max="255" class="iconpaint fp-opac-inp"></input>
     <details class="fp-stroke-settings-cont" open>
       <summary>Stroke Settings</summary>
       <canvas width="50px" height="50px" class="strokedisplay"></canvas>
-      <input type="range" min="0" max="1" step="0.01" class="iconpaint fp-soft-slide" title="Softness"></input>
-      <input type="number" step="0.1" min="0" max="1" class="iconpaint fp-soft-inp"></input>
-      <input type="range" min="0" max="255" class="iconpaint fp-opac-slide" title="Opacity"></input>
-      <input type="number" min="0" max="255" class="iconpaint fp-opac-inp"></input>
-      <input type="range" min="1" max="100" class="iconpaint fp-step-slide" title="Step"></input>
-      <input type="number" min="1" max="500" class="iconpaint fp-step-inp"></input>
+      <div class="fp-stroke-sliders-cont insect">
+        <input type="range" min="0" max="1" step="0.01" class="iconpaint fp-soft-slide" title="Softness"></input>
+        <input type="number" step="0.1" min="0" max="1" class="iconpaint fp-soft-inp"></input>
+        <input type="range" min="1" max="100" class="iconpaint fp-step-slide" title="Step"></input>
+        <input type="number" min="1" max="500" class="iconpaint fp-step-inp"></input>
+      </div>
     </details>
     <details class="fp-clip-settings-cont">
       <summary>Clip Settings</summary>
+      <div class="insect">
       <input type="checkbox" id="fpclipcheckbox" class="fp-clipping-check" title="Clip mask"></input>
       <label for="fpclipcheckbox">Clipping mask</label>
+      </div>
+      <div class="insect">
       <input type="checkbox" id="fpselectadd" class="fp-selectadd-check" title="Add selections"></input>
       <label for="fpselectadd">Add select</label>
+      </div>
     </details>
     <details class="fp-font-settings-cont">
       <summary>Font Settings</summary>
@@ -172,15 +228,7 @@
         <option value="Garamond">Garamond</option>
         <option value="Courier New">Courier New</option>
         <option value="Brush Script MT">Brush S MT</option>
-        <option value="Roboto">Roboto</option>
       </select>
-      <input type="text" placeholder="Name" class="smallinput fp-fontname-inp"></input>
-      <select>
-        <option>URL</option>
-        <option>File</option>
-      </select>
-      <input type="text" placeholder="URL" class="smallinput fp-fonturl-inp"></input>
-      <button class="button smallbutton fp-loadf-btn">Load</button>
       <select class="iconpaint fp-fv-select" title="Font variant">
         <option value="normal">Normal</option>
         <option value="small-caps">Small-caps</option>
@@ -195,20 +243,233 @@
         <option value="center">Center</option>
         <option value="right">Right</option>
       </select>
+      <select class="iconpaint fp-fstretch-select" title="Font stretching (Works on certain fonts)">
+        <option value="normal">Normal</option>
+        <option value="ultra-condensed">U-Cond</option>
+        <option value="extra-condensed">E-Cond</option>
+        <option value="condensed">Condensed</option>
+        <option value="semi-condensed">S-Cond</option>
+        <option value="semi-expanded">S-Exp</option>
+        <option value="expanded">Expanded</option>
+        <option value="extra-expanded">E-Exp</option>
+        <option value="ultra-expanded">U-Exp</option>
+      </select>
+      <select class="iconpaint fp-fkern-select" title="Kerning">
+        <option value="auto">Auto</option>
+        <option value="normal">Normal</option>
+        <option value="none">None</option>
+      </select>
+      <div class="fp-fontload-cont insect">
+        <input type="text" placeholder="Name" class="iconpaint smallinput fp-fontname-inp"></input>
+        <select class="iconpaint fp-fontsource-select">
+          <option value="fp-furl-cont">URL</option>
+          <option value="fp-ffile-cont">File</option>
+        </select>
+        <div class="fp-furl-cont inline fp-fontsource-item">
+        <input type="text" placeholder="URL" class="iconpaint smallinput fp-fonturl-inp"></input>
+        </div>
+        <div class="fp-ffile-cont inline hid fp-fontsource-item">
+        <button class="iconpaint button fp-fontfile-inp">Upload file</button>
+        <input type="file" style="display:none" accept=".ttf,.otf,.woff,.woff2" class="fp-rfontfile-inp"></input>
+        </div>
+        <button class="button smallbutton fp-loadf-btn">Load</button>
+        <div class="insect">
+        <input type="checkbox" id="fpsavefont" class="fp-savefont-check"></input>
+        <label for="fpsavefont">Save font to browser</label>
+        </div>
+        <div class="insect">
+        <button class="button fp-delsav-btn">Delete saved fonts</button>
+        </div>
+      </div>
       <input type="range" min="0" max="2" step="0.01" class="iconpaint fp-line-slide" title="Leading"></input>
       <input type="number" step="0.1" min="0" max="10" class="iconpaint fp-line-inp"></input>
+      <input type="range" min="0" max="20" step="1" class="iconpaint fp-ttrack-slide" title="Tracking"></input>
+      <input type="number" step="1" min="-500" max="500" class="iconpaint fp-ttrack-inp"></input>
+      <input type="range" min="0" max="50" step="1" class="iconpaint fp-twtrack-slide" title="Word tracking"></input>
+      <input type="number" step="1" min="-500" max="500" class="iconpaint fp-twtrack-inp"></input>
     </details>
     <details class="fp-roundrect-settings-cont">
       <summary>RoundRect Settings</summary>
       <input type="range" min="0" max="50" class="iconpaint fp-radius-slide" title="Radius"></input>
       <input type="number" min="0" max="500" class="iconpaint fp-radius-inp"></input>
     </details>
+    <details class="fp-shadow-settings-cont">
+      <summary>Shadow Settings</summary>
+      <input type="color" class="iconpaint fp-scolor"></input>
+      <div>
+      <input type="range" min="0" max="50" class="iconpaint fp-sblur-slide" title="Blur"></input>
+      <input type="number" min="0" max="500" class="iconpaint fp-sblur-inp"></input>
+      </div>
+      <div>
+      <input type="range" min="-50" max="50" class="iconpaint fp-sxoff-slide" title="Xoffset"></input>
+      <input type="number" min="-500" max="500" class="iconpaint fp-sxoff-inp"></input>
+      <input type="range" min="-50" max="50" class="iconpaint fp-syoff-slide" title="Yoffset"></input>
+      <input type="number" min="-500" max="500" class="iconpaint fp-syoff-inp"></input>
+      </div>
+    </details>
+    <details class="fp-filter-settings-cont">
+      <summary>Filter Settings</summary>
+      <details class="fp-filter-cont fp-filter-sepia fp-toggle-cont">
+        <summary>Sepia</summary>
+        <input type="range" min="0" max="100" class="iconpaint fp-fipercent-slide" title="Master percent"></input>
+        <input type="number" min="-500" max="500" class="iconpaint fp-fipercent-inp"></input>
+      </details>
+      <details class="fp-filter-cont fp-filter-saturate fp-toggle-cont">
+        <summary>Saturate</summary>
+        <input type="range" min="0" max="200" class="iconpaint fp-fipercent-slide" title="Master percent"></input>
+        <input type="number" min="-500" max="500" class="iconpaint fp-fipercent-inp"></input>
+      </details>
+      <details class="fp-filter-cont fp-filter-opacity fp-toggle-cont">
+        <summary>Opacity</summary>
+        <input type="range" min="0" max="100" class="iconpaint fp-fipercent-slide" title="Master percent"></input>
+        <input type="number" min="-500" max="500" class="iconpaint fp-fipercent-inp"></input>
+      </details>
+      <details class="fp-filter-cont fp-filter-invert fp-toggle-cont">
+        <summary>Invert</summary>
+        <input type="range" min="0" max="100" class="iconpaint fp-fipercent-slide" title="Master percent"></input>
+        <input type="number" min="-500" max="500" class="iconpaint fp-fipercent-inp"></input>
+      </details>
+      <details class="fp-filter-cont fp-filter-hue-rotate fp-toggle-cont">
+        <summary>Hue rotate</summary>
+        <input type="range" min="0" max="360" class="iconpaint fp-firotate-slide" title="Master rotate"></input>
+        <input type="number" class="iconpaint fp-firotate-inp"></input>
+      </details>
+      <details class="fp-filter-cont fp-filter-grayscale fp-toggle-cont">
+        <summary>Grayscale</summary>
+        <input type="range" min="0" max="100" class="iconpaint fp-fipercent-slide" title="Master percent"></input>
+        <input type="number" min="-500" max="500" class="iconpaint fp-fipercent-inp"></input>
+      </details>
+      <details class="fp-filter-cont fp-filter-drop-shadow fp-toggle-cont">
+        <summary>Drop shadow</summary>
+        <input type="color" class="iconpaint fp-ficolor"></input>
+        <div class="insect">
+        <input type="range" min="0" max="50" class="iconpaint fp-fiblur-slide" title="Blur"></input>
+        <input type="number" min="0" max="500" class="iconpaint fp-fiblur-inp"></input>
+        </div>
+        <div>
+        <input type="range" min="-50" max="50" class="iconpaint fp-fixoff-slide" title="Xoffset"></input>
+        <input type="number" min="-500" max="500" class="iconpaint fp-fixoff-inp"></input>
+        <input type="range" min="-50" max="50" class="iconpaint fp-fiyoff-slide" title="Yoffset"></input>
+        <input type="number" min="-500" max="500" class="iconpaint fp-fiyoff-inp"></input>
+        </div>
+      </details>
+      <details class="fp-filter-cont fp-toggle-cont fp-filter-contrast">
+        <summary>Contrast</summary>
+        <input type="range" min="0" max="200" class="iconpaint fp-fipercent-slide" title="Master percent"></input>
+        <input type="number" min="-500" max="500" class="iconpaint fp-fipercent-inp"></input>
+      </details>
+      <details class="fp-filter-cont fp-toggle-cont fp-filter-brightness">
+        <summary>Brightness</summary>
+        <input type="range" min="0" max="200" class="iconpaint fp-fipercent-slide" title="Master percent"></input>
+        <input type="number" min="-500" max="500" class="iconpaint fp-fipercent-inp"></input>
+      </details>
+      <details class="fp-filter-cont fp-toggle-cont fp-filter-blur">
+        <summary>Gaussian blur</summary>
+        <input type="range" min="0" max="100" class="iconpaint fp-fipixel-slide" title="Master pixel"></input>
+        <input type="number" min="-500" max="500" class="iconpaint fp-fipixel-inp"></input>
+      </details>
+      <details class="fp-filter-cont fp-toggle-cont fp-filter-url">
+        <summary>URL</summary>
+        <input type="text" class="iconpaint fp-fiurl-inp" placeholder="URL"></input>
+      </details>
+    </details>
+    <details class="fp-tmatrix-settings-cont">
+      <summary>Transform Matrix</summary>
+      <div class="fp-tm-matrixsmol">
+      <div class="fp-tm-row">
+      <input type="number" class="iconpaint fp-m11-inp" step="0.1" placeholder="M11"></input>
+      <input type="number" class="iconpaint fp-m21-inp" step="0.1" placeholder="M21"></input>
+      <input type="number" class="iconpaint fp-m41-inp" step="0.1" placeholder="M41"></input>
+      </div>
+      <div class="fp-tm-row insect">
+      <input type="number" class="iconpaint fp-m12-inp" step="0.1" placeholder="M12"></input>
+      <input type="number" class="iconpaint fp-m22-inp" step="0.1" placeholder="M22"></input>
+      <input type="number" class="iconpaint fp-m42-inp" step="0.1" placeholder="M42"></input>
+      </div>
+      </div>
+      <button class="button smallbutton fp-tmload-btn">Load</button>
+      <button class="button smallbutton fp-tmapply-btn">Apply</button>
+      <button class="button smallbutton fp-tmreset-btn">Reset</button>
+    </details>
+    <details class="fp-grad-settings-cont">
+      <summary>Gradient Settings</summary>
+      <div class="flx-center">
+        <canvas class="fp-grad-prev" width="500px" height="100px" style="width:500px;height:100px;"></canvas>
+      </div>
+      <div class="insect">
+        <select class="iconpaint fp-grad-type-select" title="Gradient type">
+          <option value="0">Linear</option>
+          <option value="1">Radial</option>
+          <option value="2">Conic/Angular</option>
+        </select>
+        <button class="smallbutton button iconpaint fp-grad-switch-btn">Switch</button>
+      </div>
+      <div class="fp-grad-stop-cont-cont">
+      
+      <div class="pad-5">
+      <button class="button iconbutton gbtn fp-grad-stop-add">+</button>
+      <button class="button iconbutton rbtn fp-grad-stop-minus">-</button>
+      </div>
+      <hr>
+      <div class="fp-grad-stop-cont">
+      
+      <div class="fp-grad-stop">
+      <input type="color" class="iconpaint fp-grad-color"></input>
+      <br/>
+      <input type="number" min="0" max="255" class="iconpaint fp-grad-opac-inp"></input>
+      <br/>
+      <input type="range" min="0" max="255" class="iconpaint fp-grad-opac-slide" title="Opacity"></input>
+      <br/>
+      <input type="number" min="0" max="1" step="0.01" class="iconpaint fp-grad-stop-inp"></input>
+      <br/>
+      <input type="range" min="0" max="1" step="0.01" class="iconpaint fp-grad-stop-slide" title="Position"></input>
+      </div>
+      
+      <div class="fp-grad-stop">
+      <input type="color" class="iconpaint fp-grad-color"></input>
+      <br/>
+      <input type="number" min="0" max="255" class="iconpaint fp-grad-opac-inp"></input>
+      <br/>
+      <input type="range" min="0" max="255" class="iconpaint fp-grad-opac-slide" title="Opacity"></input>
+      <br/>
+      <input type="number" min="0" max="1" step="0.01" class="iconpaint fp-grad-stop-inp"></input>
+      <br/>
+      <input type="range" min="0" max="1" step="0.01" class="iconpaint fp-grad-stop-slide" title="Position"></input>
+      </div>
+      
+      </div>
+      
+      </div>
+      <details class="fp-toggle-cont fp-grad-clip-cont">
+        <summary>Clipping</summary>
+        <input type="number" min="0" class="iconpaint fp-grad-posx-inp" title="Pos X"></input>
+        <input type="number" min="0" class="iconpaint fp-grad-posy-inp" title="Pos Y"></input>
+        <div class="insect">
+          <input type="number" min="0" class="iconpaint fp-grad-sizx-inp"></input>
+          <input type="number" min="0" class="iconpaint fp-grad-sizy-inp"></input>
+        </div>
+        <input type="range" min="0" step="1" class="iconpaint fp-grad-sizx-slide" title="Size X"></input>
+        <input type="range" min="0" step="1" class="iconpaint fp-grad-sizy-slide" title="Size Y"></input>
+      </details>
+    </details>
     <button class="iconpaint button fp-flipx">FlipX</button>
     <button class="iconpaint button fp-flipy">FlipY</button>
   </div>
   <input type="text" placeholder="File Name" class="filnameinp"></input>
-  <button class="button fildwnbtn">Save</button>
+  <button class="button fildwnbtn">Download</button>
   <button class="button urlopenbtn">URL</button>
+  <button class="button projsavbtn">Save</button>
+  <div class="loadprojcont insect">
+    <h3>Project Management</h3>
+    <hr/>
+    <select class="proj-select">
+      <option value="null">Choose</option>
+    </select>
+    <button class="button smallbutton loadproj-btn">Load</button>
+    <button class="button smallbutton delproj-btn">Delete</button>
+    <br/>
+    <button class="button delallproj-btn">Delete all</button>
+  </div>
   </div>
   <footer>Tested by Ayden<br/>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
@@ -247,39 +508,73 @@
         this.radius = 20;
         this.font = "30px sans-serif";
         this.fv = "normal";
+        this.fs = "normal";
+        this.filter = {
+          active: [],
+          sepia: {p:0},
+          saturate: {p:100},
+          opacity: {p:100},
+          invert: {p:0},
+          hueRotate: {a:0},
+          grayscale: {p:0},
+          dropShadow: {ox:0,oy:0,br:0,clr:"#000000"},
+          contrast: {p:100},
+          brightness: {p:100},
+          blur: {l:0},
+          url: ""
+        };
+        this.transformmtx = [1,0,0,1,0,0];
+        this.gradclip = [0,0,this.canvas.width,this.canvas.height];
+        this.fonttrack = 0;
+        this.wordtrack = 0;
+        this.shadcolor = "#000000";
+        this.shadblur = 0;
+        this.shadox = 0;
+        this.shadoy = 0;
+        this.fontkern = "auto";
         this.strokectx = this.strokedisp.getContext("2d");
         this.paint = this.paint.bind(this);
         this.clear = this.clear.bind(this);
+        this.aptmtx = this.aptmtx.bind(this);
+        this.updfilter = this.updfilter.bind(this);
+        this.updwordtrack = this.updwordtrack.bind(this);
+        this.updfstretch = this.updfstretch.bind(this);
+        this.updfkern = this.updfkern.bind(this);
         this.updrend = this.updrend.bind(this);
         this.updfont = this.updfont.bind(this);
         this.updstroke = this.updstroke.bind(this);
-        this._checkHistory = this._checkHistory.bind(this);
+        this.updsource = this.updsource.bind(this);
+        this.pLoadFont = this.pLoadFont.bind(this);
+        this.updgradclip = this.updgradclip.bind(this);
+        this.rsttmtx = this.rsttmtx.bind(this);
+        this.ldtmtx = this.ldtmtx.bind(this);
+        this._checkKey = this._checkKey.bind(this);
         this.loadhistory2 = this.loadhistory2.bind(this);
         this.loadhistory = this.loadhistory.bind(this);
         this.updtool = this.updtool.bind(this);
         this.savehistory = this.savehistory.bind(this);
+        this.addGradStop = this.addGradStop.bind(this);
+        this.removeGradStop = this.removeGradStop.bind(this);
+        this.switchgrad = this.switchgrad.bind(this);
         this.updfv = this.updfv.bind(this);
         this.flipx = this.flipx.bind(this);
         this.flipy = this.flipy.bind(this);
         this.uploadFil = this.uploadFil.bind(this);
         this.actEyedrop = this.actEyedrop.bind(this);
+        this.updShadow = this.updShadow.bind(this);
+        this.updgradprev = this.updgradprev.bind(this);
         this.prevloc = [0,0];
         this.history = [];
         this.history2 = [];
+        this.inbezier = false;
+        this.curbezier = 0;
+        this.bezierpoints = [];
+        this.activecpoint = [];
+        //mar:canvasmouse
         this.canvas.parentNode.addEventListener("mousedown",e=>{e.preventDefault();
           this.md = true;
           switch(parseInt(this.inp_tool_select.value)){
-            case 0:
-            case 3:
-            case 4:
-            case 1:
-            case 2:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-              this.savehistory();this.prevloc = [Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width))),Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)))];this.paint(e)
+            case 5:
               break;
             case 6:
               //this.inp_tool_select.value = "0";
@@ -288,13 +583,50 @@
               this.inp_color.value = clr;
               this.updstroke();
               break;
+            default:
+              this.prevloc = [Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width))),Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)))];
+              switch(parseInt(this.inp_tool_select.value)){
+                case 16:
+                  //mar:cur
+                  if(!this.inbezier){
+                    this.savehistory();
+                  }
+                  this.curbezier = this.bezierpoints.length;
+                  try{
+                  this.activecpoint = [];
+                  let found = false;
+                  for(let i=0;i<this.bezierpoints.length && !found;i++){
+                    for(let j=0;j<3;j++){
+                      if(Math.sqrt((this.bezierpoints[i][j][0]-this.prevloc[0])**2 + (this.bezierpoints[i][j][1]-this.prevloc[1])**2) <= 5){found=true;this.activecpoint=[i,j];};
+                    };
+                  };
+                  }catch(e){alert(e)}
+                  break;
+                case 12:
+                case 13:
+                case 14:
+                  this.canvas.style.opacity=0;
+                default:
+                  this.savehistory();
+                  break;
+              };
+              this.paint(e)
+              break;
           }
         });
         this.canvas.parentNode.addEventListener("mousemove",this.paint);
-        this.canvas.parentNode.addEventListener("mouseup",e=>{this.md = false;if(!(this.inp_tool_select.value=="5")){this.commit()}});
+        this.canvas.parentNode.addEventListener("mouseup",e=>{this.md = false;if(!(this.inp_tool_select.value=="5")){this.commit(parseInt(this.inp_tool_select.value))}});
         this.canvas.parentNode.addEventListener("click", e=>{if(this.inp_tool_select.value=="5"){
           this.savehistory();
           this.cctx.fontVariantCaps = this.inp_fv_select.value;
+          this.cctx.fontStretch = this.fs;
+          this.cctx.fontKerning = this.fontkern;
+          this.cctx.letterSpacing = this.fonttrack.toString() + "px";
+          this.cctx.wordSpacing = this.wordtrack.toString() + "px";
+          this.cctx.shadowColor = this.shadcolor;
+          this.cctx.shadowBlur = this.shadblur;
+          this.cctx.shadowOffsetX = this.shadox;
+          this.cctx.shadowOffsetY = this.shadoy;
           this.cctx.font = this.font;
           this.cctx.fillStyle = this.clr+this.opacity.toString(16);
           const toinput = document.createElement("textarea");
@@ -305,7 +637,7 @@
             const lines = toinput.value.split("\n");
             for(let i=0;i<lines.length;i++){this.cctx.fillText(lines[i],Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width))),Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)))+i*(this.strokesize*this.linemult))};
           });
-          toinput.addEventListener("focusout",f=>{this.commit();toinput.remove()});
+          toinput.addEventListener("focusout",f=>{this.commit(5);toinput.remove()});
         }});
         if(inp2){
         this.topinp = inp2.getElementsByClassName("iconpaint");
@@ -316,6 +648,8 @@
         this.topinp[3].addEventListener("click",this.uploadFil)
         }
         if(inp){
+        //mar:inpdef
+        this.inp=inp;
         this.inp_tool_select = inp.getElementsByClassName("fp-tool-select")[0];
         this.inp_color = inp.getElementsByClassName("fp-color")[0];
         this.inp_size_slide = inp.getElementsByClassName("fp-size-slide")[0];
@@ -343,15 +677,76 @@
         this.cont_clip = inp.getElementsByClassName("fp-clip-settings-cont")[0];
         this.cont_font = inp.getElementsByClassName("fp-font-settings-cont")[0];
         this.cont_stroke = inp.getElementsByClassName("fp-stroke-settings-cont")[0];
+        this.cont_tmmatrix = inp.getElementsByClassName("fp-tmatrix-settings-cont")[0];
+        this.cont_gradient = inp.getElementsByClassName("fp-grad-settings-cont")[0];
+        this.cont_gradclip = this.cont_gradient.getElementsByClassName("fp-grad-clip-cont")[0];
+        this.inp_delsav_btn = this.cont_font.getElementsByClassName("fp-delsav-btn")[0];
+        this.inp_savefont_check = this.cont_font.getElementsByClassName("fp-savefont-check")[0];
+        this.prev_grad = this.cont_gradient.getElementsByClassName("fp-grad-prev")[0];
+        this.gradctx = this.prev_grad.getContext("2d");
+        this.inp_grad_posx_inp = this.cont_gradclip.getElementsByClassName("fp-grad-posx-inp")[0];
+        this.inp_grad_posy_inp = this.cont_gradclip.getElementsByClassName("fp-grad-posy-inp")[0];
+        this.inp_grad_sizx_inp = this.cont_gradclip.getElementsByClassName("fp-grad-sizx-inp")[0];
+        this.inp_grad_sizy_inp = this.cont_gradclip.getElementsByClassName("fp-grad-sizy-inp")[0];
+        this.inp_grad_sizx_sld = this.cont_gradclip.getElementsByClassName("fp-grad-sizx-slide")[0];
+        this.inp_grad_sizy_sld = this.cont_gradclip.getElementsByClassName("fp-grad-sizy-slide")[0];
+        this.inp_grad_sizx_inp.max = this.inp_grad_sizx_sld.max = this.canvas.width;
+        this.inp_grad_sizy_sld.max = this.inp_grad_sizy_inp.max = this.canvas.height;
+        [this.inp_grad_posx_inp.value,this.inp_grad_posy_inp.value,this.inp_grad_sizx_inp.value,this.inp_grad_sizy_inp.value] = this.gradclip;
+        [this.inp_grad_sizx_sld.value,this.inp_grad_sizy_sld.value] = [this.inp_grad_sizx_inp.value,this.inp_grad_sizy_inp.value];
+        this.inp_grad_posy_inp.addEventListener("input",this.updgradclip);
+        this.inp_grad_posx_inp.addEventListener("input",this.updgradclip);
+        this.inp_grad_sizx_inp.addEventListener("input",e=>{this.inp_grad_sizx_sld.value=this.inp_grad_sizx_inp.value;this.updgradclip();});
+        this.inp_grad_sizy_inp.addEventListener("input",e=>{this.inp_grad_sizy_sld.value=this.inp_grad_sizy_inp.value;this.updgradclip();});
+        this.inp_grad_sizy_sld.addEventListener("input",e=>{this.inp_grad_sizy_inp.value=this.inp_grad_sizy_sld.value;this.updgradclip();});
+        this.inp_grad_sizx_sld.addEventListener("input",e=>{this.inp_grad_sizx_inp.value=this.inp_grad_sizx_sld.value;this.updgradclip();});
+        this.inp_grad_type_select = this.cont_gradient.getElementsByClassName("fp-grad-type-select")[0];
+        this.inp_grad_switch_btn = this.cont_gradient.getElementsByClassName("fp-grad-switch-btn")[0];
+        this.updateStopList();
+        this.inp_grad_stop_minus = this.cont_gradient.getElementsByClassName("fp-grad-stop-minus")[0];
+        this.inp_grad_stop_add = this.cont_gradient.getElementsByClassName("fp-grad-stop-add")[0];
+        this.inp_tmrst_btn = this.cont_tmmatrix.getElementsByClassName("fp-tmreset-btn")[0];
+        this.inp_tmload_btn = this.cont_tmmatrix.getElementsByClassName("fp-tmload-btn")[0];
+        this.inp_tmapply_btn = this.cont_tmmatrix.getElementsByClassName("fp-tmapply-btn")[0];
+        this.inp_tm_m11_inp = this.cont_tmmatrix.getElementsByClassName("fp-m11-inp")[0];
+        this.inp_tm_m21_inp = this.cont_tmmatrix.getElementsByClassName("fp-m21-inp")[0];
+        this.inp_tm_m41_inp = this.cont_tmmatrix.getElementsByClassName("fp-m41-inp")[0];
+        this.inp_tm_m12_inp = this.cont_tmmatrix.getElementsByClassName("fp-m12-inp")[0];
+        this.inp_tm_m22_inp = this.cont_tmmatrix.getElementsByClassName("fp-m22-inp")[0];
+        this.inp_tm_m42_inp = this.cont_tmmatrix.getElementsByClassName("fp-m42-inp")[0];
         this.inp_loadf_btn = inp.getElementsByClassName("fp-loadf-btn")[0];
         this.inp_fonturl_inp = inp.getElementsByClassName("fp-fonturl-inp")[0];
+        this.inp_fontfile_inp = inp.getElementsByClassName("fp-fontfile-inp")[0];
+        this.inp_rfontfile_inp = inp.getElementsByClassName("fp-rfontfile-inp")[0];
         this.inp_fontname_inp = inp.getElementsByClassName("fp-fontname-inp")[0];
+        this.inp_fontsource_select = inp.getElementsByClassName("fp-fontsource-select")[0];
+        this.inp_fontsource_items = inp.getElementsByClassName("fp-fontsource-item");
+        this.inp_fstretch_select = inp.getElementsByClassName("fp-fstretch-select")[0];
+        this.inp_fkern_select = inp.getElementsByClassName("fp-fkern-select")[0];
+        this.inp_ttrack_inp = inp.getElementsByClassName("fp-ttrack-inp")[0];
+        this.inp_ttrack_slide = inp.getElementsByClassName("fp-ttrack-slide")[0];
+        this.inp_twtrack_inp = inp.getElementsByClassName("fp-twtrack-inp")[0];
+        this.inp_twtrack_slide = inp.getElementsByClassName("fp-twtrack-slide")[0];
+        this.inp_sblur_slide = inp.getElementsByClassName("fp-sblur-slide")[0];
+        this.inp_sblur_inp = inp.getElementsByClassName("fp-sblur-inp")[0];
+        this.inp_sxoff_slide = inp.getElementsByClassName("fp-sxoff-slide")[0];
+        this.inp_sxoff_inp = inp.getElementsByClassName("fp-sxoff-inp")[0];
+        this.inp_syoff_slide = inp.getElementsByClassName("fp-syoff-slide")[0];
+        this.inp_syoff_inp = inp.getElementsByClassName("fp-syoff-inp")[0];
+        this.inp_scolor = inp.getElementsByClassName("fp-scolor")[0];
+        this.inp_filter_settings_cont = inp.getElementsByClassName("fp-filter-settings-cont")[0];
+        this.inp_filter_conts = this.inp_filter_settings_cont.getElementsByClassName("fp-filter-cont");
+        this.inp_ttrack_inp.value = this.inp_ttrack_slide.value = this.fonttrack;
         this.inp_size_inp.value = this.inp_size_slide.value = this.strokesize.toString();
         this.inp_soft_slide.value = this.inp_soft_inp.value = this.softness.toString();
         this.inp_opac_slide.value = this.inp_opac_inp.value = this.opacity.toString();
         this.inp_step_slide.value = this.inp_step_inp.value = this.step.toString();
         this.inp_radius_inp.value = this.inp_radius_slide.value = this.radius.toString();
         this.inp_line_slide.value = this.inp_line_inp.value = this.linemult.toString();
+        this.inp_sblur_slide.value = this.inp_sblur_inp.value = this.shadblur.toString();
+        this.inp_sxoff_slide.value = this.inp_sxoff_inp.value = this.shadox.toString();
+        this.inp_syoff_slide.value = this.inp_syoff_inp.value = this.shadoy.toString();
+        this.inp_twtrack_inp.value = this.inp_twtrack_inp.value = this.wordtrack.toString();
         this.inp_color.addEventListener("input",e=>{this.clr = this.inp_color.value;this.updstroke();})
         this.inp_size_slide.addEventListener("input",e=>{this.inp_size_inp.value = this.inp_size_slide.value;this.updsize();this.updfont()});
         this.inp_size_inp.addEventListener("input",e=>{this.inp_size_slide.value = this.inp_size_inp.value;this.updsize();this.updfont()});
@@ -365,7 +760,25 @@
         this.inp_radius_inp.addEventListener("input",e=>{this.inp_radius_slide.value = this.inp_radius_inp.value;this.updrad()});
         this.inp_line_slide.addEventListener("input",e=>{this.inp_line_inp.value = this.inp_line_slide.value;this.updlinem();});
         this.inp_line_inp.addEventListener("input",e=>{this.inp_line_slide.value = this.inp_line_inp.value;this.updlinem();});
+        this.inp_ttrack_slide.addEventListener("input",e=>{this.inp_ttrack_inp.value = this.inp_ttrack_slide.value;this.updftrack();});
+        this.inp_ttrack_inp.addEventListener("input",e=>{this.inp_ttrack_slide.value = this.inp_ttrack_inp.value;this.updftrack();});
+        this.inp_twtrack_slide.addEventListener("input",e=>{this.inp_twtrack_inp.value = this.inp_twtrack_slide.value;this.updwordtrack()});
+        this.inp_twtrack_inp.addEventListener("input",e=>{this.inp_twtrack_slide.value = this.inp_twtrack_inp.value;this.updwordtrack()});
+        this.inp_sblur_slide.addEventListener("input",e=>{this.inp_sblur_inp.value = this.inp_sblur_slide.value;this.updShadow()});
+        this.inp_sblur_inp.addEventListener("input",e=>{this.inp_sblur_slide.value = this.inp_sblur_inp.value;this.updShadow()});
+        this.inp_sxoff_slide.addEventListener("input",e=>{this.inp_sxoff_inp.value = this.inp_sxoff_slide.value;this.updShadow()});
+        this.inp_sxoff_inp.addEventListener("input",e=>{this.inp_sxoff_slide.value = this.inp_sxoff_inp.value;this.updShadow()});
+        this.inp_syoff_slide.addEventListener("input",e=>{this.inp_syoff_inp.value = this.inp_syoff_slide.value;this.updShadow()});
+        this.inp_syoff_inp.addEventListener("input",e=>{this.inp_syoff_slide.value = this.inp_syoff_inp.value;this.updShadow()});
+        this.inp_grad_stop_add.addEventListener("click",this.addGradStop);
+        this.inp_grad_stop_minus.addEventListener("click",this.removeGradStop);
+        for(let i=0;i<this.inp_grad_stops.length;i++){
+          this.addStopListener(this.inp_grad_stops[i]);
+          this.inp_grad_stops[i].getElementsByClassName("fp-grad-opac-inp")[0].value = this.inp_grad_stops[i].getElementsByClassName("fp-grad-opac-slide")[0].value = 255;
+        }
+        this.inp_scolor.addEventListener("input",this.updShadow);
         this.inp_blendmode_select.addEventListener("input",e=>{this.ccanvas.style.mixBlendMode = this.inp_blendmode_select.value});
+        this.inp_grad_type_select.addEventListener("input",this.updgradprev);
         this.inp_flipx.addEventListener("click",this.flipx);
         this.inp_flipy.addEventListener("click",this.flipy);
         this.inp_ff_select.addEventListener("input",this.updfont);
@@ -373,12 +786,133 @@
         this.inp_tool_select.addEventListener("input",this.updtool);
         this.inp_rend_select.addEventListener("input",this.updrend);
         this.inp_fv_select.addEventListener("input",this.updfv);
-        this.inp_loadf_btn.addEventListener("click",e=>{this.loadFont(this.inp_fontname_inp.value,this.inp_fonturl_inp.value)});
-        this.updrend();
+        this.inp_loadf_btn.addEventListener("click",this.pLoadFont);
+        this.inp_fontsource_select.addEventListener("input",this.updsource);
+        this.inp_fontfile_inp.addEventListener("click",e=>{this.inp_rfontfile_inp.click()});
+        this.inp_fstretch_select.addEventListener("input",this.updfstretch);
+        this.inp_fkern_select.addEventListener("input",this.updfkern);
+        this.inp_tmrst_btn.addEventListener("click",this.rsttmtx);
+        this.inp_tmload_btn.addEventListener("click",this.ldtmtx);
+        this.inp_tmapply_btn.addEventListener("click",this.aptmtx);
+        this.inp_grad_switch_btn.addEventListener("click",this.switchgrad);
+        this.inp_delsav_btn.addEventListener("click",e=>{localStorage.removeItem("fp-font-storage")});
+        this.savedfonts = JSON.parse(localStorage.getItem("fp-font-storage")) || [];
+        for(let i=0;i<this.savedfonts.length;i++){this.loadFont(this.savedfonts[i][0],this.savedfonts[i][1])};
+        for(let i=0;i<this.inp_filter_conts.length;i++){
+          let currfilter = this.inp_filter_conts[i];
+          let filterid = currfilter.classList.item(1).replace("fp-filter-","");
+          currfilter.addEventListener("toggle",this.updfilter);
+          ///*
+          switch(filterid){
+            case "sepia":
+              let perslide = currfilter.getElementsByClassName("fp-fipercent-slide")[0];
+              let perinp = currfilter.getElementsByClassName("fp-fipercent-inp")[0];
+              perslide.value = this.filter.sepia.p;
+              perinp.value = this.filter.sepia.p;
+              perslide.addEventListener("input",e=>{perinp.value=this.filter.sepia.p=perslide.value;})
+              perinp.addEventListener("input",e=>{perslide.value=this.filter.sepia.p=perinp.value;})
+              //alert(perslide.value);
+              break;
+            case "saturate":
+              let satperslide = currfilter.getElementsByClassName("fp-fipercent-slide")[0];
+              let satperinp = currfilter.getElementsByClassName("fp-fipercent-inp")[0];
+              satperslide.value = this.filter.saturate.p;
+              satperinp.value = this.filter.saturate.p;
+              satperslide.addEventListener("input",e=>{satperinp.value=this.filter.saturate.p=satperslide.value;})
+              satperinp.addEventListener("input",e=>{satperslide.value=this.filter.saturate.p=satperinp.value;})
+              break;
+            case "opacity":
+              let opaperslide = currfilter.getElementsByClassName("fp-fipercent-slide")[0];
+              let opaperinp = currfilter.getElementsByClassName("fp-fipercent-inp")[0];
+              opaperslide.value = this.filter.opacity.p;
+              opaperinp.value = this.filter.opacity.p;
+              opaperslide.addEventListener("input",e=>{opaperinp.value=this.filter.opacity.p=opaperslide.value;})
+              opaperinp.addEventListener("input",e=>{opaperslide.value=this.filter.opacity.p=opaperinp.value;})
+              break;
+            case "invert":
+              let invperslide = currfilter.getElementsByClassName("fp-fipercent-slide")[0];
+              let invperinp = currfilter.getElementsByClassName("fp-fipercent-inp")[0];
+              invperslide.value = this.filter.invert.p;
+              invperinp.value = this.filter.invert.p;
+              invperslide.addEventListener("input",e=>{invperinp.value=this.filter.invert.p=invperslide.value;})
+              invperinp.addEventListener("input",e=>{invperslide.value=this.filter.invert.p=invperinp.value;})
+              break;
+            case "hue-rotate":
+              let hrotslide = currfilter.getElementsByClassName("fp-firotate-slide")[0];
+              let hrotinp = currfilter.getElementsByClassName("fp-firotate-inp")[0];
+              hrotslide.value = this.filter.hueRotate.a;
+              hrotinp.value = this.filter.hueRotate.a;
+              hrotslide.addEventListener("input",e=>{hrotinp.value=this.filter.hueRotate.a=hrotslide.value;})
+              hrotinp.addEventListener("input",e=>{hrotslide.value=this.filter.hueRotate.a=hrotinp.value;})
+              break;
+            case "grayscale":
+              let greperslide = currfilter.getElementsByClassName("fp-fipercent-slide")[0];
+              let greperinp = currfilter.getElementsByClassName("fp-fipercent-inp")[0];
+              greperslide.value = this.filter.grayscale.p;
+              greperinp.value = this.filter.grayscale.p;
+              greperslide.addEventListener("input",e=>{greperinp.value=this.filter.grayscale.p=greperslide.value;})
+              greperinp.addEventListener("input",e=>{greperslide.value=this.filter.grayscale.p=greperinp.value;})
+              break;
+            case "blur":
+              let blupixslide = currfilter.getElementsByClassName("fp-fipixel-slide")[0];
+              let blupixinp = currfilter.getElementsByClassName("fp-fipixel-inp")[0];
+              blupixslide.value = this.filter.blur.l;
+              blupixinp.value = this.filter.blur.l;
+              blupixslide.addEventListener("input",e=>{blupixinp.value=this.filter.blur.l=blupixslide.value;})
+              blupixinp.addEventListener("input",e=>{blupixslide.value=this.filter.blur.l=blupixinp.value;})
+              break;
+            case "url":
+              let urlinp = currfilter.getElementsByClassName("fp-fiurl-inp")[0];
+              urlinp.addEventListener("input",e=>{this.filter.url = urlinp.value});
+              break;
+            case "contrast":
+              let conperslide = currfilter.getElementsByClassName("fp-fipercent-slide")[0];
+              let conperinp = currfilter.getElementsByClassName("fp-fipercent-inp")[0];
+              conperslide.value = this.filter.contrast.p;
+              conperinp.value = this.filter.contrast.p;
+              conperslide.addEventListener("input",e=>{conperinp.value=this.filter.contrast.p=conperslide.value;})
+              conperinp.addEventListener("input",e=>{conperslide.value=this.filter.contrast.p=conperinp.value;})
+              break;
+            case "brightness":
+              let briperslide = currfilter.getElementsByClassName("fp-fipercent-slide")[0];
+              let briperinp = currfilter.getElementsByClassName("fp-fipercent-inp")[0];
+              briperslide.value = this.filter.brightness.p;
+              briperinp.value = this.filter.brightness.p;
+              briperslide.addEventListener("input",e=>{briperinp.value=this.filter.brightness.p=briperslide.value;})
+              briperinp.addEventListener("input",e=>{briperslide.value=this.filter.brightness.p=briperinp.value;})
+              break;
+            case "drop-shadow":
+              let dscolor = currfilter.getElementsByClassName("fp-ficolor")[0];
+              let dsblurslide = currfilter.getElementsByClassName("fp-fiblur-slide")[0];
+              let dsblurinp = currfilter.getElementsByClassName("fp-fiblur-inp")[0];
+              let dsxoffslide = currfilter.getElementsByClassName("fp-fixoff-slide")[0];
+              let dsxoffinp = currfilter.getElementsByClassName("fp-fixoff-inp")[0];
+              let dsyoffslide = currfilter.getElementsByClassName("fp-fiyoff-slide")[0];
+              let dsyoffinp = currfilter.getElementsByClassName("fp-fiyoff-inp")[0];
+              dsblurinp.value = dsblurslide.value = this.filter.dropShadow.br;
+              dsxoffslide.value = dsxoffinp.value = this.filter.dropShadow.ox;
+              dsyoffslide.value = dsyoffinp.value = this.filter.dropShadow.oy;
+              dscolor.addEventListener("input",e=>{this.filter.dropShadow.clr=dscolor.value});
+              dsblurslide.addEventListener("input",e=>{dsblurinp.value=this.filter.dropShadow.br=dsblurslide.value;});
+              dsblurinp.addEventListener("input",e=>{dsblurslide.value=this.filter.dropShadow.br=dsblurinp.value;});
+              dsxoffslide.addEventListener("input",e=>{dsxoffinp.value=this.filter.dropShadow.ox=dsxoffslide.value;});
+              dsxoffinp.addEventListener("input",e=>{dsxoffslide.value=this.filter.dropShadow.ox=dsxoffinp.value;});
+              dsyoffslide.addEventListener("input",e=>{dsyoffinp.value=this.filter.dropShadow.oy=dsyoffslide.value;});
+              dsyoffinp.addEventListener("input",e=>{dsyoffslide.value=this.filter.dropShadow.oy=dsyoffinp.value;});
+              break;
+          }
+          //*/
         }
-        document.addEventListener("keydown",this._checkHistory);
+        //*/
+        this.updrend();
         this.updstroke();
+        this.rsttmtx();
+        this.updgradprev();
+        this.updgradstops();
+        }
+        document.addEventListener("keydown",this._checkKey);
       }
+      //mar:paint
       paint(e) {
         const realX = Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width)));
         const realY = Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)));
@@ -386,6 +920,8 @@
         if(this.md){
           let contextused = this.cctx;
           let alphaused = 255;
+          contextused.filter = this.getFil();
+          contextused.setTransform(this.transformmtx[0],this.transformmtx[1],this.transformmtx[2],this.transformmtx[3],this.transformmtx[4],this.transformmtx[5]);
           switch(parseInt(this.inp_tool_select.value)){
             case 0:
             case 3:
@@ -454,11 +990,19 @@
               }
               break;
             case 1:
+              contextused.shadowColor = this.shadcolor;
+              contextused.shadowBlur = this.shadblur;
+              contextused.shadowOffsetX = this.shadox;
+              contextused.shadowOffsetY = this.shadoy;
               contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
               contextused.fillStyle = this.clr;
               contextused.fillRect(this.prevloc[0],this.prevloc[1],realX-this.prevloc[0],realY-this.prevloc[1]);
               break;
             case 4:
+              contextused.shadowColor = this.shadcolor;
+              contextused.shadowBlur = this.shadblur;
+              contextused.shadowOffsetX = this.shadox;
+              contextused.shadowOffsetY = this.shadoy;
               contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
               contextused.fillStyle = this.clr;
               const widthused = Math.max(realX-this.prevloc[0],realY-this.prevloc[1]);
@@ -466,6 +1010,10 @@
               break;
             case 2:
               contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
+              contextused.shadowColor = this.shadcolor;
+              contextused.shadowBlur = this.shadblur;
+              contextused.shadowOffsetX = this.shadox;
+              contextused.shadowOffsetY = this.shadoy;
               contextused.fillStyle = this.clr;
               contextused.beginPath();
               contextused.ellipse(this.prevloc[0],this.prevloc[1],Math.abs(realX-this.prevloc[0]),Math.abs(realY-this.prevloc[1]),0,0,Math.PI*2);
@@ -474,6 +1022,10 @@
               break;
             case 8:
               contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
+              contextused.shadowColor = this.shadcolor;
+              contextused.shadowBlur = this.shadblur;
+              contextused.shadowOffsetX = this.shadox;
+              contextused.shadowOffsetY = this.shadoy;
               contextused.fillStyle = this.clr;
               contextused.beginPath();
               contextused.arc(this.prevloc[0],this.prevloc[1],Math.max(realX-this.prevloc[0],realY-this.prevloc[1]),0,Math.PI*2);
@@ -482,6 +1034,10 @@
               break;
             case 7:
               contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
+              contextused.shadowColor = this.shadcolor;
+              contextused.shadowBlur = this.shadblur;
+              contextused.shadowOffsetX = this.shadox;
+              contextused.shadowOffsetY = this.shadoy;
               contextused.fillStyle = this.clr;
               contextused.beginPath();
               contextused.roundRect(this.prevloc[0],this.prevloc[1],realX-this.prevloc[0],realY-this.prevloc[1],this.radius);
@@ -524,14 +1080,247 @@
               }
               else {this.selection[0] = false};
               break;
+            case 12:
+            case 13:
+            case 14:
+              contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
+              switch(this.inp_rend_select.value){
+                case "pixelated":
+                  contextused.imageSmoothingEnabled = false;
+                  break;
+                default:
+                  contextused.imageSmoothingEnabled = true;
+                  break;
+              }
+              switch(parseInt(this.inp_tool_select.value)){
+                case 12:
+                  contextused.translate(realX-this.prevloc[0],realY-this.prevloc[1]);
+                  this.pathOverlay(this.prevloc[0],this.prevloc[1],realX,realY,false);
+                  break;
+                case 13:
+                  contextused.translate(this.prevloc[0],this.prevloc[1]);
+                  contextused.rotate(-Math.atan2(realX-this.prevloc[0],realY-this.prevloc[1]));
+                  contextused.translate(-this.prevloc[0],-this.prevloc[1]);
+                  this.pathOverlay(this.prevloc[0],this.prevloc[1],realX,realY,true);
+                  break;
+                case 14:
+                  contextused.translate(this.prevloc[0],this.prevloc[1]);
+                  contextused.scale((this.canvas.width+(realX-this.prevloc[0]))/this.canvas.width,(this.canvas.height+(realY-this.prevloc[1]))/this.canvas.height);
+                  contextused.translate(-this.prevloc[0],-this.prevloc[1]);
+                  this.pathOverlay(this.prevloc[0],this.prevloc[1],realX,realY,false);
+                  break;
+              };
+              contextused.drawImage(this.canvas,0,0);
+              contextused.resetTransform();
+              break;
+            case 15:
+              let gradient;
+              switch(parseInt(this.inp_grad_type_select.value)){
+                case 0:
+                  gradient = contextused.createLinearGradient(this.prevloc[0], this.prevloc[1], realX, realY);
+                  this.pathOverlay(this.prevloc[0],this.prevloc[1],realX,realY,false);
+                  break;
+                case 1:
+                  gradient = contextused.createRadialGradient(this.prevloc[0], this.prevloc[1], 0, this.prevloc[0], this.prevloc[1], Math.sqrt((realX-this.prevloc[0])**2 + (realY-this.prevloc[1])**2));
+                  //alert(Math.sqrt((realX-this.prevloc[0])**2 + (realY-this.prevloc[1])**2))
+                  this.pathOverlay(this.prevloc[0],this.prevloc[1],realX,realY,true);
+                  break;
+                case 2:
+                  gradient = contextused.createConicGradient(Math.atan2(realX-this.prevloc[0],-(realY-this.prevloc[1]))-Math.PI/2,this.prevloc[0], this.prevloc[1]);
+                  this.pathOverlay(this.prevloc[0],this.prevloc[1],realX,realY,false);
+                  break;
+              }
+              /*
+              gradient.addColorStop(0, this.gradcolor[0]);
+              gradient.addColorStop(1, this.gradcolor[1]);
+              */
+              for(let i=0;i<this.inp_grad_stops.length;i++){
+                gradient.addColorStop(this.inp_grad_stops[i].getElementsByClassName("fp-grad-stop-inp")[0].value,this.inp_grad_stops[i].getElementsByClassName("fp-grad-color")[0].value+parseInt(this.inp_grad_stops[i].getElementsByClassName("fp-grad-opac-inp")[0].value).toString(16).padStart(2,"0"))
+              }
+              contextused.fillStyle = gradient;
+              contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
+              if(this.cont_gradclip.open){
+                contextused.fillRect(this.gradclip[0],this.gradclip[1],this.gradclip[2],this.gradclip[3]);
+              }else{
+                contextused.fillRect(0,0,this.canvas.width,this.canvas.height);
+              }
+              break;
+            case 16:
+              //over = false
+              if(this.activecpoint.length>0){
+                switch(this.activecpoint[1]){
+                  case 0:
+                    const dx = realX-this.bezierpoints[this.activecpoint[0]][this.activecpoint[1]][0];
+                    const dy = realY-this.bezierpoints[this.activecpoint[0]][this.activecpoint[1]][1];
+                    this.bezierpoints[this.activecpoint[0]][1][0]+=dx;
+                    this.bezierpoints[this.activecpoint[0]][1][1]+=dy;
+                    this.bezierpoints[this.activecpoint[0]][2][0]+=dx;
+                    this.bezierpoints[this.activecpoint[0]][2][1]+=dy;
+                    break;
+                  //case 1:
+                  //case 2:
+                  default:
+                    const mod = this.activecpoint[1]==1 ? 2 : 1;
+                    this.bezierpoints[this.activecpoint[0]][mod][0]=this.bezierpoints[this.activecpoint[0]][0][0]+(this.bezierpoints[this.activecpoint[0]][0][0]-realX);
+                    this.bezierpoints[this.activecpoint[0]][mod][1]=this.bezierpoints[this.activecpoint[0]][0][1]+(this.bezierpoints[this.activecpoint[0]][0][1]-realY);
+                    break;
+                }
+                this.bezierpoints[this.activecpoint[0]][this.activecpoint[1]][0]=realX;
+                this.bezierpoints[this.activecpoint[0]][this.activecpoint[1]][1]=realY;
+              }else{
+                if(!this.inbezier){
+                  this.inbezier = true;
+                  //mar:cur (commit inbezier on keyup)?
+                  this.bezierpoints.push([this.prevloc,this.prevloc,this.prevloc]);
+                  this.curbezier+=1;
+                }
+                const autoset = (realX-this.bezierpoints[this.curbezier-1][0][0])/2;
+                if(!this.bezierpoints[this.curbezier]){
+                  this.bezierpoints.push([[realX,realY],[realX-autoset,realY],[realX+autoset,realY]]);
+                }else{
+                  this.bezierpoints[this.curbezier] = [[realX,realY],[realX-autoset,realY],[realX+autoset,realY]];
+                  if(this.curbezier==1){
+                    this.bezierpoints[this.curbezier-1][2] = [this.bezierpoints[this.curbezier-1][0][0]+autoset,this.bezierpoints[this.curbezier-1][0][1]];
+                  } /*else {
+                    //implement rotation normal of p1 to p2?
+                    this.bezierpoints[this.curbezier-1][2] = ;
+                  }*/
+                }
+              }
+              
+              contextused.clearRect(0,0,this.canvas.width,this.canvas.height);
+              for(let i=1;i<this.bezierpoints.length;i++){
+                contextused.beginPath();
+                contextused.moveTo(this.bezierpoints[i-1][0][0],this.bezierpoints[i-1][0][1]);
+                contextused.bezierCurveTo(this.bezierpoints[i-1][2][0],this.bezierpoints[i-1][2][1],this.bezierpoints[i][1][0],this.bezierpoints[i][1][1],this.bezierpoints[i][0][0],this.bezierpoints[i][0][1]);
+                contextused.stroke();
+              }
+              if(this.selection[0]){this.renderSelect();}else{this.octx.clearRect(0,0,this.canvas.width,this.canvas.height);};
+              for(let i=0;i<this.bezierpoints.length;i++){
+                let mpath = new Path2D();
+                let tpath = new Path2D();
+                this.octx.fillStyle = "black";
+                mpath.arc(this.bezierpoints[i][0][0],this.bezierpoints[i][0][1],3,0,Math.PI*2);
+                tpath.arc(this.bezierpoints[i][1][0],this.bezierpoints[i][1][1],3,0,Math.PI*2);
+                mpath.addPath(tpath);
+                tpath = new Path2D();
+                tpath.arc(this.bezierpoints[i][2][0],this.bezierpoints[i][2][1],3,0,Math.PI*2);
+                mpath.addPath(tpath);
+                tpath = new Path2D();
+                this.octx.fill(mpath);
+                this.octx.fillStyle = "white";
+                mpath = new Path2D();
+                mpath.arc(this.bezierpoints[i][0][0],this.bezierpoints[i][0][1],2,0,Math.PI*2);
+                tpath.arc(this.bezierpoints[i][1][0],this.bezierpoints[i][1][1],2,0,Math.PI*2);
+                mpath.addPath(tpath);
+                tpath = new Path2D();
+                tpath.arc(this.bezierpoints[i][2][0],this.bezierpoints[i][2][1],2,0,Math.PI*2);
+                mpath.addPath(tpath);
+                this.octx.fill(mpath);
+                /*
+                if(!over){
+                  for(let j=0;j<3;j++){
+                    if(Math.sqrt((this.bezierpoints[i][j][0]-realX)**2 + (this.bezierpoints[i][j][1]-realY)**2) <= 5){over=true;this.bezierpoints[i][j][0]=realX;this.bezierpoints[i][j][0]=realY}
+                  };
+                };
+                */
+              }
           }
-          this.ctx.globalCompositeOperation = "source-over";
+          contextused.filter = "";
+          contextused.resetTransform();
+          contextused.globalCompositeOperation = "source-over";
+          contextused.imageSmoothingEnabled = true;
         };
         return;
+      }
+      pathOverlay(startx,starty,endx,endy,circle){
+        if(this.selection[0]){this.renderSelect();}else{this.octx.clearRect(0,0,this.canvas.width,this.canvas.height);};
+        this.octx.fillStyle = this.octx.strokeStyle = "white";
+        this.octx.fillRect(startx-2,starty-2,5,5);
+        this.octx.fillRect(endx-2,endy-2,5,5);
+        this.octx.lineWidth = 3;
+        this.octx.beginPath();
+        this.octx.moveTo(startx,starty);
+        this.octx.lineTo(endx,endy);
+        this.octx.stroke();
+        if(circle){
+        this.octx.beginPath();
+        this.octx.arc(startx,starty,Math.sqrt((endx-startx)**2 + (endy-starty)**2),0,Math.PI*2);
+        this.octx.stroke();
+        }
+        this.octx.fillStyle = this.octx.strokeStyle = "black";
+        this.octx.lineWidth = 1;
+        this.octx.stroke();
+        if(circle){
+        this.octx.beginPath();
+        this.octx.moveTo(startx,starty);
+        this.octx.lineTo(endx,endy);
+        this.octx.stroke();
+        }
+        this.octx.fillRect(startx-1,starty-1,3,3);
+        this.octx.fillRect(endx-1,endy-1,3,3);
+      }
+      getFil(){
+        if(this.filter.active.length == 0){return "none"};
+        let contstring = "";
+        for(let i=0;i<this.filter.active.length;i++){
+          switch(this.filter.active[i]){
+            case "sepia":
+              contstring+=" sepia("+this.filter.sepia.p+"%)";
+              break;
+            case "saturate":
+              contstring+=" saturate("+this.filter.saturate.p+"%)";
+              break;
+            case "opacity":
+              contstring+=" opacity("+this.filter.opacity.p+"%)";
+              break;
+            case "invert":
+              contstring+=" invert("+this.filter.invert.p+"%)";
+              break;
+            case "grayscale":
+              contstring+=" grayscale("+this.filter.grayscale.p+"%)";
+              break;
+            case "contrast":
+              contstring+=" contrast("+this.filter.contrast.p+"%)";
+              break;
+            case "brightness":
+              contstring+=" brightness("+this.filter.brightness.p+"%)";
+              break;
+            case "blur":
+              contstring+=" blur("+this.filter.blur.l+"px)";
+              break;
+            case "hue-rotate":
+              contstring+=" hue-rotate("+this.filter.hueRotate.a+"deg)";
+              break;
+            case "url":
+              contstring+=" url("+this.filter.url+")";
+              break;
+            case "drop-shadow":
+              contstring+=" drop-shadow("+this.filter.dropShadow.ox+"px "+this.filter.dropShadow.oy+"px "+this.filter.dropShadow.br+"px "+this.filter.dropShadow.clr+")";
+              break;
+          }
+        }
+        return contstring;
       }
       hex2rgb(s) {return [parseInt(s.substring(1,3),16),parseInt(s.substring(3,5),16),parseInt(ss.substring(5,7),16)]}
       rgb2hex(a) {return "#" + a[0].toString(16).padStart(2,"0") + a[1].toString(16).padStart(2,"0") + a[2].toString(16).padStart(2,"0")}
       clear(e) {this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)}
+      rsttmtx() {
+        this.transformmtx = [1,0,0,1,0,0];
+        [this.inp_tm_m11_inp.value,this.inp_tm_m12_inp.value,this.inp_tm_m21_inp.value,this.inp_tm_m22_inp.value,this.inp_tm_m41_inp.value,this.inp_tm_m42_inp.value] = this.transformmtx;
+      }
+      ldtmtx() {
+        this.transformmtx = [this.inp_tm_m11_inp.value,this.inp_tm_m12_inp.value,this.inp_tm_m21_inp.value,this.inp_tm_m22_inp.value,this.inp_tm_m41_inp.value,this.inp_tm_m42_inp.value];
+      }
+      aptmtx() {
+        this.cctx.filter = this.getFil();
+        this.cctx.setTransform(this.inp_tm_m11_inp.value,this.inp_tm_m12_inp.value,this.inp_tm_m21_inp.value,this.inp_tm_m22_inp.value,this.inp_tm_m41_inp.value,this.inp_tm_m42_inp.value);
+        this.cctx.drawImage(this.canvas,0,0);
+        this.cctx.filter = "";
+        this.cctx.resetTransform();
+        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+        this.commit(0);
+      }
       flipx(e) {
         this.savehistory();
         const oimg = this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height);
@@ -560,12 +1349,49 @@
         this.ctx.putImageData(nimg,0,0);
         return;
       }
+      pLoadFont(e) {
+        if(this.inp_fontname_inp.value == ""){
+          alert("Empty font Name!")
+        }
+        else{
+          switch(this.inp_fontsource_select.value){
+            case "fp-furl-cont":
+              if(this.inp_fonturl_inp.value == ""){
+                alert("Empty font URL!")
+              }else{
+                this.loadFont(this.inp_fontname_inp.value,this.inp_fonturl_inp.value);
+                if(this.inp_savefont_check.checked){this.saveFont(this.inp_fontname_inp.value,fr.result);};
+              }
+              break;
+            case "fp-ffile-cont":
+              if(this.inp_rfontfile_inp.files.length == 0){
+                alert("Empty font file input!")
+              }else{
+                const fr = new FileReader();
+                fr.onload = ()=>{
+                  const furl = URL.createObjectURL((new Blob([fr.result],{type:this.inp_rfontfile_inp.files[0].type})));
+                  this.loadFont(this.inp_fontname_inp.value,furl);
+                  fr.onload = ()=>{if(this.inp_savefont_check.checked){this.saveFont(this.inp_fontname_inp.value,fr.result);};}
+                  fr.readAsDataURL(this.inp_rfontfile_inp.files[0]);
+                }
+                fr.readAsArrayBuffer(this.inp_rfontfile_inp.files[0]);
+              }
+              break;
+          }
+        }
+      }
       loadFont(name,url) {
         const f = new FontFace(name,"url("+url+")");
-        document.fonts.add(f);
-        const op = document.createElement("option");
-        op.value = op.innerText = name;
-        this.inp_ff_select.appendChild(op);
+        f.load().then(()=>{
+          document.fonts.add(f);
+          const op = document.createElement("option");
+          op.value = op.innerText = name;
+          this.inp_ff_select.appendChild(op);
+        });
+      }
+      saveFont(name,url) {
+        this.savedfonts.push([name,url]);
+        localStorage.setItem("fp-font-storage",JSON.stringify(this.savedfonts));
       }
       updstroke() {
         this.strokectx.clearRect(0,0,this.strokedisp.width,this.strokedisp.height);
@@ -582,13 +1408,6 @@
             stroke.addColorStop(1,this.clr+"00");
             this.strokectx.fillStyle = stroke;
             this.strokectx.fillRect(0,0,this.strokedisp.width,this.strokedisp.height);
-            /*
-            let curstroke = this.curctx.createRadialGradient(50,50,0,50,50,realstroke);
-            curstroke.addColorStop(1-this.softness,this.clr+this.opacity.toString(16));
-            curstroke.addColorStop(1,this.clr+"00");
-            this.curctx.fillStyle = curstroke;
-            this.curctx.fillRect(0,0,100,100);
-            */
             this.curctx.strokeStyle = this.clr+this.opacity.toString(16);
             this.curctx.beginPath();
             this.curctx.arc(50,50,realstroke,0,2*Math.PI);
@@ -616,8 +1435,30 @@
         }
         this.updtool();
       }
+      updwordtrack() {this.wordtrack = this.inp_twtrack_inp.value}
       updfv() {this.fv = this.inp_fv_select.value};
       updrend() {this.canvas.style.imageRendering = this.ccanvas.style.imageRendering = this.inp_rend_select.value};
+      updgradclip() {this.gradclip = [this.inp_grad_posx_inp.value,this.inp_grad_posy_inp.value,this.inp_grad_sizx_inp.value,this.inp_grad_sizy_inp.value];};
+      updfilter() {
+        for(let i=0;i<this.inp_filter_conts.length;i++){
+          let currfilter = this.inp_filter_conts[i];
+          let filterid = currfilter.classList.item(1).replace("fp-filter-","");
+          if(currfilter.open && !(this.filter.active.includes(filterid))){
+            this.filter.active.push(filterid);
+          } else if(!(currfilter.open) && this.filter.active.includes(filterid)){
+            this.filter.active.splice(this.filter.active.indexOf(filterid),1);
+          }
+        }
+      }
+      updsource() {
+        for(let i=0;i<this.inp_fontsource_items.length;i++){
+          if(!(this.inp_fontsource_items[i].classList.contains("hid"))){this.inp_fontsource_items[i].classList.add("hid")}else if(this.inp_fontsource_items[i].classList.contains(this.inp_fontsource_select.value)){this.inp_fontsource_items[i].classList.remove("hid")};
+        }
+      }
+      updftrack() {this.fonttrack = parseInt(this.inp_ttrack_inp.value)}
+      updfstretch() {this.fs = this.inp_fstretch_select.value;}
+      updfkern() {this.fontkern = this.inp_fkern_select.value;}
+      updShadow() {this.shadcolor = this.inp_scolor.value;this.shadblur = this.inp_sblur_inp.value;this.shadox = this.inp_sxoff_inp.value;this.shadoy = this.inp_syoff_inp.value;}
       updsoft() {
         this.softness = parseFloat(this.inp_soft_inp.value);
         this.updstroke();
@@ -648,25 +1489,11 @@
           case 6:
             this.canvas.parentNode.style.cursor = 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAATxJREFUSEutluFtwjAQhb9swAhsUNgANmCDlg3KBmxAOwEwATBB6QQtE8AG0A3qh3ySFcWxneSkKD8Sf8/37i5OxbCx8LijYase/AnwBQh2Al4BE/gF5sCjq4DBRy0b3AHLLgJjv3PdU9FZ4Joi++edBLT2HdgkRG6uNtM+Fn37wsZ0lsCuVMD8/wQ+gDdgG1HQ81WJgMH3DrgOoG0iVa5ADC4dteqPs6PeVdkWpeAaNg2aimp2PeFST2WQCzfLZt66c86nohTeWOtYBoPAYxYNBm8SyIFrwDTJWRFalAO/+OHKgocZtMH13sFN5V8pPBTQ17E+obZL9bYy1cQWhxaqd9XH1sMhpBfcMlDBZFG9cL3hJqAzVddztH0MAjeBuz+gZdGLE9N5W9wtseKoBhJQqMj6G7CruKBNC/4BCYpO6UFp88AAAAAASUVORK5CYII=") 0 36,pointer';
             break;
-          case 1:
-          case 2:
-          case 4:
-          case 7:
-          case 8:
-          case 9:
-          case 11:
-          case 10:
-            if(this.inp_tool_select.value=="7"){
-              this.cont_stroke.open = false;
-              this.cont_roundrect.open = true;
-              this.cont_font.open = false;
-            }
-            this.canvas.parentNode.style.cursor = "crosshair";
-            break;
           case 5:
             this.cont_stroke.open = false;
             this.cont_roundrect.open = false;
             this.cont_font.open = true;
+            this.cont_gradient.open = false;
             this.canvas.parentNode.style.cursor = "text";
             break;
           case 0:
@@ -674,13 +1501,98 @@
             this.cont_stroke.open = true;
             this.cont_roundrect.open = false;
             this.cont_font.open = false;
+            this.cont_gradient.open = false;
             this.canvas.parentNode.style.cursor = 'url("'+this.curcanvas.toDataURL()+'") 50 50,default';
             break;
+          case 12:
+            this.canvas.parentNode.style.cursor = "move";
+            break;
+          case 14:
+            this.canvas.parentNode.style.cursor = "nwse-resize";
+            break;
           default:
-            this.canvas.parentNode.style.cursor = "default";
+            switch(this.inp_tool_select.value){
+              case "7":
+                this.cont_stroke.open = false;
+                this.cont_roundrect.open = true;
+                this.cont_font.open = false;
+                this.cont_gradient.open = false;
+                break;
+              case "15":
+                this.cont_stroke.open = false;
+                this.cont_roundrect.open = false;
+                this.cont_font.open = false;
+                this.cont_gradient.open = true;
+                break;
+            };
+            this.canvas.parentNode.style.cursor = "crosshair";
             break;
         }
       }
+      switchgrad() {
+        for(let i=0;i<this.inp_grad_stops.length;i++){
+          this.inp_grad_stops[i].getElementsByClassName("fp-grad-stop-inp")[0].value = this.inp_grad_stops[i].getElementsByClassName("fp-grad-stop-slide")[0].value = -(this.inp_grad_stops[i].getElementsByClassName("fp-grad-stop-inp")[0].value-0.5)+0.5;
+        }
+        this.updgradprev();
+      }
+      updgradprev() {
+        //try{
+        let gradient;
+        switch(parseInt(this.inp_grad_type_select.value)){
+          case 0:
+            gradient = this.gradctx.createLinearGradient(0, this.prev_grad.height/2, this.prev_grad.width, this.prev_grad.height/2);
+            break;
+          case 1:
+            gradient = this.gradctx.createRadialGradient(this.prev_grad.width/2, this.prev_grad.height/2, 0, this.prev_grad.width/2, this.prev_grad.height/2, Math.min(this.prev_grad.width,this.prev_grad.height)/2-10);
+            break;
+          case 2:
+            gradient = this.gradctx.createConicGradient(0, this.prev_grad.width/2, this.prev_grad.height/2);
+            break;
+        }
+        for(let i=0;i<this.inp_grad_stops.length;i++){
+          gradient.addColorStop(this.inp_grad_stops[i].getElementsByClassName("fp-grad-stop-inp")[0].value,this.inp_grad_stops[i].getElementsByClassName("fp-grad-color")[0].value+parseInt(this.inp_grad_stops[i].getElementsByClassName("fp-grad-opac-inp")[0].value).toString(16).padStart(2,"0"))
+        }
+        this.gradctx.fillStyle = gradient;
+        this.gradctx.clearRect(0,0,this.prev_grad.width,this.prev_grad.height);
+        this.gradctx.fillRect(0,0,this.prev_grad.width,this.prev_grad.height);
+        //}catch(e){alert(e.stack)}
+      }
+      updgradstops() {
+        for(let i=0;i<this.inp_grad_stops.length;i++){
+          this.inp_grad_stops[i].getElementsByClassName("fp-grad-stop-inp")[0].value = this.inp_grad_stops[i].getElementsByClassName("fp-grad-stop-slide")[0].value = (1/(this.inp_grad_stops.length-1))*i;
+        }
+      }
+      addGradStop() {
+        let nstop = this.inp_grad_stops[0].cloneNode();
+        nstop.innerHTML = this.inp_grad_stops[0].innerHTML;
+        this.cont_gradient.getElementsByClassName("fp-grad-stop-cont")[0].insertBefore(nstop,this.inp_grad_stops[this.inp_grad_stops.length-1]);
+        this.addStopListener(nstop);
+        this.updateStopList();
+        nstop.getElementsByClassName("fp-grad-opac-inp")[0].value = nstop.getElementsByClassName("fp-grad-opac-slide")[0].value = 255;
+        nstop.getElementsByClassName("fp-grad-color")[0].value = "#000000";
+        this.updgradstops();
+        this.updgradprev();
+      }
+      removeGradStop() {
+        if(this.inp_grad_stops.length>2){
+          this.inp_grad_stops[this.inp_grad_stops.length-2].remove();
+          this.updateStopList();
+          this.updgradprev();
+        }
+      }
+      addStopListener(stop) {
+        const ss = stop.getElementsByClassName("fp-grad-stop-slide")[0];
+        const si = stop.getElementsByClassName("fp-grad-stop-inp")[0];
+        const os = stop.getElementsByClassName("fp-grad-opac-slide")[0];
+        const oi = stop.getElementsByClassName("fp-grad-opac-inp")[0];
+        //add updgradprev
+        ss.addEventListener("input",e=>{si.value = ss.value;this.updgradprev()});
+        si.addEventListener("input",e=>{ss.value = si.value;this.updgradprev()});
+        os.addEventListener("input",e=>{oi.value = os.value;this.updgradprev()});
+        oi.addEventListener("input",e=>{os.value = oi.value;this.updgradprev()});
+        stop.getElementsByClassName("fp-grad-color")[0].addEventListener("input",this.updgradprev);
+      }
+      updateStopList() {this.inp_grad_stops = this.cont_gradient.getElementsByClassName("fp-grad-stop-cont")[0].getElementsByClassName("fp-grad-stop");};
       savehistory() {
         this.history.push(this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height));
       }
@@ -698,12 +1610,38 @@
           this.ctx.putImageData(this.history2.pop(),0,0);
         }
       }
-      _checkHistory(e) {
-        if(e.key == "z" && e.ctrlKey){
-          this.loadhistory();
-        } else if(e.key == "Z" && e.ctrlKey){
-          this.loadhistory2();
+      _checkKey(e) {
+        if(e.ctrlKey){
+          switch(e.key){
+            case "z":
+              this.loadhistory();
+              break;
+            case "Z":
+              this.loadhistory2();
+              break;
+            case "d":
+              this.selection[0] = false;
+              this.commit(9);
+              break;
+          }
         }
+        //mar:cur
+        if(this.inbezier) {
+          switch(e.key){
+            case "Enter":
+            case "Escape":
+              e.stopPropagation();
+              this.commitBezier();
+              break;
+          }
+        }
+      }
+      commitBezier(){
+        this.inbezier = false;
+        this.bezierpoints = [];
+        this.activecpoints = [];
+        if(this.selection[0]){this.renderSelect();}else{this.octx.clearRect(0,0,this.canvas.width,this.canvas.height);};
+        this.commit(0);
       }
       renderSelect(){
         this.octx.save();
@@ -724,8 +1662,8 @@
         this.octx.stroke(ropath);
         this.octx.restore();
       }
-      commit() {
-        switch(parseInt(this.inp_tool_select.value)){
+      commit(type) {
+        switch(type){
           case 9:
           case 10:
           case 11:
@@ -752,6 +1690,15 @@
               this.nselection.length=0;
             }
             break;
+          case 16:
+            //mar:cur
+            break;
+          case 12:
+          case 13:
+          case 14:
+            this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);this.canvas.style.opacity="";
+          case 15:
+            if(this.selection[0]){this.renderSelect();}else{this.octx.clearRect(0,0,this.canvas.width,this.canvas.height);};
           default:
             this.ctx.globalAlpha = this.opacity/255;
             this.ctx.globalCompositeOperation = this.inp_blendmode_select.value;
@@ -786,8 +1733,12 @@
           img.onload = () => {
             this.savehistory();
             URL.revokeObjectURL(url);
+            this.cctx.setTransform(this.transformmtx[0],this.transformmtx[1],this.transformmtx[2],this.transformmtx[3],this.transformmtx[4],this.transformmtx[5]);
+            this.cctx.filter = this.getFil();
             this.cctx.drawImage(img,0,0);
-            this.commit();
+            this.cctx.resetTransform();
+            this.cctx.filter = "";
+            this.commit(0);
           }
           img.src = url;
         })
@@ -798,6 +1749,10 @@
       }
     }
     const controls = document.getElementById("controls");
+    const projsavbtn = controls.getElementsByClassName("projsavbtn")[0];
+    const loadprojcont = controls.getElementsByClassName("loadprojcont")[0];
+    const projSelect = controls.getElementsByClassName("proj-select")[0];
+    let projs = JSON.parse(localStorage.getItem("fp-ext-projs")) || [];
     //try{
     let painter = new fpaint(document.getElementById("controls").getElementsByClassName("canvascont")[0].children[0],document.getElementById("controls").getElementsByClassName("conpaint")[0],document.getElementById("controls").getElementsByClassName("topConpaint")[0]);
     //}catch(e){alert(e)}
@@ -818,8 +1773,51 @@
       dwnelem.remove();
       return;
     }
+    function addProj(i) {
+      let nproj = document.createElement("option");
+      nproj.innerText = projs[i][0];
+      nproj.value = i.toString();
+      projSelect.appendChild(nproj);
+    }
+    function findFirst(arr,look){
+      for(let i=0;i<arr.length;i++){
+        if(arr[i][0]==look){return i;break;}
+      }
+      return null;
+    }
     controls.getElementsByClassName("fildwnbtn")[0].addEventListener("click", trig0f);
     controls.getElementsByClassName("urlopenbtn")[0].addEventListener("click", trig1f);
+    loadprojcont.getElementsByClassName("loadproj-btn")[0].addEventListener("click", e=>{if(projSelect.value != "null"){
+        let image = new Image();
+        image.onload = function() {
+          painter.ctx.drawImage(image, 0, 0);
+        };
+        image.src = projs[parseInt(projSelect.value)][1];
+        controls.getElementsByClassName("filnameinp")[0].value = projs[parseInt(projSelect.value)][0];
+      }
+    });
+    projsavbtn.addEventListener("click", e=>{
+      const rname = (controls.getElementsByClassName("filnameinp")[0].value || "Untitled");
+      const rnpos = findFirst(projs,rname);
+      if(rnpos!=null){
+        projs[rnpos][1] = painter.canvas.toDataURL();
+      }else{
+        projs.push([rname,painter.canvas.toDataURL()]);
+        addProj(projs.length-1);
+      }
+      localStorage.setItem("fp-ext-projs",JSON.stringify(projs));
+    });
+    loadprojcont.getElementsByClassName("delproj-btn")[0].addEventListener("click", e=>{if(projSelect.value != "null"){
+        const rnpos = parseInt(projSelect.value);
+        projs.splice(rnpos,1);
+        for(let i=projSelect.selectedIndex+1;i<projSelect.options.length;i++){projSelect.options[i].value = (parseInt(projSelect.options[i].value)-1).toString();};
+        projSelect.options[projSelect.selectedIndex].remove();
+        localStorage.setItem("fp-ext-projs",JSON.stringify(projs));
+      }
+    });
+    loadprojcont.getElementsByClassName("delallproj-btn")[0].addEventListener("click", e=>{if(prompt("Are you sure (This is irreversible) y/n").toLowerCase() == "y"){localStorage.removeItem("fp-ext-projs");this.projs = [];for(let i=1;i<projSelect.options.length;i++){projSelect.options[i].remove();};};
+    });
+    for(let i=0;i<projs.length;i++){addProj(i);}
   </script>
 </body>
 </html>
