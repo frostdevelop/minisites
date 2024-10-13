@@ -91,23 +91,35 @@
 
 <body lang="en">
   <div id="controls">
-  <canvas width="550" height="550" class="maincanvas" style="background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jvHz58n8GIoCOjg4RqhgYGEcNxBlOo2GIM2iGQLL5//8/UTnlypUrxOWUUQNxhtNoGOLOKYM+2QAAq6xondxhvh8AAAAASUVORK5CYII=')" title="550x550 canvas"></canvas>
-  <textarea type="text" placeholder='Use "ctx" for context. (Canvas 550x550)'></textarea>
-  <button class="button">Run</button>
-  <button class="button">Reset</button>
-  <button class="button">Save Code</button>
-  <button class="button">Save Image</button>
-  <button class="button">Save URL</button>
-  <button class="button">Upload</button>
-  <input type="number" title="width" min="0" value="550"></input>
-  <input type="number" title="height" min="0" value="550"></input>
+  <canvas width="550" height="550" class="maincanvas control" style="background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAEBJREFUOE9jvHz58n8GIoCOjg4RqhgYGEcNxBlOo2GIM2iGQLL5//8/UTnlypUrxOWUUQNxhtNoGOLOKYM+2QAAq6xondxhvh8AAAAASUVORK5CYII=')" title="550x550 canvas"></canvas>
+  <textarea type="text" class="control" placeholder='Use "ctx" for context. (Canvas 550x550)'></textarea>
+  <button class="button control">Run</button>
+  <button class="button control">Reset</button>
+  <button class="button control">Save Code</button>
+  <button class="button control">Save Image</button>
+  <button class="button control">Save URL</button>
+  <button class="button control">Upload</button>
+  <br/>
+  <input type="number" class="control" title="width" min="0" value="550"></input>
+  <input type="number" class="control" title="height" min="0" value="550"></input>
+  <br/>
+  <input type="number" class="control" title="width" min="0" value="550"></input>
+  <input type="number" class="control" title="height" min="0" value="550"></input>
+  <br/>
+  <input type="checkbox" class="control" id="unlockcheck"></input>
+  <label for="unlockcheck">Unlock dimensions</label>
+  <br/>
+  <select title="Pixel Interpolation" class="control">
+    <option value="">Bilinear</option>
+    <option value="pixelated">Nearest</option>
+  </select>
   </div>
   <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
-    const controls = document.getElementById("controls").children;
+    const controls = document.getElementById("controls").getElementsByClassName("control");
     const maincanv = document.getElementsByClassName("maincanvas")[0];
-    maincanv.width = controls[8].value = controls[1].offsetWidth;
-    maincanv.height = controls[9].value = (document.body.offsetHeight/100)*75
+    maincanv.width = controls[8].value = controls[10].value = controls[1].offsetWidth;
+    maincanv.height = controls[9].value = controls[11].value = (document.body.offsetHeight/100)*75
     updtitle();
     const ctx = maincanv.getContext("2d");
     function trig0f(e) {eval("try{"+controls[1].value+"}catch(e){alert(e.stack)}")}
@@ -146,8 +158,11 @@
     controls[6].addEventListener("click", e=>{let data = new Blob([maincanv.toDataURL()]);dwnl("CanvasDATAURL.txt",URL.createObjectURL(data),"text/html");URL.revokeObjectURL(data)});
     //controls[1].addEventListener("change", e=>{e.preventDefault();trig0f(e)});
     controls[7].addEventListener("click",uploadFil);
-    controls[8].addEventListener("input", e=>{maincanv.width = controls[8].value;updtitle()});
-    controls[9].addEventListener("input", e=>{maincanv.height = controls[9].value;updtitle()});
+    controls[8].addEventListener("input", e=>{maincanv.width = controls[8].value;if(!controls[12].checked){controls[10].value=maincanv.style.width=controls[8].value};updtitle()});
+    controls[9].addEventListener("input", e=>{maincanv.height = controls[9].value;if(!controls[12].checked){controls[11].value=maincanv.style.height=controls[9].value};updtitle()});
+    controls[10].addEventListener("input", e=>{maincanv.style.width = controls[10].value+"px";if(!controls[12].checked){controls[8].value=maincanv.width=controls[10].value};});
+    controls[11].addEventListener("input", e=>{maincanv.style.height = controls[11].value+"px";if(!controls[12].checked){controls[9].value=maincanv.height=controls[11].value};});
+    controls[13].addEventListener("input", e=>{maincanv.style.imageRendering=controls[13].value});
   </script>
 </body>
 </html>
