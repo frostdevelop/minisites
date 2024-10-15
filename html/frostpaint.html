@@ -329,6 +329,14 @@
       <input type="range" min="0" max="50" step="1" class="iconpaint fp-twtrack-slide" title="Word tracking"></input>
       <input type="number" step="1" min="-500" max="500" class="iconpaint fp-twtrack-inp"></input>
     </details>
+    <details class="fp-fill-settings-cont">
+      <summary>Fill settings</summary>
+      <input type="checkbox" id="fpcheckalpha" class="fp-alphac-check" checked></input>
+      <label for="fpcheckalpha">Check alpha</label>
+      <br/>
+      <input type="range" min="0" max="50" step="1" class="iconpaint fp-tolerance-slide" title="Tolerance"></input>
+      <input type="number" step="1" min="-500" max="500" class="iconpaint fp-tolerance-inp"></input>
+    </details>
     <details class="fp-roundrect-settings-cont">
       <summary>RoundRect Settings</summary>
       <input type="range" min="0" max="50" class="iconpaint fp-radius-slide" title="Radius"></input>
@@ -573,6 +581,7 @@
         this.shadblur = 0;
         this.shadox = 0;
         this.shadoy = 0;
+        this.tolerance = 10;
         this.fontkern = "auto";
         this.strokectx = this.strokedisp.getContext("2d");
         this.paint = this.paint.bind(this);
@@ -742,6 +751,10 @@
         this.cont_line = inp.getElementsByClassName("fp-line-settings-cont")[0];
         this.cont_line_dash = this.cont_line.getElementsByClassName("fp-line-dash-cont")[0];
         this.cont_line_sect = this.cont_line_dash.getElementsByClassName("fp-line-sect-cont")[0];
+        this.cont_fill = inp.getElementsByClassName("fp-fill-settings-cont")[0];
+        this.inp_alphac_check = this.cont_fill.getElementsByClassName("fp-alphac-check")[0];
+        this.inp_tolerance_inp = this.cont_fill.getElementsByClassName("fp-tolerance-inp")[0];
+        this.inp_tolerance_slide = this.cont_fill.getElementsByClassName("fp-tolerance-slide")[0];
         this.inp_dash_add_btn = this.cont_line_dash.getElementsByClassName("fp-line-dash-add")[0];
         this.inp_dash_minus_btn = this.cont_line_dash.getElementsByClassName("fp-line-dash-minus")[0];
         this.dash_sect_conts = this.cont_line_sect.getElementsByClassName("fp-line-sect");
@@ -819,6 +832,7 @@
         this.inp_sxoff_slide.value = this.inp_sxoff_inp.value = this.shadox.toString();
         this.inp_syoff_slide.value = this.inp_syoff_inp.value = this.shadoy.toString();
         this.inp_twtrack_inp.value = this.inp_twtrack_inp.value = this.wordtrack.toString();
+        this.inp_tolerance_slide.value = this.inp_tolerance_inp.value = this.tolerance.toString();
         this.inp_stsize_inp.value = this.inp_stsize_slide.value = this.stwidth;
         this.inp_color.addEventListener("input",e=>{this.clr = this.inp_color.value;this.updstroke();})
         this.inp_size_slide.addEventListener("input",e=>{this.inp_size_inp.value = this.inp_size_slide.value;this.updsize();this.updfont()});
@@ -844,9 +858,11 @@
         this.inp_syoff_slide.addEventListener("input",e=>{this.inp_syoff_inp.value = this.inp_syoff_slide.value;this.updShadow()});
         this.inp_syoff_inp.addEventListener("input",e=>{this.inp_syoff_slide.value = this.inp_syoff_inp.value;this.updShadow()});
         this.inp_stsize_slide.addEventListener("input",e=>{this.inp_stsize_inp.value = this.inp_stsize_slide.value;this.stwidth = this.inp_stsize_inp.value;});
-        this.inp_stopac_inp.addEventListener("input",e=>{this.inp_stopac_slide.value = this.inp_stopac_inp.value;this.stwidth = this.inp_stsize_inp.value;});
+        this.inp_stopac_inp.addEventListener("input",e=>{this.inp_stopac_slide.value = this.inp_stopac_inp.value;this.updstclr();});
         this.inp_stopac_slide.addEventListener("input",e=>{this.inp_stopac_inp.value = this.inp_stopac_slide.value;this.updstclr();});
-        this.inp_stopac_slide.addEventListener("input",e=>{this.inp_stsize_slide.value = this.inp_stsize_inp.value;this.updstclr();});
+        this.inp_stsize_inp.addEventListener("input",e=>{this.inp_stsize_slide.value = this.inp_stsize_inp.value;this.stwidth = this.inp_stsize_inp.value;});
+        this.inp_tolerance_slide.addEventListener("input",e=>{this.inp_tolerance_inp.value = this.inp_tolerance_slide.value;this.tolerance = parseInt(this.inp_tolerance_inp.value);});
+        this.inp_tolerance_inp.addEventListener("input",e=>{this.inp_tolerance_slide.value = this.inp_tolerance_inp.value;this.tolerance = parseInt(this.inp_tolerance_inp.value);});
         this.inp_stcolor.addEventListener("input",this.updstclr);
         this.inp_grad_stop_add.addEventListener("click",this.addGradStop);
         this.inp_grad_stop_minus.addEventListener("click",this.removeGradStop);
@@ -1374,6 +1390,10 @@
               try{
               this.floodFill(this.prevloc[0],this.prevloc[1]);
               }catch(e){alert(e.stack)}
+              break;
+            case 20:
+              //use destination-in
+              break;
           }
           contextused.filter = "";
           contextused.resetTransform();
@@ -1403,28 +1423,28 @@
         while(s.length != 0){
           csarr = s.pop();
           let wx = csarr[0];
-          if(this.isSameClr(this.getImgDatPix(wImgDat,wx,csarr[2]), rcolor, true)){
-            while(this.isSameClr(this.getImgDatPix(wImgDat,wx,csarr[2]), rcolor, true) && wx>=0){
+          if(this.isSameClr(this.getImgDatPix(wImgDat,wx,csarr[2]), rcolor)){
+            while(this.isSameClr(this.getImgDatPix(wImgDat,wx,csarr[2]), rcolor) && wx>=0){
               this.setImgDatPix(wImgDat,wx,csarr[2],fcolor);
               wx--;
             }
             if(++wx < csarr[0]){s.push(Int16Array.of(wx,csarr[0]-1,csarr[2]-csarr[3],-csarr[3]));};
           }
           while(csarr[0] <= csarr[1]){
-            while(this.isSameClr(this.getImgDatPix(wImgDat,csarr[0],csarr[2]), rcolor, true) && csarr[0]<this.canvas.width){
+            while(this.isSameClr(this.getImgDatPix(wImgDat,csarr[0],csarr[2]), rcolor) && csarr[0]<this.canvas.width){
               this.setImgDatPix(wImgDat,csarr[0],csarr[2],fcolor);
               csarr[0]++;
             }
             if(wx < csarr[0]){s.push(Int16Array.of(wx,csarr[0]-1,csarr[2]+csarr[3],csarr[3]));};
             if(csarr[0]-1 > csarr[1]){s.push(Int16Array.of(csarr[1]+1,csarr[0]-1,csarr[2]-csarr[3],-csarr[3]));csarr[0]++;}else{
-              for(csarr[0]++;!(this.isSameClr(this.getImgDatPix(wImgDat,csarr[0],csarr[2]), rcolor, true)) && csarr[0]<csarr[1];csarr[0]++){}
+              for(csarr[0]++;!(this.isSameClr(this.getImgDatPix(wImgDat,csarr[0],csarr[2]), rcolor)) && csarr[0]<csarr[1];csarr[0]++){}
             }
             wx = csarr[0];
           }
         }
         this.ctx.putImageData(wImgDat,0,0);
       }
-      isSameClr(a,b,alp=true){if(a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && (a[3] == b[3] || !alp)){return true;}else{return false;}}
+      isSameClr(a,b){if(b[0]-this.tolerance < a[0] && a[0]< b[0]+this.tolerance && b[1]-this.tolerance < a[1] && a[1]< b[1]+this.tolerance && b[2]-this.tolerance < a[2] && a[2] < b[2]+this.tolerance && (!this.inp_alphac_check.checked || (Math.max(b[3]-this.tolerance,0) < a[3] && a[3]< b[3]+this.tolerance))){return true;}else{return false;}}
       getFil(){
         if(this.filter.active.length == 0){return "none"};
         let contstring = "";
