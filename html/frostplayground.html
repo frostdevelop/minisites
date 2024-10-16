@@ -534,6 +534,9 @@
       <div class='item'>
         <button class="iinput">Delete History</input>
       </div>
+      <div class='item'>
+       Tab size: <input type="number" class="smol iinput" value="4" id="tse"></input>
+      </div>
       </div>
       <footer>Copyright 2024 Pacifiky. All rights reserved.<br/>Thank you Aaron for testing!</footer>
     </dialog>
@@ -563,6 +566,7 @@
         <hr/>
         <button class="menuddi" id="trig14e">Preferences (ctrl+p)</button>
         <button class="menuddi" id="trig17e">Help (ctrl+?)</button>
+        <button class="menuddi" id="trig19e">Goto</button>
         <button class="menuddi" id="trig15e" disabled>Plugins</button>
       </div>
     </div>
@@ -660,6 +664,7 @@
     let updateen = true;
     var inphistory = new Array(inps.length).fill().map(()=>[[],[]]);
     const delsvg = document.getElementById("trashsvg");
+    playframe.contentWindow.console = {log: function (m){consolee.value += m + "\n";consolee.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){consolee.value = "console cleared\n"},dir: function(o){const props = Object.getOwnPropertyNames(o);for(let i=0;i<props.length;i++){consolee.value+=props[i]+": "+o[props[i]]+"\n"};}};
     //mar: class def
     class fileSys {
       constructor (container,filesid,filekeyid){
@@ -694,15 +699,15 @@
           ndel.addEventListener("click",e=>{
             e.stopPropagation();
             let yn = prompt("Are you sure you want to delete? (y/n)").toLowerCase();
-            if(yn == "y"){
+            if(yn === "y"){
               date.remove();
               let indexofsect = this.filekey.indexOf(keyfor);
               let indexofelem = 0;
               for(let k=0;k<this.files[indexofsect].length;k++){
-                if(this.files[indexofsect][k][0] == timef) indexofelem = k;
+                if(this.files[indexofsect][k][0] === timef) indexofelem = k;
               }
               this.files[indexofsect].splice(indexofelem,1);
-              if(this.files[indexofsect].length == 0) {
+              if(this.files[indexofsect].length === 0) {
                 this.filekey.splice(indexofsect,1);
                 this.files.splice(indexofsect,1);
                 this.sectors[i].remove();
@@ -732,7 +737,7 @@
         this.files = JSON.parse(localStorage.getItem(this.filesid)) || [];
         this.filekey = JSON.parse(localStorage.getItem(this.filekeyid)) || [];
         this.container.innerHTML = "";
-        if(!(this.filekey == null)){
+        if(!(this.filekey === null)){
           for(let i=0;i<this.filekey.length;i++){
             this.sectors[i] = document.createElement("div");
             this.sectors[i].classList.add("filesect");
@@ -760,7 +765,7 @@
             head.addEventListener("keydown",e=>{
               //set filekey (turn into function later?)
               //Add button for update aswell
-              if(e.key == "Enter"){
+              if(e.key === "Enter"){
               keyfor = this.updateCat(head,keyfor,i);
               updatebtn.classList.remove("sho");resetbtn.classList.remove("sho");updatebtn.classList.add("hid");resetbtn.classList.add("hid");
               }
@@ -782,12 +787,12 @@
       };
       updateCat(head,keyfor,i) {
         head.value = head.value || "Untitled";
-        if(this.filekey.indexOf(head.value) == -1){
+        if(this.filekey.indexOf(head.value) === -1){
           this.filekey[this.filekey.indexOf(keyfor)] = head.value;
           localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey));
-        } else if(!(head.value == keyfor)){
+        } else if(!(head.value === keyfor)){
           let yn = prompt("Are you sure you want to merge? (y/n)").toLowerCase();
-          if(yn == "y"){
+          if(yn === "y"){
             //Create a loop for date sorting. (use time field).
             //use current filekey and merger filekey.
             let originind = this.filekey.indexOf(keyfor);
@@ -806,7 +811,7 @@
             let nstysec = null;
             for(let j=0;j<this.container.children.length;j++){
               let chilsec = this.container.children[j];
-              if(chilsec.getElementsByClassName("filetitle")[0].value == nkey){
+              if(chilsec.getElementsByClassName("filetitle")[0].value === nkey){
                 nstysec = chilsec;
               }
             }
@@ -826,17 +831,17 @@
         document.getElementById("closebtn").removeEventListener("click",this._closeLocalStorage);
         document.body.removeEventListener("keydown",this._closeLocalStorageKey);
       };
-      _closeLocalStorageKey(e) {e.key == "Escape" && this._closeLocalStorage(e)};
+      _closeLocalStorageKey(e) {e.key === "Escape" && this._closeLocalStorage(e)};
       saveTo() {
         //todo
         let rvalue = prefinp[0].value || "Untitled"; 
-        if(this.files == null || this.filekey == null){
+        if(this.files === null || this.filekey === null){
           this.files = [];
           this.filekey = [];
         }
         
         let keyindex = this.filekey.indexOf(rvalue);
-        if(keyindex == -1){
+        if(keyindex === -1){
           this.files.push([[Date.now(),htmli.value,cssi.value,jsin.value]]);
           this.filekey.push(rvalue);
         } else {
@@ -854,7 +859,7 @@
           let trig = this.items[i].getElementsByClassName('menutrigger')[0];
           let dd = this.items[i].getElementsByClassName('menudd')[0];
           document.addEventListener("click",e=>{
-            if(dd.classList.contains("sho") && e.target != dd && !(e.target == trig)){dd.classList.add("hid");dd.classList.remove("sho");};
+            if(dd.classList.contains("sho") && e.target != dd && !(e.target === trig)){dd.classList.add("hid");dd.classList.remove("sho");};
           });
           trig.addEventListener("click",e=>{dd.classList.toggle("sho");dd.classList.toggle("hid");});
           dd.addEventListener("mouseover",e=>{dd.classList.add("mouse");dd.classList.remomve("notmouse")});
@@ -870,50 +875,52 @@
       let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];
       let finput = finrep.getElementsByClassName("finputfr")[0];
       let rinput = finrep.getElementsByClassName("rinputfr")[0];
-      
+
+      inps[i].addEventListener("focusin", e=>{for(let j=0;j<inps.length;j++){inps[j].classList.remove("active");};inps[i].classList.add("active");});
+      //inps[i].addEventListener("focusout", e=>{inps[i].classList.remove("active")});
       inps[i].addEventListener("input", trig0f);
       inps[i].addEventListener("input", intUpdLn);
       inps[i].addEventListener("input", e=>{
         inphistory[i][1].length = 0;
         switch(e.data){
           case "(":
-          storeHistory(i);
           if(prefinp[4].checked){
           document.execCommand("insertText",false,")");
           inps[i].selectionStart = inps[i].selectionStart-1;
           inps[i].selectionEnd=inps[i].selectionStart;
           }
+          storeHistory(i);
           break;
           case "[":
-          storeHistory(i);
           if(prefinp[4].checked){
           document.execCommand("insertText",false,"]");
           inps[i].selectionStart = inps[i].selectionStart-1;
           inps[i].selectionEnd=inps[i].selectionStart;
           }
+          storeHistory(i);
           break;
           case "{":
-          storeHistory(i);
           if(prefinp[4].checked){
           document.execCommand("insertText",false,"}");
           inps[i].selectionStart = inps[i].selectionStart-1;
           inps[i].selectionEnd=inps[i].selectionStart;
           }
+          storeHistory(i);
           break;
         }
-        if((e.data == '"' || e.data == "'" || e.data == "`") && prefinp[5].checked){
-          storeHistory(i);
+        if((e.data === '"' || e.data === "'" || e.data === "`") && prefinp[5].checked){
           let orig = inps[i].selectionStart;
           inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + e.data + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
           inps[i].selectionStart = orig;
           inps[i].selectionEnd=inps[i].selectionStart
-        }else if(e.inputType == "insertFromPaste" || e.inputType == "deleteByCut"){storeHistory(i)};
+          storeHistory(i);
+        }else if(e.inputType === "insertFromPaste" || e.inputType === "deleteByCut"){storeHistory(i)};
       })
       //https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
       inps[i].addEventListener("keydown",e=>{
-        if(e.key=="Tab" && !e.shiftKey){
+        if(e.key==="Tab" && !e.shiftKey){
           e.preventDefault();
-          storeHistory(i);
+          //storeHistory(i);
           let spos = st = inps[i].selectionStart;
           let epos = en = inps[i].selectionEnd;
           let lines = [];
@@ -922,7 +929,7 @@
           //fill list
           let plb = st;
           for(let j=st;j<en;j++){
-            if(inps[i].value[j]=="\n"){
+            if(inps[i].value[j]==="\n"){
               lines.push([plb,j]);
               plb = j+1;
             }
@@ -934,7 +941,7 @@
             //inps[i].value = inps[i].value.substring(0,st) + inps[i].value.substring(en+1,inps[i].value.length);
             let oi = "";
             for(let j=0;j<lndata.length;j++){
-              if(lndata[j]==" " || lndata[j]=="\t"){oi+=lndata[j]}else{break}
+              if(lndata[j]===" " || lndata[j]==="\t"){oi+=lndata[j]}else{break}
             }
             let eni = lndata.substring(oi.length,lndata.length);
             //let strels = spos-(st+oi.length);
@@ -948,9 +955,9 @@
           }
           inps[i].selectionStart = spos+prefinp[1].value.length;
           inps[i].selectionEnd = epos+prefinp[1].value.length*lines.length;
-        } else if(e.key=="Tab" && e.shiftKey){
+        } else if(e.key==="Tab" && e.shiftKey){
           e.preventDefault()
-          storeHistory(i);
+          //storeHistory(i);
           let spos = st = inps[i].selectionStart;
           let epos = en = inps[i].selectionEnd;
           let lines = [];
@@ -959,7 +966,7 @@
           //fill list
           let plb = st;
           for(let j=st;j<en;j++){
-            if(inps[i].value[j]=="\n"){
+            if(inps[i].value[j]==="\n"){
               lines.push([plb,j]);
               plb = j+1;
             }
@@ -972,22 +979,21 @@
             //inps[i].value = inps[i].value.substring(0,st) + inps[i].value.substring(en+1,inps[i].value.length);
             let oi = "";
             for(let j=0;j<lndata.length;j++){
-              if(lndata[j]==" " || lndata[j]=="\t"){oi+=lndata[j]}else{break}
+              if(lndata[j]===" " || lndata[j]==="\t"){oi+=lndata[j]}else{break}
             }
             let eni = lndata.substring(oi.length,lndata.length);
             //let strel = spos-(st+oi.length);
             let poi = oi.length;
             oi = oi.replace(prefinp[1].value,"");
-            if(oi.length-poi==0 && j==0) foil=false;
+            if(oi.length-poi===0 && j===0) foil=false;
             inps[i].value = inps[i].value.substring(0,lines[j][0]+soil) + oi + eni + inps[i].value.substring(lines[j][1]+soil,inps[i].value.length);
             soil+=oi.length-poi;
             //strel = strel < 0 ? 0 : strel;
           }
           inps[i].selectionStart = foil ? spos-prefinp[1].value.length : spos;
           inps[i].selectionEnd = epos+soil;
-        } else if(e.key=="Enter" && prefinp[3].checked){
+        } else if(e.key==="Enter" && prefinp[3].checked){
           e.preventDefault()
-          storeHistory(i);
           let spos = st = en = inps[i].selectionStart;
           //console.log(spos);
           for(let j=spos-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
@@ -997,19 +1003,20 @@
           let lndata = inps[i].value.substring(st,en);
           //for(let j=0;j<countl(inps[i].value.substring(st,en+1),"\t");j++){as+="\t"};
           for(let j=0;j<lndata.length;j++){
-            if(lndata[j]==" " || lndata[j]=="\t"){as+=lndata[j]}else{break}
+            if(lndata[j]===" " || lndata[j]==="\t"){as+=lndata[j]}else{break}
           }
-          if(inps[i].value[inps[i].selectionStart-1]=="{"){
+          if(inps[i].value[inps[i].selectionStart-1]==="{"){
             as += prefinp[1].value;
-          }else if(inps[i].value[inps[i].selectionStart-1]==">" && inps[i].value[inps[i].selectionStart]=="<"){
+          }else if(inps[i].value[inps[i].selectionStart-1]===">" && inps[i].value[inps[i].selectionStart]==="<"){
             as += prefinp[1].value;
           }
           //check for { or } here.
           inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\n" + as + inps[i].value.substring(inps[i].selectionEnd)
           inps[i].selectionStart = spos+as.length+1;
           inps[i].selectionEnd = inps[i].selectionStart;
+          storeHistory(i);
           intUpdLn.call(inps[i]);
-        }else if((e.key=="Z" && e.ctrlKey) || (e.key=="y" && e.ctrlKey)){
+        }else if((e.key==="Z" && e.ctrlKey) || (e.key==="y" && e.ctrlKey)){
           e.preventDefault();
           if(inphistory[i][1].length > 0){
             inphistory[i][0].push([inps[i].value,inps[i].selectionStart]);
@@ -1020,10 +1027,10 @@
             intUpdLn.call(cssi);
             intUpdLn.call(jsin);
           }
-        }else if(e.key=="z" && e.ctrlKey){
+        }else if(e.key==="z" && e.ctrlKey){
           e.preventDefault();
           loadHistory(i);
-        }else if(e.key=="h" && e.ctrlKey){
+        }else if(e.key==="h" && e.ctrlKey){
           e.preventDefault();
           finrep.classList.toggle("hid");
           finrep.classList.toggle("sho");
@@ -1036,10 +1043,10 @@
       });
       finrep.getElementsByClassName("repbtn")[0].addEventListener("click",e=>{
         storeHistory(i);
-        let rf = finput.value == '\\n' ? '\n' : finput.value;
-        rf = rf == '\\t' ? '\t' : rf;
-        let rr = rinput.value == '\\n' ? '\n' : rinput.value;
-        rr = rr == '\\t' ? '\t' : rr;
+        let rf = finput.value === '\\n' ? '\n' : finput.value;
+        rf = rf === '\\t' ? '\t' : rf;
+        let rr = rinput.value === '\\n' ? '\n' : rinput.value;
+        rr = rr === '\\t' ? '\t' : rr;
         inps[i].value = inps[i].value.replaceAll(rf,rr);
       });
     }
@@ -1056,7 +1063,7 @@
     function trig0f(e) {
       if(updateen){
         playframe.click();
-        playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";this.panel.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){this.panel.value = "console cleared\\n"}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`;
+        playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";this.panel.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){this.panel.value = "console cleared\\n"},dir: function(o){const props = Object.getOwnPropertyNames(o);for(let i=0;i<props.length;i++){this.panel.value+=props[i]+": "+o[props[i]]+"\\n"};this.panel.scrollTop=this.panel.scrollHeight;}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`;
       }
       return;
     }
@@ -1114,27 +1121,30 @@
     function intSetFullFrame(e) {
       playframe.style="";document.getElementById("closebtn").style="";document.getElementById("closebtn").removeEventListener("click",intSetFullFrame);document.removeEventListener("keydown",intEscFullFrame);
     }
-    function intEscFullFrame(e){e.key == "Escape" && intSetFullFrame(e);}
+    function intEscFullFrame(e){e.key === "Escape" && intSetFullFrame(e);}
+    function updTS(){
+      for(let i=0;i<inps.length;i++){inps[i].style.tabSize = prefinp[9].value}
+    }
     function savefil(){
-      dwnl(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`,prefinp[0].value == "" ? "Untitled-FrostPlayground.html" : prefinp[0].value + "-FrostPlayground.html")
+      dwnl(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`,prefinp[0].value === "" ? "Untitled-FrostPlayground.html" : prefinp[0].value + "-FrostPlayground.html")
     }
     //mar:dcm
     document.body.addEventListener("keydown", (e)=>{
-      if(e.key == "e" && e.ctrlKey){e.preventDefault();savefil();}
-      else if(e.key == "o" && e.ctrlKey){
+      if(e.key === "e" && e.ctrlKey){e.preventDefault();savefil();}
+      else if(e.key === "o" && e.ctrlKey){
         e.preventDefault();
         if(document.getElementById("saves").classList.contains("hid")){
           savedb.openUI();
         } else {
           savedb._closeLocalStorage(null);
         }
-      } else if(e.key == "s" && e.ctrlKey) {
+      } else if(e.key === "s" && e.ctrlKey) {
         e.preventDefault();
         savedb.saveTo();
-      } else if(e.key == "p" && e.ctrlKey) {
+      } else if(e.key === "p" && e.ctrlKey) {
         e.preventDefault();
         if(!(pref.open)){pref.showModal();prefinp[6].checked = updateen}else{pref.close()};
-      } else if(e.key == "/" && e.ctrlKey) {
+      } else if(e.key === "/" && e.ctrlKey) {
         e.preventDefault();
         if(!(help.open)){help.showModal()}else{help.close()};
       }
@@ -1151,17 +1161,19 @@
     topbtn[3].addEventListener("click",(e)=>{playframe.parentNode.classList.toggle("hid");
     if(playframe.parentNode.classList.contains("hid")){updateen = false}else{updateen = true}});
     topbtn[4].addEventListener("click",e=>{playframe.parentNode.getElementsByClassName("cnscont")[0].classList.toggle("hid")});
-    /*topbtn[5].addEventListener("click",(e)=>{if(topbtn[5].value == "true"){document.body.style="color-scheme: light;background: #FFF;color:black";topbtn[5].value="false"}else{document.body.style="";topbtn[5].value="true"};});*/
+    /*topbtn[5].addEventListener("click",(e)=>{if(topbtn[5].value === "true"){document.body.style="color-scheme: light;background: #FFF;color:black";topbtn[5].value="false"}else{document.body.style="";topbtn[5].value="true"};});*/
     topbtn[5].addEventListener("click",e=>{document.body.classList.toggle("light")});
     filebtn[4].addEventListener("click",e=>savedb.saveTo());
     filebtn[5].addEventListener("click",e=>savedb.openUI());
     editbtn[2].addEventListener("click",e=>pref.showModal());
     editbtn[3].addEventListener("click",e=>help.showModal());
     prefinp[8].addEventListener("click",e=>{inphistory[0].length = 0;inphistory[1].length = 0;});
-    editbtn[1].addEventListener("click",e=>{for(let i=0;i<inps.length;i++){let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];finrep.classList.toggle("hid");finrep.classList.toggle("sho")}})
+    editbtn[1].addEventListener("click",e=>{for(let i=0;i<inps.length;i++){if(inps[i].classList.contains("active")){let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];finrep.classList.toggle("hid");finrep.classList.toggle("sho")}}});
+    editbtn[4].addEventListener("click",e=>{const line = parseInt(prompt("Enter line number:"));if(line){for(let i=0;i<inps.length;i++){if(inps[i].classList.contains("active")){let curline = 1;for(let j=0;j<inps[i].value.length;j++){if(inps[i].value[j] === "\n" && ++curline === line){inps[i].setSelectionRange(j+1,j+1);inps[i].focus();break;}}}}}}); //goto
+    prefinp[9].addEventListener("input",updTS);
     for(let i=0;i<pagem.length;i++){
       pagem[i].getElementsByClassName("close")[0].addEventListener("click",e=>{pagem[i].close()});
-    }  
+    }
     prefinp[2].addEventListener("input",e=>{
        for(let i=0;i<inps.length;i++){
          switch(prefinp[2].value){
@@ -1182,11 +1194,17 @@
     });
     prefinp[6].addEventListener("input",e=>{updateen = prefinp[6].checked});
     txt0.addEventListener("keydown",e=>{
-    if(e.key=="Enter"){
+    if(e.key==="Enter"){
       e.preventDefault();
       consolee.value += ">" + txt0.value + "\n";
-      let ret = playframe.contentWindow.eval(`var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){this.panel.value = "console cleared\\n"}};try{${txt0.value}}catch(e){console.error(e.stack)};`) + "\n";
-      consolee.value += ret;
+      try{
+      let ret = playframe.contentWindow.eval(txt0.value);
+      consolee.value += ret + "\n";
+      if(typeof ret === "object" && !Array.isArray(ret)){
+        const props = Object.getOwnPropertyNames(ret);
+        for(let i=0;i<props.length;i++){consolee.value+=props[i]+": "+ret[props[i]]+"\n"};
+      };
+      }catch(e){consolee.value += e.stack + "\n";};
       txt0.value = "";
       consolee.scrollTop=consolee.scrollHeight;
     }
@@ -1196,7 +1214,7 @@
     });
     filebtn[3].addEventListener("click",e=>{
       let yn = prompt("Are you sure you want to Import? (This is irreversable) (y/n)");
-      if(yn == "y"){
+      if(yn === "y"){
         let uploader = document.createElement("input");
         uploader.setAttribute("type","file");
         uploader.setAttribute("accept",".fdb,.json");
@@ -1215,13 +1233,14 @@
         uploader.click();
       }
     })
+    updTs();
     })
     window.onbeforeunload = function(){
       if(htmli.value != "" || cssi.value != "" || jsin.value != ""){return 'Are you sure you have saved your work?';}else{return;}
     };
     function countl(s,l){
       let c = 0;
-      for(let i=0;i<s.length;i++){s[i]==l && c++}
+      for(let i=0;i<s.length;i++){s[i]===l && c++}
       return c;
     }
   </script>
