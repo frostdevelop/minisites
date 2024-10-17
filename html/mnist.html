@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pacifiky's Mnist</title>
+  <style>
+    body {
+      padding: 0 5vw;
+      color: #EEE;
+      font-size: 20px;
+      font-family: Tahoma, Arial, sans-serif;
+      color-scheme: dark;
+      text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      background: #222;
+    }
+    /*Begin PacifikyNeoDark*/
+    :root {
+      --hover: #4f4f4f;
+      --border: 2px;
+      --radius: 45px;
+      --height: 6px;
+    }
+    input:focus,select:focus {outline:none;}
+    input:active,select:active,input[type="text"]:focus,.button:active {background: linear-gradient(to left top, #292929, #121212)};
+    .button,input,select {font-family: Tahoma, Arial, sans-serif;}
+    input:active,select:active,input[type="text"]:focus,.button:active {
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
+      border-color: rgba(0,0,0,0);
+    }
+    details,input,select,.button,.fp-grad-stop-cont-cont {border: var(--border) #292929 solid;box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);}
+    input,select {
+      transition: box-shadow 500ms ease, border 500ms ease;
+      background: linear-gradient(to left top, #121212, #292929);
+      color: currentcolor;
+      font-size: 13px;
+      padding: 10px;
+      margin: 2px;
+      border-radius: var(--radius);
+      min-width:0px;
+    }
+    select {background:#222}
+    input:hover,select:hover,.button:hover {border-color: var(--hover);}
+    .smallinput {width:10em}
+    .button {
+      display: inline-flex;
+      flex-direction: row;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+      cursor: pointer;
+      background: linear-gradient(to left top, #121212, #292929);
+      color: currentColor;
+      transition: box-shadow 500ms ease, border 500ms ease;
+      font-size: 13px;
+      padding: 8px;
+      margin: 4px;
+      border-radius: var(--radius);
+      min-width: 100px;
+    }
+    .iconbutton {
+      min-width: 0;
+      width: 45px;
+      height: 45px;
+      font-size: 30px;
+      border-radius: 50%;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+    .icon {
+      display: inline;
+      height: 25px;
+      width: 25px;
+    }
+    .smallbutton {min-width:5em;}
+    details {
+      border-radius: 20px;
+      padding: 10px;
+      margin: 10px;
+      /*background: linear-gradient(to left top, #121212, #292929);*/
+    }
+    details[open] > summary {
+      border-bottom: rgba(255,255,255,0.2) solid 2px;
+      margin-bottom: 10px;
+    }
+    .gbtn {
+      background: linear-gradient(135deg,#33ff33,#11c011);
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.8),-2px -2px var(--height) #33ff33;
+      border-color:#11c011;
+    }
+    .gbtn:hover {border-color:#33ff33;}
+    .gbtn:active {background: linear-gradient(-45deg,#33ff33,#11c011);box-shadow: inset 2px 2px var(--height) rgba(0,0,0,0.8),inset -2px -2px var(--height) #33ff33;}
+    .rbtn {
+      background: linear-gradient(135deg,#f95353,#a51212);
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.8),-2px -2px var(--height) #f95353;
+      border-color: #a51212;
+    }
+    .rbtn:hover {border-color: #f95353}
+    .rbtn:active {background: linear-gradient(-45deg,#f95353,#a51212);box-shadow: inset 2px 2px var(--height) rgba(0,0,0,0.8), inset -2px -2px var(--height) #f95353;}
+    /*End PacifikyNeoDark*/
+    .pabs {position:absolute;top:0;left:0;}
+    .canvascont {display: inline-block;position:relative;width:500px;height:500px}
+    input[type="color"] {padding:0;width:50px;height:35px;}
+    .inline {display:inline}
+    .hid {opacity:0;position:fixed;pointer-events:none;}
+    .insect {margin: 10px 0}
+    .flx-center {display:flex;flex-direction:column;align-content:center;justify-content:center;width:100%;justify-items:center;align-items:center;}
+    .pad-5 {padding:10px;}
+    hr {width:95%;border-color: #3d3d3d;margin:0 auto;}
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <div id="controls">
+  <div class="mnistouttop">
+    <h3>
+      Saved Epoch: Null 
+    </h3>
+    <h3>
+      Activation: Leaky ReLU
+      <br/>
+      Softmax: null
+      <br/>
+      Hidden layer depth: 2
+      <br/>
+      Type: FF
+      <br/>
+      Connections: FCLs
+      <br/>
+      Loss: MSE
+      <br/>
+      Training: Stochastic Gradient Descent
+    </h3>
+    <h3>(Output layer display)</h3>
+    <h3 class="mniststatus">Loading train data, Calculating negative gradient, Randomizing weights/bias</h3>
+  </div>
+  <div class="topConpaint">
+    <h3 class="ioutpaint">0,0</h3>
+    <button class="iconpaint button">Clear</button>
+    <button class="iconpaint button">Undo</button>
+    <button class="iconpaint button">Redo</button>
+    <button class="iconpaint button">Upload</button>
+  </div>
+  <div class="canvascont">
+  <canvas width="28" height="28" style="width:500px;height:500px;"></canvas>
+  </div>
+  <div class="mnistoutbot">
+    <h3>
+      Current Epoch: Null 
+    </h3>
+  </div>
+  </div>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    //class for draw
+    class fpaint {
+      constructor(canv,inp2) {
+        this.canvas = canv;
+        this.canvas.classList.add("pabs");
+        this.ccanvas = document.createElement("canvas");
+        this.ccanvas.classList.add("pabs");
+        this.ccanvas.width = this.canvas.width;
+        this.ccanvas.height = this.canvas.height;
+        this.canvas.parentNode.appendChild(this.ccanvas);
+        this.ccanvas.style.pointerEvents = "none";
+        this.ccanvas.style.width= this.canvas.style.width;
+        this.ccanvas.style.height = this.canvas.style.height;
+        this.curcanvas = document.createElement("canvas");
+        this.curcanvas.width = this.curcanvas.height = 100;
+        this.ctx = this.canvas.getContext("2d");
+        this.cctx = this.ccanvas.getContext("2d");
+        this.curctx = this.curcanvas.getContext("2d");
+        this.clr = "#FFFFFF";
+        this.md = false;
+        this.softness = 1.0;
+        this.opacity = 255;
+        this.strokesize = 2;
+        this.step = 1;
+        this.paint = this.paint.bind(this);
+        this.clear = this.clear.bind(this);
+        this.prevloc = [0,0];
+        this.history = [];
+        this.history2 = [];
+        //mar:canvasmouse
+        this.canvas.parentNode.addEventListener("mousedown",e=>{e.preventDefault();
+          document.body.focus();
+          //document.body.click();
+          this.md = true;
+          this.prevloc = [Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width))),Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)))];
+          this.savehistory();
+          this.paint(e)
+        });
+        this.canvas.parentNode.addEventListener("mousemove",this.paint);
+        this.canvas.parentNode.addEventListener("mouseup",e=>{this.md = false;this.commit()});
+        if(inp2){
+        this.topinp = inp2.getElementsByClassName("iconpaint");
+        this.topoup = inp2.getElementsByClassName("ioutpaint");
+        this.topinp[0].addEventListener("click",this.clear);
+        this.topinp[1].addEventListener("click",this.loadhistory);
+        this.topinp[2].addEventListener("click",this.loadhistory2);
+        this.topinp[3].addEventListener("click",this.uploadFil)
+        }
+        this.canvas.style.imageRendering = this.ccanvas.style.imageRendering = "pixelated";
+        this.updstroke();
+        document.addEventListener("keydown",this._checkKey);
+        this.ctx.fillStyle="#000000"
+        this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
+      }
+      //mar:paint
+      paint(e) {
+        const realX = Math.floor(e.offsetX*(this.canvas.width/parseInt(this.canvas.style.width)));
+        const realY = Math.floor(e.offsetY*(this.canvas.height/parseInt(this.canvas.style.height)));
+        this.topoup[0].innerText = realX + "," + realY;
+        if(this.md){
+          let contextused = this.cctx;
+          let alphaused = 255;
+          if(realX==this.prevloc[0] && realY==this.prevloc[1]){
+            let stroke = contextused.createRadialGradient(realX,realY,0,realX,realY,this.strokesize);
+            stroke.addColorStop(1-this.softness,this.clr+alphaused.toString(16).padEnd(2,"0"));
+            stroke.addColorStop(1,this.clr+"00");
+            contextused.fillStyle = stroke;
+            contextused.fillRect(0,0,this.canvas.width,this.canvas.height);
+          } else {
+            //intdiv dist by 5 
+            //for the amount of 5ves go into the dist.
+            //multiply nvect by 5 
+            //use ^ var then mult by index (start at 1 on for loop)
+            //add to ploc
+            //set ploc to last stroke.
+            let nvect = [realX-this.prevloc[0],realY-this.prevloc[1]];
+            const dist = Math.sqrt(nvect[0]**2 + nvect[1]**2);
+            nvect = nvect.map(i=>i/dist);
+            const amountofstep = Math.floor(dist/this.step);
+            for(let i=1;i<=amountofstep;i++){
+              const npos = [this.prevloc[0]+nvect[0]*(this.step*i),this.prevloc[1]+nvect[1]*(this.step*i)];
+              let stroke = contextused.createRadialGradient(npos[0],npos[1],0,npos[0],npos[1],this.strokesize);
+              stroke.addColorStop(1-this.softness,this.clr+alphaused.toString(16).padEnd(2,"0"));
+              stroke.addColorStop(1,this.clr+"00");
+              contextused.fillStyle = stroke;
+              contextused.fillRect(0,0,this.canvas.width,this.canvas.height);
+              if(i==amountofstep){this.prevloc = npos};
+            }
+          }
+        };
+        return;
+      }
+      hex2rgb(s) {if(s.length > 7){return Uint8Array.of(parseInt(s.substring(1,3),16),parseInt(s.substring(3,5),16),parseInt(s.substring(5,7),16),parseInt(s.substring(7,9),16))}else{return Uint8Array.of(parseInt(s.substring(1,3),16),parseInt(s.substring(3,5),16),parseInt(s.substring(5,7),16),255)};}
+      rgb2hex(a) {return "#" + a[0].toString(16).padStart(2,"0") + a[1].toString(16).padStart(2,"0") + a[2].toString(16).padStart(2,"0")}
+      clear(e) {this.ctx.fillStyle="#000000";this.ctx.fillRect(0,0,this.canvas.width,this.canvas.height);}
+      updstroke() {
+        this.curctx.clearRect(0,0,100,100);
+        this.curctx.fillStyle = "white";
+        this.curctx.fillRect(48,48,5,5);
+        this.curctx.fillStyle = "black";
+        this.curctx.fillRect(49,49,3,3);
+        const realstroke = Math.floor(this.strokesize*(parseInt(this.canvas.style.height)/this.canvas.height));
+        this.curctx.strokeStyle = this.clr+this.opacity.toString(16);
+        this.curctx.beginPath();
+        this.curctx.arc(50,50,realstroke,0,2*Math.PI);
+        this.curctx.stroke();
+        this.curctx.closePath();
+        this.updtool();
+      }
+      updtool() {
+        this.canvas.parentNode.style.cursor = 'url("'+this.curcanvas.toDataURL()+'") 50 50,default';
+      }
+      savehistory() {
+        this.history.push(this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height));
+      }
+      loadhistory() {
+        if(this.history.length > 0){
+          this.history2.push(this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height));
+          this.ctx.putImageData(this.history.pop(),0,0);
+        } else {
+          this.clear(null);
+        }
+      }
+      loadhistory2() {
+        if(this.history2.length > 0){
+          this.history.push(this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height));
+          this.ctx.putImageData(this.history2.pop(),0,0);
+        }
+      }
+      _checkKey(e) {
+        if(e.ctrlKey){
+          switch(e.key){
+            case "z":
+              this.loadhistory();
+              break;
+            case "Z":
+              this.loadhistory2();
+              break;
+            case "d":
+              this.selection[0] = false;
+              this.commit();
+              break;
+          }
+        }
+      }
+      commit() {
+        this.ctx.globalAlpha = this.opacity/255;
+        //Add clip code
+        this.ctx.drawImage(this.ccanvas,0,0);
+        this.cctx.clearRect(0,0,this.ccanvas.width,this.ccanvas.height);
+        return;
+      }
+      uploadFil(e) {
+        const fin = document.createElement("input");
+        fin.setAttribute("type","file");
+        fin.setAttribute("accept","image/*");
+        fin.addEventListener("change",e=>{
+          const url = URL.createObjectURL(fin.files[0])
+          let img = new Image();
+          img.onload = () => {
+            this.savehistory();
+            URL.revokeObjectURL(url);
+            this.cctx.setTransform(this.transformmtx[0],this.transformmtx[1],this.transformmtx[2],this.transformmtx[3],this.transformmtx[4],this.transformmtx[5]);
+            this.cctx.filter = this.getFil();
+            this.cctx.drawImage(img,0,0);
+            this.cctx.resetTransform();
+            this.cctx.filter = "";
+            this.commit();
+          }
+          img.src = url;
+        })
+        fin.click();
+      }
+    }
+    class NeuralJS { 
+      constructor(){
+        
+      }
+      static Layer = class Layer {
+        constructor(){
+          
+        }
+        static LinearFC = class LinearFC extends Layer{
+          constructor(inum,onum){
+            
+          }
+          compute(i){
+            
+          }
+        }
+      }
+      static Network = class Network {
+        constructor(shape,options){
+          //enum activation 0:Sigmoid 1:ReLU 2:LReLU
+          //enum loss 0:MSE 1:CROSSENTROPY
+          this.learnRate = options.learnRate || 0.2;
+          this.activation = options.activation || 0;
+          switch(this.activation){
+            case 2:
+              this.lreluA = options.lreluA;
+              break;
+          }
+          this.softmax = options.softmax || true;
+          this.loss = options.loss || 0;
+          //
+          this.shape = shape;
+        }
+        train(tensors){
+          
+        }
+      }
+    }
+    class MnistFrontend {
+      constructor(top,bot,paint){
+        
+      }
+    }
+    //try{
+    let painter = new fpaint(document.getElementById("controls").getElementsByClassName("canvascont")[0].children[0],document.getElementById("controls").getElementsByClassName("topConpaint")[0]);
+    //}catch(e){alert(e)}
+  </script>
+</body>
+</html>
