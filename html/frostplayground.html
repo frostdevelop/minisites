@@ -918,124 +918,136 @@
       })
       //https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
       inps[i].addEventListener("keydown",e=>{
-        if(e.key==="Tab" && !e.shiftKey){
-          e.preventDefault();
-          //storeHistory(i);
-          let spos = st = inps[i].selectionStart;
-          let epos = en = inps[i].selectionEnd;
-          let lines = [];
-          for(let j=inps[i].selectionStart-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
-          for(let j=inps[i].selectionEnd;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
-          //fill list
-          let plb = st;
-          for(let j=st;j<en;j++){
-            if(inps[i].value[j]==="\n"){
-              lines.push([plb,j]);
-              plb = j+1;
+        switch(e.key){
+          case "Tab":
+            if(e.shiftKey){
+              e.preventDefault()
+              //storeHistory(i);
+              let spos = st = inps[i].selectionStart;
+              let epos = en = inps[i].selectionEnd;
+              let lines = [];
+              for(let j=inps[i].selectionStart-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
+              for(let j=inps[i].selectionEnd;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
+              //fill list
+              let plb = st;
+              for(let j=st;j<en;j++){
+                if(inps[i].value[j]==="\n"){
+                  lines.push([plb,j]);
+                  plb = j+1;
+                }
+              }
+              lines.push([plb,en+1]);
+              let soil = 0;
+              let foil = true;
+              for(let j=0;j<lines.length;j++){
+                let lndata = inps[i].value.substring(lines[j][0]+soil,lines[j][1]+soil);
+                //inps[i].value = inps[i].value.substring(0,st) + inps[i].value.substring(en+1,inps[i].value.length);
+                let oi = "";
+                for(let j=0;j<lndata.length;j++){
+                  if(lndata[j]===" " || lndata[j]==="\t"){oi+=lndata[j]}else{break}
+                }
+                let eni = lndata.substring(oi.length,lndata.length);
+                //let strel = spos-(st+oi.length);
+                let poi = oi.length;
+                oi = oi.replace(prefinp[1].value,"");
+                if(oi.length-poi===0 && j===0) foil=false;
+                inps[i].value = inps[i].value.substring(0,lines[j][0]+soil) + oi + eni + inps[i].value.substring(lines[j][1]+soil,inps[i].value.length);
+                soil+=oi.length-poi;
+                //strel = strel < 0 ? 0 : strel;
+              }
+              inps[i].selectionStart = foil ? spos-prefinp[1].value.length : spos;
+              inps[i].selectionEnd = epos+soil;
+            }else{
+              e.preventDefault();
+              //storeHistory(i);
+              let spos = st = inps[i].selectionStart;
+              let epos = en = inps[i].selectionEnd;
+              let lines = [];
+              for(let j=inps[i].selectionStart-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
+              for(let j=inps[i].selectionEnd;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
+              //fill list
+              let plb = st;
+              for(let j=st;j<en;j++){
+                if(inps[i].value[j]==="\n"){
+                  lines.push([plb,j]);
+                  plb = j+1;
+                }
+              }
+              lines.push([plb,en+1]);
+              for(let j=0;j<lines.length;j++){
+                let lndata = inps[i].value.substring(lines[j][0]+j*prefinp[1].value.length,lines[j][1]+j*prefinp[1].value.length);
+                //alert(lndata);
+                //inps[i].value = inps[i].value.substring(0,st) + inps[i].value.substring(en+1,inps[i].value.length);
+                let oi = "";
+                for(let j=0;j<lndata.length;j++){
+                  if(lndata[j]===" " || lndata[j]==="\t"){oi+=lndata[j]}else{break}
+                }
+                let eni = lndata.substring(oi.length,lndata.length);
+                //let strels = spos-(st+oi.length);
+                //let strele = epos-(en+oi.length);
+                oi = oi + prefinp[1].value;
+                inps[i].value = inps[i].value.substring(0,lines[j][0]+j*prefinp[1].value.length) + oi + eni + inps[i].value.substring((lines[j][1]+j*prefinp[1].value.length),inps[i].value.length);
+                //strels = strels < 0 ? 0 : strels;
+                //inps[i].selectionStart = st + oi.length + strels;
+                //alert(inps[i].selectionStart);
+                //inps[i].selectionEnd = inps[i].selectionStart;
+              }
+              inps[i].selectionStart = spos+prefinp[1].value.length;
+              inps[i].selectionEnd = epos+prefinp[1].value.length*lines.length;
             }
-          }
-          lines.push([plb,en+1]);
-          for(let j=0;j<lines.length;j++){
-            let lndata = inps[i].value.substring(lines[j][0]+j*prefinp[1].value.length,lines[j][1]+j*prefinp[1].value.length);
-            //alert(lndata);
-            //inps[i].value = inps[i].value.substring(0,st) + inps[i].value.substring(en+1,inps[i].value.length);
-            let oi = "";
-            for(let j=0;j<lndata.length;j++){
-              if(lndata[j]===" " || lndata[j]==="\t"){oi+=lndata[j]}else{break}
+            break;
+          case "Enter":
+            if(prefinp[3].checked){
+              e.preventDefault()
+              let spos = st = en = inps[i].selectionStart;
+              //console.log(spos);
+              for(let j=spos-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
+              for(let j=spos;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
+              //console.log(inps[i].value.substring(st,en));
+              let as = "";
+              let lndata = inps[i].value.substring(st,en);
+              //for(let j=0;j<countl(inps[i].value.substring(st,en+1),"\t");j++){as+="\t"};
+              for(let j=0;j<lndata.length;j++){
+                if(lndata[j]===" " || lndata[j]==="\t"){as+=lndata[j]}else{break}
+              }
+              if(inps[i].value[inps[i].selectionStart-1]==="{" || (inps[i].value[inps[i].selectionStart-1]===">" && inps[i].value[inps[i].selectionStart]==="<")){as += prefinp[1].value;}
+              //check for { or } here.
+              inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\n" + as + inps[i].value.substring(inps[i].selectionEnd)
+              inps[i].selectionStart = spos+as.length+1;
+              inps[i].selectionEnd = inps[i].selectionStart;
+              storeHistory(i);
+              intUpdLn.call(inps[i]);
             }
-            let eni = lndata.substring(oi.length,lndata.length);
-            //let strels = spos-(st+oi.length);
-            //let strele = epos-(en+oi.length);
-            oi = oi + prefinp[1].value;
-            inps[i].value = inps[i].value.substring(0,lines[j][0]+j*prefinp[1].value.length) + oi + eni + inps[i].value.substring((lines[j][1]+j*prefinp[1].value.length),inps[i].value.length);
-            //strels = strels < 0 ? 0 : strels;
-            //inps[i].selectionStart = st + oi.length + strels;
-            //alert(inps[i].selectionStart);
-            //inps[i].selectionEnd = inps[i].selectionStart;
-          }
-          inps[i].selectionStart = spos+prefinp[1].value.length;
-          inps[i].selectionEnd = epos+prefinp[1].value.length*lines.length;
-        } else if(e.key==="Tab" && e.shiftKey){
-          e.preventDefault()
-          //storeHistory(i);
-          let spos = st = inps[i].selectionStart;
-          let epos = en = inps[i].selectionEnd;
-          let lines = [];
-          for(let j=inps[i].selectionStart-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
-          for(let j=inps[i].selectionEnd;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
-          //fill list
-          let plb = st;
-          for(let j=st;j<en;j++){
-            if(inps[i].value[j]==="\n"){
-              lines.push([plb,j]);
-              plb = j+1;
-            }
-          }
-          lines.push([plb,en+1]);
-          let soil = 0;
-          let foil = true;
-          for(let j=0;j<lines.length;j++){
-            let lndata = inps[i].value.substring(lines[j][0]+soil,lines[j][1]+soil);
-            //inps[i].value = inps[i].value.substring(0,st) + inps[i].value.substring(en+1,inps[i].value.length);
-            let oi = "";
-            for(let j=0;j<lndata.length;j++){
-              if(lndata[j]===" " || lndata[j]==="\t"){oi+=lndata[j]}else{break}
-            }
-            let eni = lndata.substring(oi.length,lndata.length);
-            //let strel = spos-(st+oi.length);
-            let poi = oi.length;
-            oi = oi.replace(prefinp[1].value,"");
-            if(oi.length-poi===0 && j===0) foil=false;
-            inps[i].value = inps[i].value.substring(0,lines[j][0]+soil) + oi + eni + inps[i].value.substring(lines[j][1]+soil,inps[i].value.length);
-            soil+=oi.length-poi;
-            //strel = strel < 0 ? 0 : strel;
-          }
-          inps[i].selectionStart = foil ? spos-prefinp[1].value.length : spos;
-          inps[i].selectionEnd = epos+soil;
-        } else if(e.key==="Enter" && prefinp[3].checked){
-          e.preventDefault()
-          let spos = st = en = inps[i].selectionStart;
-          //console.log(spos);
-          for(let j=spos-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
-          for(let j=spos;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
-          //console.log(inps[i].value.substring(st,en));
-          let as = "";
-          let lndata = inps[i].value.substring(st,en);
-          //for(let j=0;j<countl(inps[i].value.substring(st,en+1),"\t");j++){as+="\t"};
-          for(let j=0;j<lndata.length;j++){
-            if(lndata[j]===" " || lndata[j]==="\t"){as+=lndata[j]}else{break}
-          }
-          if(inps[i].value[inps[i].selectionStart-1]==="{"){
-            as += prefinp[1].value;
-          }else if(inps[i].value[inps[i].selectionStart-1]===">" && inps[i].value[inps[i].selectionStart]==="<"){
-            as += prefinp[1].value;
-          }
-          //check for { or } here.
-          inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\n" + as + inps[i].value.substring(inps[i].selectionEnd)
-          inps[i].selectionStart = spos+as.length+1;
-          inps[i].selectionEnd = inps[i].selectionStart;
-          storeHistory(i);
-          intUpdLn.call(inps[i]);
-        }else if((e.key==="Z" && e.ctrlKey) || (e.key==="y" && e.ctrlKey)){
-          e.preventDefault();
-          if(inphistory[i][1].length > 0){
-            inphistory[i][0].push([inps[i].value,inps[i].selectionStart]);
-            [inps[i].value,inps[i].selectionStart] = inphistory[i][1].pop();
-            inps[i].selectionEnd = inps[i].selectionStart;
-            trig0f(null);
-            intUpdLn.call(htmli);
-            intUpdLn.call(cssi);
-            intUpdLn.call(jsin);
-          }
-        }else if(e.key==="z" && e.ctrlKey){
-          e.preventDefault();
-          loadHistory(i);
-        }else if(e.key==="h" && e.ctrlKey){
-          e.preventDefault();
-          finrep.classList.toggle("hid");
-          finrep.classList.toggle("sho");
-          //mar:cur
-        }else if(prefinp[7].checked && savechars.includes(e.key)){storeHistory(i)}
+            break;
+          default:
+            if(e.ctrlKey){
+              switch(e.key){
+                case "Z":
+                case "y":
+                  e.preventDefault();
+                  if(inphistory[i][1].length > 0){
+                    inphistory[i][0].push([inps[i].value,inps[i].selectionStart]);
+                    [inps[i].value,inps[i].selectionStart] = inphistory[i][1].pop();
+                    inps[i].selectionEnd = inps[i].selectionStart;
+                    trig0f(null);
+                    intUpdLn.call(htmli);
+                    intUpdLn.call(cssi);
+                    intUpdLn.call(jsin);
+                  }
+                  break;
+                case "z":
+                  e.preventDefault();
+                  loadHistory(i);
+                  break;
+                case "h":
+                  e.preventDefault();
+                  finrep.classList.toggle("hid");
+                  finrep.classList.toggle("sho");
+                  //mar:cur
+                  break;
+              }
+            }else if(prefinp[7].checked && savechars.includes(e.key)){storeHistory(i)};
+        }
       });
       finrep.getElementsByClassName("close")[0].addEventListener("click",e=>{
         finrep.classList.remove("sho");
@@ -1078,6 +1090,10 @@
     function storeHistory(index){
       if(prefinp[7].checked){
         inphistory[index][0].push([inps[index].value,inps[index].selectionStart]);
+        /*
+        //(Mode: 0-2), 0: delete = [0,Uint32Array.of(pos,numchars)] 1: add [1,[pos,chars]] 2: del+add [2,Uint32Array.of([pos,numchar]),[pos,chars]]
+        let new = Uint32Array.of(marr,0,0);
+        */
       }
       return;
     }
