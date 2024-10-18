@@ -114,12 +114,7 @@
   <div id="controls">
   <div class="mnistouttop">
     <h3>
-      Saved Epoch: Null 
-    </h3>
-    <h3>
       Activation: Leaky ReLU
-      <br/>
-      Softmax: null
       <br/>
       Hidden layer depth: 2
       <br/>
@@ -129,7 +124,9 @@
       <br/>
       Loss: MSE
       <br/>
-      Training: Stochastic Gradient Descent
+      Optimization: Mini Batch Gradient Descent
+      <br/>
+      OutActivation: Linear
     </h3>
     <h3>(Output layer display)</h3>
     <h3 class="mniststatus">Loading train data, Calculating negative gradient, Randomizing weights/bias</h3>
@@ -153,7 +150,7 @@
   <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
     //class for draw
-    class fpaint {
+    class mfpaint {
       constructor(canv,inp2) {
         this.canvas = canv;
         this.canvas.classList.add("pabs");
@@ -326,13 +323,14 @@
         fin.click();
       }
     }
-    class NeuralJS { 
-      constructor(){
-        
-      }
+    class NeuralJS {
       static Layer = class Layer {
         constructor(){
-          
+          this.weights = new Float32Array;
+          this.biases = new Float32Array;
+        }
+        static randVals(){
+          //Randomize w/b
         }
         static LinearFC = class LinearFC extends Layer{
           constructor(inum,onum){
@@ -345,8 +343,10 @@
       }
       static Network = class Network {
         constructor(shape,options){
-          //enum activation 0:Sigmoid 1:ReLU 2:LReLU
+          //enum activation 0:Sigmoid 1:ReLU 2:LReLU 3:Tanh
           //enum loss 0:MSE 1:CROSSENTROPY
+          //enum opti 0:SGD 1: BGD 2: MBGD
+          //enum oactiv 0:Softmax 1:Linear 2:Sigmoid
           this.learnRate = options.learnRate || 0.2;
           this.activation = options.activation || 0;
           switch(this.activation){
@@ -354,14 +354,93 @@
               this.lreluA = options.lreluA;
               break;
           }
-          this.softmax = options.softmax || true;
+          this.oActiv = options.oActiv || 0;
           this.loss = options.loss || 0;
-          //
+          this.opti = options.opti || 0;
+          switch(opti){
+            case 2:
+              this.mbgdsize = options.mgbdsize || 1;
+              break;
+          }
           this.shape = shape;
         }
-        train(tensors){
+        forward(itensor){
+          let otensor = itensor
+          for(let i=0;i<this.shape.length;i++){
+            otensor = this.shape[i].compute(otensor);
+            if(i<this.shape.length-1){
+              switch(this.activation){
+                case 0:
+                  break;
+                case 1:
+                  break;
+                case 2:
+                  break;
+                case 3:
+                  break;
+              }
+            }else{
+              switch(this.oActiv){
+                case 0:
+                  break;
+                case 1:
+                  break;
+                case 2:
+                  break;
+              }
+            }
+          }
+          return otensor;
+        }
+        train(itensor){
           
         }
+      }
+    }
+    //put 
+    class IDXReader{
+      constructor(data){
+        //Data is arraybuffer
+        this.data = new DataView(data);
+        this.vdata = true;
+        if(this.data.getInt16(0) != 0){
+          alert("Invalid IDX data missing header!");
+          this.vdata = false;
+        };
+        this.type = this.data.getInt8(2);
+        this.dimnum = this.data.getInt8(3);
+      }
+      getTensor(){
+        switch(this.type){
+          case 8:
+            this.data.getUint8();
+            break;
+          case 9:
+            this.data.getInt8();
+            break;
+          case 11:
+            this.data.getInt16();
+            break;
+          case 12:
+            this.data.getInt32();
+            break;
+          case 13:
+            this.data.getFloat32();
+            break;
+          case 14:
+            this.data.getFloat64();
+            break;
+          default:
+            alert("Invalid IDX data invalid type!")
+            this.vdata = false;
+            break;
+        }
+      }
+      getDimArr(){
+        return this.dim;
+      }
+      getType(){
+        return this.type;
       }
     }
     class MnistFrontend {
@@ -370,8 +449,9 @@
       }
     }
     //try{
-    let painter = new fpaint(document.getElementById("controls").getElementsByClassName("canvascont")[0].children[0],document.getElementById("controls").getElementsByClassName("topConpaint")[0]);
+    let painter = new mfpaint(document.getElementById("controls").getElementsByClassName("canvascont")[0].children[0],document.getElementById("controls").getElementsByClassName("topConpaint")[0]);
     //}catch(e){alert(e)}
+    //const mnistdb = Float32Array.of(0.0); //await translating mnist to float32array
   </script>
 </body>
 </html>
