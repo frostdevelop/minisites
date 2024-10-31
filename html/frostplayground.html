@@ -537,6 +537,12 @@
       <div class='item'>
        Tab size: <input type="number" class="smol iinput" value="4" id="tse"></input>
       </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk5">Update Lines</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk6">Console Divider</input>
+      </div>
       </div>
       <footer>Copyright 2024 Pacifiky. All rights reserved.<br/>Thank you Aaron for testing!</footer>
     </dialog>
@@ -661,10 +667,14 @@
     const inps = document.getElementsByClassName("input");
     const nums = document.getElementsByClassName("lnnumb");
     const savechars = [":",";","!","+","=","-","Enter","Backspace","?",".",">","<","*","//","&","|"];
+    const commitDelay = 800; //Undo stack commit delay (of one keydown to another)
+    let chnbuf = [false,0,[0,[],0]]; //[status,index,[finalCursor,[stringofdeleted],lengthofadd]]
+    let lastInputTime = 0; //use +new Date
     let updateen = true;
     var inphistory = new Array(inps.length).fill().map(()=>[[],[]]);
+    var fieldHistory = new Array(inps.length).fill().map(()=>[[],[]]);
     const delsvg = document.getElementById("trashsvg");
-    playframe.contentWindow.console = {log: function (m){consolee.value += m + "\n";consolee.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){consolee.value = "console cleared\n"},dir: function(o){const props = Object.getOwnPropertyNames(o);for(let i=0;i<props.length;i++){consolee.value+=props[i]+": "+o[props[i]]+"\n"};}};
+    playframe.contentWindow.console = {log: function (m){consolee.value += m + "\n";consolee.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){consolee.value = "";consolee.placeholder = "Console cleared"},dir: function(o){const props = Object.getOwnPropertyNames(o);for(let i=0;i<props.length;i++){consolee.value+=props[i]+": "+o[props[i]]+"\n"};}};
     //mar: class def
     class fileSys {
       constructor (container,filesid,filekeyid){
@@ -877,33 +887,72 @@
       let rinput = finrep.getElementsByClassName("rinputfr")[0];
 
       inps[i].addEventListener("focusin", e=>{for(let j=0;j<inps.length;j++){inps[j].classList.remove("active");};inps[i].classList.add("active");});
-      //inps[i].addEventListener("focusout", e=>{inps[i].classList.remove("active")});
-      inps[i].addEventListener("input", trig0f);
-      inps[i].addEventListener("input", intUpdLn);
+      
+      inps[i].addEventListener("beforeinput", e=>{
+        //needs chnbuf check if correct field.
+        if(!chnbuf[0]){
+          chnbuf[2][1].length = 0;
+          chnbuf[2][2] = 0;
+          lastInputTime = Date.now();
+        }else if(Date.now()-lastInputTime > commitDelay || chnbuf[1] != i){
+          saveHistory();
+          chnbuf[1] = i;
+          chnbuf[2][1].length = 0;
+          chnbuf[2][2] = 0;
+        }
+        chnbuf[2][0] = inps[i].selectionEnd;
+        if(inphistory[i][1].length > 0){
+          //mar:todo
+          inphistory[i][1].length = 0;
+        }
+        if(inps[i].selectionStart != chnbuf[2][0]){
+          //todo do mth diff for delete and insert
+        }else if(inps[i].selectionEnd != chnbuf[2][0]){
+          //todo
+        }
+        //inps[i].selectionStart != inps[i].selectionEnd
+        if(e.inputType == "deleteContentBackward" && inps[i].value.length > 0){
+            if(chnbuf[2][2] > 0){
+              chnbuf[2][2]--;
+            }else{
+              chnbuf[2][1].push(inps[i].value[inps[i].selectionEnd-1])
+            }
+            chnbuf[2][0]--;
+        }else if(e.inputType == "insertText"){
+          chnbuf[2][2]++;
+          chnbuf[2][0]++;
+        }
+        chnbuf[0] = true
+        console.log(Date.now()-lastInputTime)
+        lastInputTime = Date.now();
+        console.log(chnbuf);
+        console.log("--")
+      });
+      
       inps[i].addEventListener("input", e=>{
         inphistory[i][1].length = 0;
         switch(e.data){
           case "(":
           if(prefinp[4].checked){
-          document.execCommand("insertText",false,")");
-          inps[i].selectionStart = inps[i].selectionStart-1;
-          inps[i].selectionEnd=inps[i].selectionStart;
+          let orig = inps[i].selectionStart;
+          inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + ")" + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
+          inps[i].selectionStart = inps[i].selectionEnd = orig;
           }
           storeHistory(i);
           break;
           case "[":
           if(prefinp[4].checked){
-          document.execCommand("insertText",false,"]");
-          inps[i].selectionStart = inps[i].selectionStart-1;
-          inps[i].selectionEnd=inps[i].selectionStart;
+          let orig = inps[i].selectionStart;
+          inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + "]" + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
+          inps[i].selectionStart = inps[i].selectionEnd = orig;
           }
           storeHistory(i);
           break;
           case "{":
           if(prefinp[4].checked){
-          document.execCommand("insertText",false,"}");
-          inps[i].selectionStart = inps[i].selectionStart-1;
-          inps[i].selectionEnd=inps[i].selectionStart;
+          let orig = inps[i].selectionStart;
+          inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + "}" + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
+          inps[i].selectionStart = inps[i].selectionEnd = orig;
           }
           storeHistory(i);
           break;
@@ -911,10 +960,11 @@
         if((e.data === '"' || e.data === "'" || e.data === "`") && prefinp[5].checked){
           let orig = inps[i].selectionStart;
           inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + e.data + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
-          inps[i].selectionStart = orig;
-          inps[i].selectionEnd=inps[i].selectionStart
+          inps[i].selectionStart = inps[i].selectionEnd = orig;
           storeHistory(i);
         }else if(e.inputType === "insertFromPaste" || e.inputType === "deleteByCut"){storeHistory(i)};
+        updateen && trig0f.call(inps[i]);
+        prefinp[10].checked && intUpdLn.call(inps[i])
       })
       //https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
       inps[i].addEventListener("keydown",e=>{
@@ -1010,13 +1060,15 @@
               for(let j=0;j<lndata.length;j++){
                 if(lndata[j]===" " || lndata[j]==="\t"){as+=lndata[j]}else{break}
               }
-              if(inps[i].value[inps[i].selectionStart-1]==="{" || (inps[i].value[inps[i].selectionStart-1]===">" && inps[i].value[inps[i].selectionStart]==="<")){as += prefinp[1].value;}
+              //let paren = false;
+              let cursoroff = 1;
+              if(inps[i].value[inps[i].selectionStart-1]==="{" || (inps[i].value[inps[i].selectionStart-1]===">" && inps[i].value[inps[i].selectionStart]==="<")){cursoroff-=as.length+1;as += prefinp[1].value + "\n" + as;}
               //check for { or } here.
               inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\n" + as + inps[i].value.substring(inps[i].selectionEnd)
-              inps[i].selectionStart = spos+as.length+1;
+              inps[i].selectionStart = spos+as.length+cursoroff;
               inps[i].selectionEnd = inps[i].selectionStart;
               storeHistory(i);
-              intUpdLn.call(inps[i]);
+              prefinp[10].checked && intUpdLn.call(inps[i]); //Prevents input so need this
             }
             break;
           default:
@@ -1029,10 +1081,12 @@
                     inphistory[i][0].push([inps[i].value,inps[i].selectionStart]);
                     [inps[i].value,inps[i].selectionStart] = inphistory[i][1].pop();
                     inps[i].selectionEnd = inps[i].selectionStart;
-                    trig0f(null);
-                    intUpdLn.call(htmli);
-                    intUpdLn.call(cssi);
-                    intUpdLn.call(jsin);
+                    updateen && trig0f(null);
+                    if(prefinp[10].checked){
+                      intUpdLn.call(htmli);
+                      intUpdLn.call(cssi);
+                      intUpdLn.call(jsin);
+                    }
                   }
                   break;
                 case "z":
@@ -1064,22 +1118,111 @@
     }
     // https://stackoverflow.com/questions/1995370/adding-line-numbers-to-html-textarea
     function intUpdLn(e){
-      let num = this.parentNode.getElementsByClassName("lnnumb")[0];
-      let span = document.createElement("span");
-      num.innerHTML = "";
-      for(let j=0;j<this.value.split("\n").length;j++){
-        num.appendChild(span);
-        span = span.cloneNode();
+      const num = this.parentNode.getElementsByClassName("lnnumb")[0];
+      const nl = this.value.split("\n").length;
+      if(num.children.length != nl){
+        let span = document.createElement("span");
+        num.innerHTML = "";
+        for(let j=0;j<nl;j++){
+          num.appendChild(span);
+          span = span.cloneNode();
+        }
       }
     }
+    //mar:todo
+    //make a subfunction for undo and redo actions using a boolean?
+    function undoHistory(i){
+      let unddat;
+      if(chnbuf[0]){
+        if(chnbuf[1] == i){
+          unddat = chnbuf[2];
+          //chnbuf[0] = false;
+        }
+        else{
+          saveHistory(); //Have to because need to add undo actions into history
+          if(fieldHistory[i][0].length == 0){inps[i].value = "";return;}
+          unddat = fieldHistory[i][0].pop();
+        }
+        //unddat = chnbuf;
+      }else{
+        if(fieldHistory[i][0].length == 0){inps[i].value = "";return;}
+        unddat = fieldHistory[i][0].pop();
+        //saveHistory();
+      }
+      
+      /*
+      //startmac(unddat,val(inps[i].value))
+      let chndat = [unddat[0],[],unddat[1].length];
+      let ptext = inps[i].value;
+      if(unddat[2] > 0){
+        chndat[0] -= unddat[2];
+        chndat[1] = ptext.substr(chndat[0],unddat[2]).split("").reverse();
+        ptext = ptext.substring(0,chndat[0]) + ptext.substring(chndat[0]+unddat[2]);
+      }
+      if(unddat[1].length > 0){
+        ptext = ptext.substring(0,chndat[0]) + unddat[1].reverse().join("") + ptext.substring(chndat[0]);
+        chndat[0] += unddat[1].length
+      }
+      //return chndat,ptext endmac
+      */
+      
+      let [chndat,ptext] = retoreChange(unddat,inps[i].value);
+      inps[i].value = ptext;
+      inps[i].selectionStart = inps[i].selectionEnd = chndat[0];
+      //fieldHistory[i][1].push(unddat); need to push !unddat to redo hist
+      fieldHistory[i][1].push(chndat);
+      
+      /*
+      chnbuf[0] = true; //figure out way to combine all redo stack actions into one change on beforeinput 
+      chnbuf[1] = i; //actually just push redo stack actions onto undo stack each as an action 
+      chnbuf[2] = chndat;
+      */
+    }
+    function redoHistory(i){
+      if(fieldHistory[i][1].length == 0) return;
+      let [chndat,ptext] = retoreChange(reddat,inps[i].value);
+      inps[i].value = ptext;
+      inps[i].selectionStart = inps[i].selectionEnd = chndat[0];
+      fieldHistory[i][0].push(chndat);
+    }
+    function restoreChange(rstdat,ptext){
+      let chndat = [rstdat[0],[],rstdat[1].length];
+      if(rstdat[2] > 0){
+        chndat[0] -= rstdat[2];
+        chndat[1] = ptext.substr(chndat[0],rstdat[2]).split("").reverse();
+        ptext = ptext.substring(0,chndat[0]) + ptext.substring(chndat[0]+rstdat[2]);
+      }
+      if(rstdat[1].length > 0){
+        ptext = ptext.substring(0,chndat[0]) + rstdat[1].reverse().join("") + ptext.substring(chndat[0]);
+        chndat[0] += rstdat[1].length
+      }
+      return [chndat,ptext];
+    }
+    function saveHistory(){if(chnbuf[0]){fieldHistory[chnbuf[1]][0].push([chnbuf[2][0],chnbuf[2][1].slice(),chnbuf[2][2]])}else{alert("Application error: saveHistory called with invalid change!")}};
+    function logHistory(){
+      let out = "--Begin HistoryLog--\n{\n";
+      for(let i=0;i<fieldHistory.length;i++){
+        out += "  Undo"+i.toString()+"{\n"
+        for(let j=0;j<fieldHistory[i][0].length;j++){
+          out += "    Change"+j.toString()+"{\n      Cursor: "+fieldHistory[i][0][j][0]+"\n      DelArr: ["+fieldHistory[i][0][j][1].join(",")+"]\n      nAdd: "+fieldHistory[i][0][j][2]+"\n    }\n";
+        }
+        out += "  }\n  Redo"+i.toString()+"{\n"
+        for(let j=0;j<fieldHistory[i][1].length;j++){
+          out += "    Change"+j.toString()+"{\n      Cursor: "+fieldHistory[i][1][j][0]+"\n      DelArr: ["+fieldHistory[i][1][j][1].join(",")+"]\n      nAdd: "+fieldHistory[i][1][j][2]+"\n    }\n";
+        }
+        out += "  }\n"
+      }
+      out += "}\n--End HistoryLog--"
+      return out;
+    }
     function trig0f(e) {
-      if(updateen){
-        playframe.click();
-        playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";this.panel.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){this.panel.value = "console cleared\\n"},dir: function(o){const props = Object.getOwnPropertyNames(o);for(let i=0;i<props.length;i++){this.panel.value+=props[i]+": "+o[props[i]]+"\\n"};this.panel.scrollTop=this.panel.scrollHeight;}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`;
+      playframe.click();
+      playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";this.panel.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){this.panel.value = "";this.panel.placeholder = "Console cleared"},dir: function(o){const props = Object.getOwnPropertyNames(o);for(let i=0;i<props.length;i++){this.panel.value+=props[i]+": "+o[props[i]]+"\\n"};this.panel.scrollTop=this.panel.scrollHeight;}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`;
+      if(prefinp[11].checked && consolee.value.length > 0 && consolee.value[consolee.length-2]+consolee.value[consolee.length-3] != "--"){
+        consolee.value += "--"+(new Date).toLocaleString()+"--\n";
       }
       return;
     }
-    
     function setEnv(name,html,css,js){
       prefinp[0].value = name;
       htmli.value = html;
@@ -1088,13 +1231,11 @@
     }
     
     function storeHistory(index){
-      if(prefinp[7].checked){
-        inphistory[index][0].push([inps[index].value,inps[index].selectionStart]);
-        /*
-        //(Mode: 0-2), 0: delete = [0,Uint32Array.of(pos,numchars)] 1: add [1,[pos,chars]] 2: del+add [2,Uint32Array.of([pos,numchar]),[pos,chars]]
-        let new = Uint32Array.of(marr,0,0);
-        */
-      }
+      prefinp[7].checked && inphistory[index][0].push([inps[index].value,inps[index].selectionStart]);
+      /*
+      //(Mode: 0-2), 0: delete = [0,Uint32Array.of(pos,numchars)] 1: add [1,[pos,chars]] 2: del+add [2,Uint32Array.of([pos,numchar]),[pos,chars]]
+      let new = Uint32Array.of(marr,0,0);
+      */
       return;
     }
     
@@ -1103,14 +1244,12 @@
         inphistory[index][1].push([inps[index].value,inps[index].selectionStart]);
         [inps[index].value,inps[index].selectionStart] = inphistory[index][0].pop();
         inps[index].selectionEnd = inps[index].selectionStart;
-        trig0f(null);
-        intUpdLn.call(htmli);
-        intUpdLn.call(cssi);
-        intUpdLn.call(jsin);
       }else if(inps[index].value != ""){
         inphistory[index][1].push([inps[index].value,inps[index].selectionStart]);
         inps[index].value = ""
-        trig0f(null);
+      }else{return}
+      updateen && trig0f(null);
+      if(prefinp[10].checked){
         intUpdLn.call(htmli);
         intUpdLn.call(cssi);
         intUpdLn.call(jsin);
