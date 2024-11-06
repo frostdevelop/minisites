@@ -547,6 +547,12 @@
         <input type="checkbox" class="iinput" id="chk7">Bundle Cursor and Hotkeys</input>
         <!-- Consumer default = uncheck -->
       </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" id="chk8" checked>Auto-cancel closing closed paren</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" id="chk9">Auto-cancel closing closed quote</input>
+      </div>
       </div>
       <footer>Copyright 2024 Pacifiky. All rights reserved.<br/>Thank you Aaron for testing!</footer>
     </dialog>
@@ -671,6 +677,8 @@
     const inps = document.getElementsByClassName("input");
     const nums = document.getElementsByClassName("lnnumb");
     const savechars = [":",";","!","+","=","-","Enter","Backspace","?",".",">","<","*","//","&","|"];
+    const parencharso = new Uint8Array([40,91,123,60]) //ascii codes, charcodeat
+    const parencharsc = new Uint8Array([41,93,125,62])
     const commitDelay = 800; //Undo stack commit delay (of one keydown to another)
     let chnbuf = [false,0,[0,[],0,0]]; //[status,index,[finalCursor,[stringofdeleted],lengthofadd,curoffset]]
     let lastInputTime = 0; //use +new Date
@@ -895,49 +903,46 @@
       inps[i].addEventListener("beforeinput", e=>checkInput(e,i));
       
       inps[i].addEventListener("input", e=>{
-        switch(e.data){
-          case "(":
-            if(prefinp[4].checked){
-            let orig = inps[i].selectionStart;
-            inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + ")" + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
-            inps[i].selectionStart = inps[i].selectionEnd = orig;
-            checkInput({inputType:"insertText",data:")"},i);
-            }
-            saveHistory(i);
-            chnbuf[0] = false;
-          break;
-          case "[":
-            if(prefinp[4].checked){
-            let orig = inps[i].selectionStart;
-            inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + "]" + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
-            inps[i].selectionStart = inps[i].selectionEnd = orig;
-            checkInput({inputType:"insertText",data:"]"},i);
-            }
-            saveHistory(i);
-            chnbuf[0] = false;
-            break;
-          case "{":
-            if(prefinp[4].checked){
-            let orig = inps[i].selectionStart;
-            inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + "}" + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
-            inps[i].selectionStart = inps[i].selectionEnd = orig;
-            checkInput({inputType:"insertText",data:"}"},i);
-            }
-            saveHistory(i);
-            chnbuf[0] = false;
-            break;
-          case "'":
-          case '"':
-          case "`":
-            if(prefinp[5].checked){
-              let orig = inps[i].selectionStart;
-              inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + e.data + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
-              inps[i].selectionStart = inps[i].selectionEnd = orig;
-              checkInput({inputType:"insertText",data:e.data},i);
-            }
-            saveHistory(i);
-            chnbuf[0] = false;
-            break;
+        fpar = flipParen(e.data)
+        if(fpar){
+          if(prefinp[4].checked){
+          let orig = inps[i].selectionStart;
+          inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + fpar + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
+          inps[i].selectionStart = inps[i].selectionEnd = orig;
+          checkInput({inputType:"insertText",data:fpar},i);
+          }
+          saveHistory();
+          chnbuf[0] = false;
+        }else{
+          switch(e.data){
+            case ")":
+            case "]":
+            case "}":
+              if(inps[i].value[inps[i].selectionEnd] == e.data && prefinp[13].checked){
+                const orig = inps[i].selectionStart;
+                inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + inps[i].value.substring(inps[i].selectionEnd+1)
+                inps[i].selectionStart = inps[i].selectionEnd = orig;
+              }
+              break;
+            case "'":
+            case '"':
+            case "`":
+              if(inps[i].value[inps[i].selectionEnd] == e.data && prefinp[14].checked){
+                const orig = inps[i].selectionStart;
+                inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + inps[i].value.substring(inps[i].selectionEnd+1)
+                inps[i].selectionStart = inps[i].selectionEnd = orig;
+              }else{
+                if(prefinp[5].checked){
+                  const orig = inps[i].selectionStart;
+                  inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + e.data + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
+                  inps[i].selectionStart = inps[i].selectionEnd = orig;
+                  checkInput({inputType:"insertText",data:e.data},i);
+                }
+              }
+              saveHistory();
+              chnbuf[0] = false;
+              break;
+          }
         }
         updateen && trig0f.call(inps[i]);
         prefinp[10].checked && intUpdLn.call(inps[i])
@@ -1046,7 +1051,24 @@
               }
               //let paren = false;
               let cursoroff = 1;
-              if(inps[i].value[inps[i].selectionStart-1]==="{" || (inps[i].value[inps[i].selectionStart-1]===">" && inps[i].value[inps[i].selectionStart]==="<")){cursoroff-=as.length+1;as += prefinp[1].value + "\n" + as;}
+              switch(inps[i].value[inps[i].selectionStart-1].charCodeAt(0)){
+                case 40:
+                case 91:
+                case 123:
+                case 62:
+                  switch(inps[i].value[inps[i].selectionStart].charCodeAt(0)){
+                    case 41:
+                    case 93:
+                    case 125:
+                    case 60:
+                      cursoroff-=as.length+1
+                      as += prefinp[1].value + "\n" + as
+                      break;
+                    default:
+                      as += prefinp[1].value
+                  }
+                  //cursoroff-= (inps[i].value[inps[i].selectionStart]==="}" || inps[i].value[inps[i].selectionStart]==="<") ? as.length+1 : 0;as += prefinp[1].value + ((inps[i].value[inps[i].selectionStart]==="}" || inps[i].value[inps[i].selectionStart]==="<") ? "\n" + as : "");
+              }
               //check for { or } here.
               
               inps[i].selectionStart = inps[i].selectionEnd = spos;
@@ -1076,7 +1098,7 @@
                   //mar:cur
                   break;
               }
-            }else if(prefinp[7].checked && savechars.includes(e.key)){saveHistory(i);chnbuf[0] = false;};
+            }else if(prefinp[7].checked && savechars.includes(e.key)){saveHistory();chnbuf[0] = false;};
         }
       });
       finrep.getElementsByClassName("close")[0].addEventListener("click",e=>{
@@ -1150,7 +1172,7 @@
       */
       let [chndat,ptext] = restoreChange(unddat,inps[i].value);
       inps[i].value = ptext;
-      inps[i].selectionStart = inps[i].selectionEnd = chndat[0];
+      inps[i].selectionStart = inps[i].selectionEnd = chndat[0]+chndat[3];
       //fieldHistory[i][1].push(unddat); need to push !unddat to redo hist
       fieldHistory[i][1].push(chndat);
       
@@ -1167,14 +1189,13 @@
       if(fieldHistory[i][1].length === 0) return;
       let [chndat,ptext] = restoreChange(fieldHistory[i][1].pop(),inps[i].value);
       inps[i].value = ptext;
-      inps[i].selectionStart = inps[i].selectionEnd = chndat[0];
+      inps[i].selectionStart = inps[i].selectionEnd = chndat[0]+chndat[3];
       fieldHistory[i][0].push(chndat);
-      
       updateen && trig0f(null);
       prefinp[10].checked && intUpdLn.call(inps[i]);
     }
     function restoreChange(rstdat,ptext){
-      let chndat = [rstdat[0],[],rstdat[1].length];
+      let chndat = [rstdat[0],[],rstdat[1].length,rstdat[3]];
       if(rstdat[2] > 0){
         chndat[0] -= rstdat[2];
         chndat[1] = ptext.substr(chndat[0],rstdat[2]).split("").reverse();
@@ -1186,17 +1207,17 @@
       }
       return [chndat,ptext];
     }
-    function saveHistory(){if(chnbuf[0] && (chnbuf[2][2] > 0 || chnbuf[2][1].length > 0)){fieldHistory[chnbuf[1]][0].push([chnbuf[2][0],chnbuf[2][1].slice(),chnbuf[2][2]])}else{console.log("Application error: saveHistory called with invalid change!")}};
+    function saveHistory(){if(chnbuf[0] && (chnbuf[2][2] > 0 || chnbuf[2][1].length > 0)){fieldHistory[chnbuf[1]][0].push([chnbuf[2][0],chnbuf[2][1].slice(),chnbuf[2][2],chnbuf[2][3]])}};
     function logHistory(){
       let out = "--Begin HistoryLog--\n{\n";
       for(let i=0;i<fieldHistory.length;i++){
         out += "  Undo"+i.toString()+"{\n"
         for(let j=0;j<fieldHistory[i][0].length;j++){
-          out += "    Change"+j.toString()+"{\n      Cursor: "+fieldHistory[i][0][j][0]+"\n      DelArr: ["+fieldHistory[i][0][j][1].join(",")+"]\n      nAdd: "+fieldHistory[i][0][j][2]+"\n    }\n";
+          out += "    Change"+j.toString()+"{\n      Cursor: "+fieldHistory[i][0][j][0]+"\n      DelArr: ["+fieldHistory[i][0][j][1].join(",")+"]\n      nAdd: "+fieldHistory[i][0][j][2]+"\n      Curoff: "+fieldHistory[i][0][j][3]+"\n    }\n";
         }
         out += "  }\n  Redo"+i.toString()+"{\n"
         for(let j=0;j<fieldHistory[i][1].length;j++){
-          out += "    Change"+j.toString()+"{\n      Cursor: "+fieldHistory[i][1][j][0]+"\n      DelArr: ["+fieldHistory[i][1][j][1].join(",")+"]\n      nAdd: "+fieldHistory[i][1][j][2]+"\n    }\n";
+          out += "    Change"+j.toString()+"{\n      Cursor: "+fieldHistory[i][1][j][0]+"\n      DelArr: ["+fieldHistory[i][1][j][1].join(",")+"]\n      nAdd: "+fieldHistory[i][1][j][2]+"\n      Curoff: "+fieldHistory[i][1][j][3]+"\n    }\n";
         }
         out += "  }\n"
       }
@@ -1208,12 +1229,14 @@
         if(!chnbuf[0]){
           chnbuf[2][1].length = 0;
           chnbuf[2][2] = 0;
+          chnbuf[2][3] = 0;
           lastInputTime = Date.now();
         }else if(Date.now()-lastInputTime > commitDelay || chnbuf[1] != i){
           saveHistory();
           chnbuf[1] = i;
           chnbuf[2][1].length = 0;
           chnbuf[2][2] = 0;
+          chnbuf[2][3] = 0;
         }
         
         if(fieldHistory[i][1].length > 0){
@@ -1232,11 +1255,16 @@
           //todo do mth diff for delete and insert
           //console.log("--Selection!--");
           seldata = inps[i].value.substring(inps[i].selectionStart,inps[i].selectionEnd);
-        }else if(inps[i].selectionEnd != chnbuf[2][0]){
-          saveHistory();
-          chnbuf[1] = i;
-          chnbuf[2][1].length = 0;
-          chnbuf[2][2] = 0;
+        }else if(inps[i].selectionEnd != chnbuf[2][0]+chnbuf[2][3]){
+          if(prefinp[12].checked && (inps[i].selectionEnd < chnbuf[2][0] && inps[i].selectionEnd >= chnbuf[2][0]-chnbuf[2][2])){
+            chnbuf[2][3] = inps[i].selectionEnd-chnbuf[2][0];
+          }else{
+            saveHistory();
+            chnbuf[1] = i;
+            chnbuf[2][1].length = 0;
+            chnbuf[2][2] = 0;
+            chnbuf[2][3] = 0;
+          }
           //console.log("--Cursor Move--");
         }
         
@@ -1251,6 +1279,7 @@
               chnbuf[2][1] = seldata.split("").reverse();
               chnbuf[2][2] = 1;
               chnbuf[2][0] = inps[i].selectionStart+1;
+              chnbuf[2][3] = 0;
             }else{
               //alert(chnbuf[2][2])
               chnbuf[2][2]++;
@@ -1266,6 +1295,7 @@
                 chnbuf[2][2] = 0;
                 chnbuf[2][1] = seldata.split("").reverse();
                 chnbuf[2][0] = inps[i].selectionStart;
+                chnbuf[2][3] = 0;
               }else{
                 if(chnbuf[2][2] > 0){
                   chnbuf[2][2]--;
@@ -1295,20 +1325,29 @@
               //alert(e.data.length)
               //Commit paste data
               chnbuf[2][0] = inps[i].selectionStart+e.data.length;
+              chnbuf[2][3] = 0;
             }
             break;
         }
         chnbuf[0] = true
         lastInputTime = Date.now();
-        /*
-        console.log(chnbuf);
-        console.log("--")
-        */
+    }
+    function flipParen(s){
+      switch(s){
+        case "(":
+          return ")"
+        case "[":
+          return "]"
+        case "{":
+          return "}"
+        default:
+          return ""
+      }
     }
     function trig0f(e) {
       playframe.click();
       playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";this.panel.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){this.panel.value = "";this.panel.placeholder = "Console cleared"},dir: function(o){const props = Object.getOwnPropertyNames(o);for(let i=0;i<props.length;i++){this.panel.value+=props[i]+": "+o[props[i]]+"\\n"};this.panel.scrollTop=this.panel.scrollHeight;}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`;
-      if(prefinp[11].checked && consolee.value.length > 0 && consolee.value[consolee.length-2]+consolee.value[consolee.length-3] != "--"){
+      if(prefinp[11].checked && consolee.value.length > 0 && consolee.value[consolee.value.length-2]+consolee.value[consolee.value.length-3] != "--"){
         consolee.value += "--"+(new Date).toLocaleString()+"--\n";
       }
       return;
