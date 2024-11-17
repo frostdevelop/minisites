@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AsciiConv</title>
+  <style>
+    body {
+      padding: 2vh 5vw;
+      color: #EEE;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+      /*font-family: Arial, sans-serif;*/
+      /*color-scheme: dark;*/
+      text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      background: #222;
+    }
+
+    input, button, textarea {
+      border: black solid 1px;
+      border-radius: 2px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      padding: 5px;
+    }
+
+    textarea {
+       height: 80vh;
+       width: 40vw;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>AsciiConv</h1>
+  <h2>Convert your text to ASCII code!</h2>
+  <div id="controls">
+  <button>Run</button>
+  <div>
+  <input type="checkbox">Prefix</input>
+  <input type="checkbox">Hex Padding</input>
+  <input type="checkbox">Octal Padding</input>
+  <input type="checkbox">Binary Padding</input>
+  </div>
+  <br/>
+  <textarea></textarea>
+  <textarea></textarea>
+  <textarea></textarea>
+  <textarea></textarea>
+  <textarea></textarea>
+  </div>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    const controls = document.getElementById("controls").children;
+    function trig0f(e) {
+      let inpv = controls[3].value;
+
+      controls[6].value = controls[4].value = controls[7].value = controls[5].value = "";
+      for(let i=0;i<inpv.length;i++){
+        const charCode = inpv.charCodeAt(i);
+        controls[4].value += charCode.toString() + " ";
+        controls[5].value += (controls[1].children[0].checked ? "0x" : "") + (controls[1].children[1].checked ? charCode.toString(16).padStart(2,"0") : charCode.toString(16)) + " ";
+        controls[6].value += (controls[1].children[0].checked ? "0o" : "") + (controls[1].children[2].checked ? charCode.toString(8).padStart(3,"0") : charCode.toString(8)) + " ";
+        controls[7].value += (controls[1].children[0].checked ? "0b" : "") + (controls[1].children[3].checked ? charCode.toString(2).padStart(8,"0") : charCode.toString(2)) + " ";
+      }
+      
+      return;
+    }
+    controls[0].addEventListener("click", trig0f);
+    controls[3].addEventListener("change", e=>{e.preventDefault();trig0f(e)});
+  </script>
+</body>
+</html>
