@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AsciiText</title>
+  <style>
+    body {
+      padding: 2vh 5vw;
+      color: #EEE;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+      /*font-family: Arial, sans-serif;*/
+      /*color-scheme: dark;*/
+      text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      background: #222;
+    }
+
+    input, button, textarea {
+      border: black solid 1px;
+      border-radius: 2px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      padding: 5px;
+    }
+
+    textarea {
+       height: 80vh;
+       width: 40vw;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>AsciiText</h1>
+  <h2>Convert your ASCII code to Text!</h2>
+  <div id="controls">
+  <button>Run</button>
+  <div>
+  <input type="number" value="10" min="2">Number system</input>
+  <input type="text" value = " ">Delimiter</input>
+  </div>
+  <br/>
+  <textarea></textarea>
+  <textarea></textarea>
+  </div>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    const controls = document.getElementById("controls").children;
+    function trig0f(e) {
+      let inpv = controls[3].value.split(controls[1].children[1].value);
+
+      controls[4].value = "";
+      for(let i=0;i<inpv.length;i++){
+        controls[4].value += String.fromCharCode(parseInt(inpv[i],parseInt(controls[1].children[0].value)))
+      }
+      
+      return;
+    }
+    controls[0].addEventListener("click", trig0f);
+    controls[3].addEventListener("change", e=>{e.preventDefault();trig0f(e)});
+  </script>
+</body>
+</html>
