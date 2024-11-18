@@ -21,6 +21,8 @@
       --top0: white;
       --top1: #eee;
       --top2: #888;
+      --sel: #52d1ff;
+      /* --sel: #8df094 even if green = style, blue still ux favor */
     }
     body.light {
       color: black;
@@ -34,6 +36,8 @@
       --top0: black;
       --top1: #111;
       --top2: #333;
+      --sel: #3a3f99;
+      /* --sel: #04b310; */
     }
     input, button, textarea, iframe {
       border: rgba(0,0,0,0.2) solid 1px;
@@ -46,6 +50,10 @@
     }
     textarea:focus, input:focus{
        outline: 0;
+    }
+    textarea::selection {
+      background: var(--sel);
+      color: var(--layer0);
     }
     .flexsect {display:flex;height:calc(96vh - 2px);width:100vw;}
     iframe {
@@ -487,6 +495,18 @@
         </p>
       </div>
     </dialog>
+    <dialog id="historymodal" class='pagemodal'>
+      <div class='topmodal'>
+        <button class='close closebtn'>×</button>
+      </div>
+      <div class="headermodal">
+        <h2>History Manager</h2>
+      </div>
+      <hr/>
+      <div class='contentmodal'>
+        hi
+      </div>
+    </dialog>
     <dialog id="pref" class='pagemodal'>
       <div class='topmodal'>
         <button class='close closebtn'>×</button>
@@ -583,6 +603,7 @@
         <button class="menuddi" id="trig14e">Preferences (ctrl+p)</button>
         <button class="menuddi" id="trig17e">Help (ctrl+?)</button>
         <button class="menuddi" id="trig19e">Goto</button>
+        <button class="menuddi" id="trig20e">History Manager</button>
         <button class="menuddi" id="trig15e" disabled>Plugins</button>
       </div>
     </div>
@@ -666,6 +687,7 @@
     const trig4 = document.getElementById("trig4e");
     const pref = document.getElementById("pref");
     const help = document.getElementById("helpmodal");
+    const historyMod = document.getElementById("historymodal");
     const txt0 = document.getElementById("txt0e");
     const htmli = document.getElementById("htmlie");
     const cssi = document.getElementById("cssie");
@@ -676,11 +698,12 @@
     for(let i=0;i<prefinp.length;i++){prefinp[i] = prefite[i].getElementsByClassName("iinput")[0]};
     const inps = document.getElementsByClassName("input");
     const nums = document.getElementsByClassName("lnnumb");
-    const savechars = [":",";","!","+","=","-","Enter","Backspace","?",".",">","<","*","//","&","|"];
+    const savechars = [":",";","!","+","=","-","Enter","?",".",">","<","*","//","&","|"]; //removed backspace
     const parencharso = new Uint8Array([40,91,123,60]) //ascii codes, charcodeat
     const parencharsc = new Uint8Array([41,93,125,62])
-    const commitDelay = 800; //Undo stack commit delay (of one keydown to another)
-    let chnbuf = [false,0,[0,[],0,0]]; //[status,index,[finalCursor,[stringofdeleted],lengthofadd,curoffset]]
+    //mar:from
+    const commitDelay = 2000; //Undo stack commit delay (of one keydown to another)
+    let chnbuf = [false,0,[0,[],0,0]]; //[status,index,[finalCursor,[stringofdeleted],lengthofadd,curoffset (accumulative)]]
     let lastInputTime = 0; //use +new Date
     let updateen = true;
     var fieldHistory = new Array(inps.length).fill().map(()=>[[],[]]);
@@ -1037,7 +1060,8 @@
             break;
           case "Enter":
             if(prefinp[3].checked){
-              e.preventDefault()
+              e.preventDefault();
+              
               let spos = st = en = inps[i].selectionStart;
               //console.log(spos);
               for(let j=spos-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
@@ -1051,27 +1075,29 @@
               }
               //let paren = false;
               let cursoroff = 1;
-              switch(inps[i].value[inps[i].selectionStart-1].charCodeAt(0)){
+              //indent adder for pars
+              switch((inps[i].value[inps[i].selectionStart-1] || "\x00").charCodeAt(0)){
                 case 40:
                 case 91:
                 case 123:
                 case 62:
-                  switch(inps[i].value[inps[i].selectionStart].charCodeAt(0)){
+                  switch((inps[i].value[inps[i].selectionStart] || "\x00").charCodeAt(0)){
                     case 41:
                     case 93:
                     case 125:
                     case 60:
                       cursoroff-=as.length+1
-                      as += prefinp[1].value + "\n" + as
+                      as += prefinp[1].value + "\n" + as;
                       break;
                     default:
-                      as += prefinp[1].value
+                      //In case f only open paren indent!
+                      as += prefinp[1].value;
                   }
                   //cursoroff-= (inps[i].value[inps[i].selectionStart]==="}" || inps[i].value[inps[i].selectionStart]==="<") ? as.length+1 : 0;as += prefinp[1].value + ((inps[i].value[inps[i].selectionStart]==="}" || inps[i].value[inps[i].selectionStart]==="<") ? "\n" + as : "");
               }
               //check for { or } here.
               
-              inps[i].selectionStart = inps[i].selectionEnd = spos;
+              inps[i].selectionStart = spos;
               checkInput({inputType:"insertFromPaste",data:("\n"+as)},i);
               
               inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\n" + as + inps[i].value.substring(inps[i].selectionEnd);
@@ -1100,12 +1126,14 @@
               }
             }else if(prefinp[7].checked && savechars.includes(e.key)){saveHistory();chnbuf[0] = false;};
         }
+        //console.log(chnbuf); //here's he prob?
       });
       finrep.getElementsByClassName("close")[0].addEventListener("click",e=>{
         finrep.classList.remove("sho");
         finrep.classList.add("hid");
       });
       finrep.getElementsByClassName("repbtn")[0].addEventListener("click",e=>{
+        //fine to rem
         let rf = finput.value === '\\n' ? '\n' : finput.value === '\\\\n' ? '\\n' : finput.value === '\\t' ? '\t' : finput.value === '\\\\t' ? '\\t' : finput.value;
         let rr = rinput.value === '\\n' ? '\n' : rinput.value === '\\\\n' ? '\\n' : rinput.value === '\\t' ? '\t' : rinput.value === '\\\\t' ? '\\t' : rinput.value;
         const replaceval = inps[i].value.replaceAll(rf,rr);
@@ -1155,24 +1183,11 @@
         //saveHistory();
       }
       
-      /*
-      //startmac(unddat,val(inps[i].value))
-      let chndat = [unddat[0],[],unddat[1].length];
-      let ptext = inps[i].value;
-      if(unddat[2] > 0){
-        chndat[0] -= unddat[2];
-        chndat[1] = ptext.substr(chndat[0],unddat[2]).split("").reverse();
-        ptext = ptext.substring(0,chndat[0]) + ptext.substring(chndat[0]+unddat[2]);
-      }
-      if(unddat[1].length > 0){
-        ptext = ptext.substring(0,chndat[0]) + unddat[1].reverse().join("") + ptext.substring(chndat[0]);
-        chndat[0] += unddat[1].length
-      }
-      //return chndat,ptext endmac
-      */
       let [chndat,ptext] = restoreChange(unddat,inps[i].value);
       inps[i].value = ptext;
-      inps[i].selectionStart = inps[i].selectionEnd = chndat[0]+chndat[3];
+      //(fieldHistory[i][0].length > 0 ? fieldHistory[i][0][fieldHistory[i][0].length-1][3] : 0) not because shows exactly before chaning
+      inps[i].selectionStart = inps[i].selectionEnd = chndat[0];
+      //alert(chndat)
       //fieldHistory[i][1].push(unddat); need to push !unddat to redo hist
       fieldHistory[i][1].push(chndat);
       
@@ -1225,15 +1240,20 @@
       return out;
     }
     function checkInput(e,i){
-        //needs chnbuf check if correct field.
+        //console.log(chnbuf); // temp prob here
+        //needs chnbuf check if correct field. 
         if(!chnbuf[0]){
+          //console.log("invchng")
+          chnbuf[2][0] = inps[i].selectionEnd;
           chnbuf[2][1].length = 0;
           chnbuf[2][2] = 0;
           chnbuf[2][3] = 0;
           lastInputTime = Date.now();
         }else if(Date.now()-lastInputTime > commitDelay || chnbuf[1] != i){
+          //console.log("comdelay")
           saveHistory();
           chnbuf[1] = i;
+          chnbuf[2][0] = inps[i].selectionEnd;
           chnbuf[2][1].length = 0;
           chnbuf[2][2] = 0;
           chnbuf[2][3] = 0;
@@ -1250,14 +1270,36 @@
         }
         
         let seldata = "";
+        const ssrbound = inps[i].selectionStart <= chnbuf[2][0];
+        const serbound = inps[i].selectionEnd <= chnbuf[2][0];
+        const sslbound = inps[i].selectionStart >= chnbuf[2][0]-chnbuf[2][2];
+        const selbound = inps[i].selectionEnd >= chnbuf[2][0]-chnbuf[2][2];
+        //(ssrbound && serbound && (sslbound || selbound))
+        //don't need others because yk (start < end, end > start)
+        //console.log(chnbuf);
+        const soperable = (serbound && selbound);
         
         if(inps[i].selectionStart != inps[i].selectionEnd){
-          //todo do mth diff for delete and insert
           //console.log("--Selection!--");
+          //SelectionStart will always be less than end
+          //no way of bundling over bound?
+          //changed old (!sslbound && !selbound) || (!ssrbound || !serbound) to soperable
+          //yep it works
+          if(!soperable){
+            //If both are not in bound
+            //make boolean?
+            saveHistory();
+            chnbuf[1] = i;
+            //chnbuf[2][0] = inps[i].selectionStart nothing is really dependent and it's auto set
+            chnbuf[2][1].length = 0;
+            chnbuf[2][2] = 0;
+            chnbuf[2][3] = 0;
+          }
           seldata = inps[i].value.substring(inps[i].selectionStart,inps[i].selectionEnd);
         }else if(inps[i].selectionEnd != chnbuf[2][0]+chnbuf[2][3]){
-          if(prefinp[12].checked && (inps[i].selectionEnd < chnbuf[2][0] && inps[i].selectionEnd >= chnbuf[2][0]-chnbuf[2][2])){
+          if(prefinp[12].checked && soperable){
             chnbuf[2][3] = inps[i].selectionEnd-chnbuf[2][0];
+            //can't handle if it's out of lft bound but possibly selection can
           }else{
             saveHistory();
             chnbuf[1] = i;
@@ -1270,39 +1312,85 @@
         
         //remove because some changes ned to see old cursr
         //prefinp[12].checked === bundlecheck
+        //tomake curoffset support
         
         switch(e.inputType){
           case "insertText":
           case "insertLineBreak":
             if(seldata){
-              saveHistory();
-              chnbuf[2][1] = seldata.split("").reverse();
-              chnbuf[2][2] = 1;
-              chnbuf[2][0] = inps[i].selectionStart+1;
-              chnbuf[2][3] = 0;
+              //mar:todo add option for saving line breaks
+              if(prefinp[12].checked && soperable){
+                let oba = 0;
+                let outd = 0;
+                if(!sslbound){
+                  for(let j=(chnbuf[2][0]-chnbuf[2][2])-1;j>=inps[i].selectionStart;j--){
+                    chnbuf[2][1].push(inps[i].value[j]);
+                    outd++;
+                  }
+                  oba += inps[i].selectionEnd-(chnbuf[2][0]-chnbuf[2][2]);
+                }else{
+                  oba += inps[i].selectionEnd-inps[i].selectionStart;
+                }
+                chnbuf[2][2] -= oba-1;
+                //tomake cursor calc
+                //no matter where you delete (in bound or out, it'll always lower cursor)
+                chnbuf[2][0] -= outd+oba-1; //Need adjustment from del
+                chnbuf[2][3] = (inps[i].selectionStart+1)-chnbuf[2][0];
+              }else{
+                saveHistory();
+                chnbuf[2][1] = seldata.split("").reverse();
+                chnbuf[2][2] = 1;
+                chnbuf[2][0] = inps[i].selectionStart+1;
+                chnbuf[2][3] = 0;
+              }
             }else{
               //alert(chnbuf[2][2])
               chnbuf[2][2]++;
-              chnbuf[2][0] = inps[i].selectionEnd+1;
+              chnbuf[2][0]++;
+              chnbuf[2][3] = (inps[i].selectionStart+1)-chnbuf[2][0];
             }
             break;
           case "deleteContentBackward":
           case "deleteByCut":
             if(inps[i].value.length > 0){
               if(seldata){
-                saveHistory();
-                chnbuf[1] = i;
-                chnbuf[2][2] = 0;
-                chnbuf[2][1] = seldata.split("").reverse();
-                chnbuf[2][0] = inps[i].selectionStart;
-                chnbuf[2][3] = 0;
+                //tomake 12 support
+                if(prefinp[12].checked && soperable){
+                  let oba = 0;
+                  let outd = 0;
+                  if(!sslbound){
+                    for(let j=(chnbuf[2][0]-chnbuf[2][2])-1;j>=inps[i].selectionStart;j--){
+                      chnbuf[2][1].push(inps[i].value[j]);
+                      outd++;
+                    }
+                    oba += inps[i].selectionEnd-(chnbuf[2][0]-chnbuf[2][2]);
+                  }else{
+                    oba += inps[i].selectionEnd-inps[i].selectionStart;
+                    //alert(oba)
+                  }
+                  chnbuf[2][2] -= oba;
+                  //tomake cursor calc
+                  chnbuf[2][0] -= oba+outd;
+                  chnbuf[2][3] = inps[i].selectionStart-chnbuf[2][0];
+                }else{
+                  //alert(soperable) //mar:temp
+                  //alert(selbound)
+                  //alert(`Begincalc ${chnbuf[2][0]-chnbuf[2][2]} Cur: ${chnbuf[2][0]} Add: ${chnbuf[2][2]}`)
+                  //alert(chnbuf)
+                  saveHistory();
+                  chnbuf[1] = i;
+                  chnbuf[2][2] = 0;
+                  chnbuf[2][1] = seldata.split("").reverse();
+                  chnbuf[2][0] = inps[i].selectionStart;
+                  chnbuf[2][3] = 0;
+                }
               }else{
                 if(chnbuf[2][2] > 0){
                   chnbuf[2][2]--;
                 }else{
                   chnbuf[2][1].push(inps[i].value[inps[i].selectionEnd-1])
                 }
-                chnbuf[2][0] = inps[i].selectionEnd-1;
+                chnbuf[2][0]--;
               }
             }
             break;
@@ -1310,10 +1398,39 @@
             alert("Native Undo Error!")
             break;
           case "insertFromPaste":
-            if(prefinp[12].checked){
+            if(prefinp[12].checked && (!seldata || soperable)){
               if(seldata){
-                
+                //Alr checked within
+                let oba = 0;
+                let outd = 0;
+                if(!sslbound){
+                  //add deleted to buffer
+                  for(let j=(chnbuf[2][0]-chnbuf[2][2])-1;j>=inps[i].selectionStart;j--){
+                    chnbuf[2][1].push(inps[i].value[j]);
+                    outd++;
+                  }
+                  //calculate new length
+                  //selectionend isn't included in selection so negate 1
+                  oba += inps[i].selectionEnd-(chnbuf[2][0]-chnbuf[2][2]);
+                  //tomake cursor calc
+                }else{
+                  //((inps[i].selectionEnd-1)-Math.max(inps[i].selectionStart,chnbuf[2][0]-chnbuf[2][2]));
+                  oba += inps[i].selectionEnd-inps[i].selectionStart;
+                }
+                //console.log(`oba: ${oba} outd: ${outd}`);
+                chnbuf[2][2] += e.data.length-oba;
+                chnbuf[2][0] += e.data.length-(oba+outd);
+                chnbuf[2][3] = (inps[i].selectionStart+e.data.length)-chnbuf[2][0];
               }else{
+                /*
+                if(){
+                  
+                }else{
+                  chnbuf[2][2]+=e.data.length;
+                  chnbuf[2][0]+=e.data.length;
+                }
+                */
+                //handle cursor movement oh wait this alr works cuz length (and out of bound check)
                 chnbuf[2][2]+=e.data.length;
                 chnbuf[2][0]+=e.data.length;
               }
@@ -1427,6 +1544,7 @@
     prefinp[8].addEventListener("click",e=>{for(let i=0;i<fieldHistory.length;i++){fieldHistory[i][0].length = 0;fieldHistory[i][1].length = 0};});
     editbtn[1].addEventListener("click",e=>{for(let i=0;i<inps.length;i++){if(inps[i].classList.contains("active")){let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];finrep.classList.toggle("hid");finrep.classList.toggle("sho")}}});
     editbtn[4].addEventListener("click",e=>{const line = parseInt(prompt("Enter line number:"));if(line){for(let i=0;i<inps.length;i++){if(inps[i].classList.contains("active")){let curline = 1;for(let j=0;j<inps[i].value.length;j++){if(inps[i].value[j] === "\n" && ++curline === line){inps[i].setSelectionRange(j+1,j+1);inps[i].focus();break;}}}}}}); //goto
+    editbtn[5].addEventListener("click",e=>{historyMod.showModal();historyMod.getElementsByClassName("contentmodal")[0].innerText = logHistory()});
     prefinp[9].addEventListener("input",updTS);
     for(let i=0;i<pagem.length;i++){
       pagem[i].getElementsByClassName("close")[0].addEventListener("click",e=>{pagem[i].close()});
