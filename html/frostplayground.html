@@ -364,7 +364,7 @@
     .gbtn,.rbtn {border: none;margin: 6px;}
     .rbtn:hover {background: linear-gradient(-45deg,#f95353,#a51212);}
     .rbtn:active {box-shadow: inset 2px 2px 8px rgba(0,0,0,0.8), inset -2px -2px 8px #f95353;}
-    .sect.hid,#svgcontainer {display: none;}
+    .sect.hid,#svgcontainer,iframe.hid {display: none;}
     .frame {display: flex;flex-direction:column;}
     #playframe {resize: vertical;height: 100%;overflow:auto;}
     #menubar .menuitem .menudd.hid {pointer-events:none;opacity:0;transform:scale(0.9);}
@@ -504,7 +504,7 @@
       </div>
       <hr/>
       <div class='contentmodal'>
-        hi
+        hi source coder :3
       </div>
     </dialog>
     <dialog id="pref" class='pagemodal'>
@@ -572,6 +572,9 @@
       </div>
       <div class='item'>
         <input type="checkbox" class="iinput" id="chk9">Auto-cancel closing closed quote</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" id="chk10" checked>Enable console output</input>
       </div>
       </div>
       <footer>Copyright 2024 Pacifiky. All rights reserved.<br/>Thank you Aaron for testing!</footer>
@@ -651,6 +654,7 @@
   <textarea id="jsie" class="input" style="white-space: nowrap;" spellcheck="false" placeholder="JS"></textarea>
   </div>
   </div>
+  <!-- frame sector -->
   <div class="sect frame">
   <iframe id="playframe" srcdoc="<div style='font-family:Arial'><h1>Frost Playground</h1><p>Your code will show up here</p></div>"></iframe>
   <div class="cnscont">
@@ -708,7 +712,10 @@
     let updateen = true;
     var fieldHistory = new Array(inps.length).fill().map(()=>[[],[]]);
     const delsvg = document.getElementById("trashsvg");
-    playframe.contentWindow.console = {log: function (m){consolee.value += m + "\n";consolee.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){consolee.value = "";consolee.placeholder = "Console cleared"},dir: function(o){const props = Object.getOwnPropertyNames(o);for(let i=0;i<props.length;i++){consolee.value+=props[i]+": "+o[props[i]]+"\n"};}};
+    function vcnslog(m){if(prefinp[15].checked){consolee.value += m + "\n";consolee.scrollTop=consolee.scrollHeight};};
+    function vcnsdir(o){if(prefinp[15].checked){const props = Object.getOwnPropertyNames(o);for(let i=0;i<props.length;i++){consolee.value+=props[i]+": "+o[props[i]]+"\n"};consolee.scrollTop=consolee.scrollHeight}};
+    function vcnsclr(){consolee.value = "";consolee.placeholder = "Console cleared"}
+    playframe.contentWindow.console = {log: vcnslog,error: function (m){vcnslog("Error:" + m)},warn: function (m){vcnslog("Warn:" + m)},info: function (m){vcnslog("Info:" + m)},debug: function (m){vcnslog("Debug:" + m)},clear: vcnsclr,dir: vcnsdir};
     //mar: class def
     class fileSys {
       constructor (container,filesid,filekeyid){
@@ -1134,8 +1141,8 @@
       });
       finrep.getElementsByClassName("repbtn")[0].addEventListener("click",e=>{
         //fine to rem
-        let rf = finput.value === '\\n' ? '\n' : finput.value === '\\\\n' ? '\\n' : finput.value === '\\t' ? '\t' : finput.value === '\\\\t' ? '\\t' : finput.value;
-        let rr = rinput.value === '\\n' ? '\n' : rinput.value === '\\\\n' ? '\\n' : rinput.value === '\\t' ? '\t' : rinput.value === '\\\\t' ? '\\t' : rinput.value;
+        let rf = parseRegex(finput.value);
+        let rr = parseRegex(rinput.value);
         const replaceval = inps[i].value.replaceAll(rf,rr);
         saveHistory();
         chnbuf[0] = false;
@@ -1146,6 +1153,7 @@
         chnbuf[0] = false;
         inps[i].selectionStart = inps[i].selectionEnd = 0;
         inps[i].value = replaceval;
+        prefinp[10].checked && intUpdLn.call(inps[i]);
         //mar:issue two options: manual replacement (which causes cursor issues) or just plain text delete and add
       });
     }
@@ -1398,6 +1406,7 @@
             alert("Native Undo Error!")
             break;
           case "insertFromPaste":
+          case "insertFromDrop":
             if(prefinp[12].checked && (!seldata || soperable)){
               if(seldata){
                 //Alr checked within
@@ -1463,7 +1472,7 @@
     }
     function trig0f(e) {
       playframe.click();
-      playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {panel: parent.document.getElementById("consolee"),log: function (m){this.panel.value += m + "\\n";this.panel.scrollTop=this.panel.scrollHeight;},error: function (m){this.log("Error:" + m)},warn: function (m){this.log("Warn:" + m)},info: function (m){this.log("Info:" + m)},debug: function (m){this.log("Debug:" + m)},clear: function (){this.panel.value = "";this.panel.placeholder = "Console cleared"},dir: function(o){const props = Object.getOwnPropertyNames(o);for(let i=0;i<props.length;i++){this.panel.value+=props[i]+": "+o[props[i]]+"\\n"};this.panel.scrollTop=this.panel.scrollHeight;}};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`;
+      playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {log: parent.vcnslog,error: function (m){parent.vcnslog("Error:" + m)},warn: function (m){parent.vcnslog("Warn:" + m)},info: function (m){parent.vcnslog("Info:" + m)},debug: function (m){parent.vcnslog("Debug:" + m)},clear: parent.vcnsclr,dir: parent.vcnsdir};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`;
       if(prefinp[11].checked && consolee.value.length > 0 && consolee.value[consolee.value.length-2]+consolee.value[consolee.value.length-3] != "--"){
         consolee.value += "--"+(new Date).toLocaleString()+"--\n";
       }
@@ -1502,6 +1511,31 @@
     function savefil(){
       dwnl(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`,prefinp[0].value === "" ? "Untitled-FrostPlayground.html" : prefinp[0].value + "-FrostPlayground.html")
     }
+    function parseRegex(s){
+      let o = "";
+      let prevSlash = false;
+      for(let i=0;i<s.length;i++){
+        if(prevSlash){
+          switch(s[i]){
+            case "\\":
+              o += "\\";
+              break;
+            case "n":
+              o += "\n";
+              break;
+            case "t":
+              o += "\t";
+              break;
+          }
+          prevSlash = false;
+        }else if(s[i] == "\\"){
+          prevSlash = true;
+        }else{
+          o += s[i];
+        }
+      }
+      return o;
+    }
     //mar:dcm
     document.body.addEventListener("keydown", (e)=>{
       if(e.key === "e" && e.ctrlKey){e.preventDefault();savefil();}
@@ -1532,9 +1566,14 @@
     topbtn[0].addEventListener("click",(e)=>{htmli.parentNode.parentNode.classList.toggle("hid")});
     topbtn[1].addEventListener("click",(e)=>{cssi.parentNode.parentNode.classList.toggle("hid")});
     topbtn[2].addEventListener("click",(e)=>{jsin.parentNode.parentNode.classList.toggle("hid")});
-    topbtn[3].addEventListener("click",(e)=>{playframe.parentNode.classList.toggle("hid");
-    if(playframe.parentNode.classList.contains("hid")){updateen = false}else{updateen = true}});
-    topbtn[4].addEventListener("click",e=>{playframe.parentNode.getElementsByClassName("cnscont")[0].classList.toggle("hid")});
+    topbtn[3].addEventListener("click",(e)=>{playframe.classList.toggle("hid");
+      if(playframe.classList.contains("hid") && playframe.parentNode.getElementsByClassName("cnscont")[0].classList.contains("hid")){playframe.parentNode.classList.add("hid")}else{playframe.parentNode.classList.remove("hid")};
+      if(playframe.classList.contains("hid")){updateen = false}else{updateen = true}
+    });
+    topbtn[4].addEventListener("click",e=>{const csncontv = playframe.parentNode.getElementsByClassName("cnscont")[0];
+      csncontv.classList.toggle("hid")
+      if(playframe.classList.contains("hid") && csncontv.classList.contains("hid")){playframe.parentNode.classList.add("hid")}else{playframe.parentNode.classList.remove("hid")};
+    });
     /*topbtn[5].addEventListener("click",(e)=>{if(topbtn[5].value === "true"){document.body.style="color-scheme: light;background: #FFF;color:black";topbtn[5].value="false"}else{document.body.style="";topbtn[5].value="true"};});*/
     topbtn[5].addEventListener("click",e=>{document.body.classList.toggle("light")});
     filebtn[4].addEventListener("click",e=>savedb.saveTo());
