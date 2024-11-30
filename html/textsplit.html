@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TextSplitter</title>
+  <style>
+    body {
+      padding: 2vh 5vw;
+      color: #EEE;
+      font-size: 20px;
+      font-family: Arial, sans-serif;
+      /color-scheme: dark;/
+      text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      background: #222;
+    }
+
+    input, button, textarea {
+      border: black solid 1px;
+      border-radius: 2px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      padding: 5px;
+    }
+
+    textarea {
+       height: 80vh;
+       width: 80vw;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>TextSplitter</h1>
+  <div id="controls">
+  <button>Run</button>
+  <input type="number" value="2000"></input>
+  <textarea></textarea>
+  </div>
+  <h2>Output:</h2>
+  <div id="outcont"></div>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    const controls = document.getElementById("controls").children;
+    const outcont = document.getElementById("outcont");
+    function trig0f(e) {
+      let inpv = controls[2].value;
+      const splitval = parseInt(controls[1].value);
+      let amount = Math.ceil(inpv.length/splitval);
+      
+      outcont.innerHTML = "";
+      
+      for(let i=0;i<amount;i++){
+        let ntext = document.createElement("textarea");
+        outcont.appendChild(ntext);
+        ntext.value = inpv.substr(i*splitval,splitval);
+      }
+      return;
+    }
+    controls[0].addEventListener("click", trig0f);
+    controls[1].addEventListener("change", e=>{e.preventDefault();trig0f(e)});
+  </script>
+</body>
+</html>
