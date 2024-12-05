@@ -21,7 +21,7 @@
     }
 
     textarea {
-       height: 80vh;
+       height: 60vh;
        width: 80vw;
        border: none;
        box-shadow: none;
@@ -82,6 +82,7 @@
     input,select {
       transition: box-shadow 500ms ease, border 500ms ease;
       background: linear-gradient(to left top, #121212, #292929);
+      background-color: #222;
       color: currentcolor;
       font-size: 13px;
       padding: 10px;
@@ -136,10 +137,16 @@
   </div>
   <hr/>
   <button class="t-run button">Run</button>
+  <select id="t-wrapsel" title="Wrapping">
+    <option value="nw">None</option>
+    <option value="bw">Break</option>
+    <option value="ww">Word</option>
+    <option value="ab">Break All</option>
+  </select>
   <div class="flexhor">
-  <textarea placeholder="{Template}" class="t-temp"></textarea>
+  <textarea placeholder="{Template}" class="t-temp" style="white-space: nowrap;"></textarea>
   <hr class="vd"></hr>
-  <textarea placeholder="Output" class="t-outp"></textarea>
+  <textarea placeholder="Output" class="t-outp" style="white-space: nowrap;"></textarea>
   </div>
   </div>
   <div id="t-elms">
@@ -158,6 +165,7 @@
     const tagctrl = control.getElementsByClassName("t-tagctrl")[0];
     const tagcont = control.getElementsByClassName("t-tags")[0];
     const elms = document.getElementById("t-elms");
+    const wrapsel = document.getElementById("t-wrapsel");
     const tagrepelm = elms.getElementsByClassName("t-tagreptemp")[0];
     let tags = tagcont.getElementsByClassName("t-tagrep");
     function trig0f(e) {
@@ -199,6 +207,26 @@
     tempinp.addEventListener("input", trig0f);
     tagctrl.children[0].addEventListener("click",e=>{let nelm = tagrepelm.content.cloneNode(true);tagcont.appendChild(nelm);tags = tagcont.getElementsByClassName("t-tagrep");});
     tagctrl.children[1].addEventListener("click",e=>{if(tags.length>0){tags[tags.length-1].remove();tags = tagcont.getElementsByClassName("t-tagrep");}});
+    wrapsel.addEventListener("change",()=>{
+      switch(wrapsel.value){
+         case "ww":
+           tempinp.style="word-wrap:normal;";
+           tempout.style="word-wrap:normal;";
+           break;
+         case "bw":
+           tempinp.style="word-wrap:break-word;";
+           tempout.style="word-wrap:break-word;";
+           break;
+         case "ab":
+           tempinp.style="word-break: break-all;";
+           tempout.style="word-break: break-all;";
+           break;
+         default:
+           tempinp.style="white-space: nowrap;";
+           tempout.style="white-space: nowrap;";
+           break;
+         }
+     });
     window.onbeforeunload = e=>{if(tempinp.value.length > 0){return "Did you save?"}}
   </script>
 </body>
