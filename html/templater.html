@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Templater</title>
+  <style>
+    body {
+      padding: 10px 20px;
+      color: #EEE;
+      font-family: Arial,sans-serif;
+      font-size: 20px;
+      /*color-scheme: dark;*/
+      text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      background: #222;
+    }
+
+    input, button, textarea {
+      border: black solid 1px;
+      border-radius: 2px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      padding: 5px;
+    }
+
+    textarea {
+       height: 80vh;
+       width: 80vw;
+       border: none;
+       box-shadow: none;
+       border-radius: 0;
+       resize: none;
+    }
+    textarea:focus,input:focus {
+    	outline: none;
+    }
+    .flexhor {
+    	display: flex;
+    }
+    .vd {
+    	padding: 0;
+    	margin: 0;
+    	border-color: white;
+    	border-style: dashed;
+    }
+    /*Begin colorbtn*/
+    .sbtn {
+      font-size: 15px;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
+      transition: opacity .1s ease;
+    }
+    .sbtn.hid {pointer-events: none;opacity:0}
+    .gbtn {
+      background: linear-gradient(135deg,#33ff33,#11c011);
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.8),-2px -2px 8px #33ff33;
+    }
+    .gbtn:hover {background: linear-gradient(-45deg,#33ff33,#11c011);}
+    .gbtn:active {box-shadow: inset 2px 2px 8px rgba(0,0,0,0.8),inset -2px -2px 8px #33ff33;}
+    .rbtn {
+      background: linear-gradient(135deg,#f95353,#a51212);
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.8),-2px -2px 8px #f95353;
+    }
+    .gbtn,.rbtn {border: none;margin: 6px;}
+    .rbtn:hover {background: linear-gradient(-45deg,#f95353,#a51212);}
+    .rbtn:active {box-shadow: inset 2px 2px 8px rgba(0,0,0,0.8), inset -2px -2px 8px #f95353;}
+    /*Being pacificneodark*/
+    :root {
+      --hover: #4f4f4f;
+      --border: 2px;
+      --radius: 45px;
+      --height: 6px;
+    }
+    input:focus,select:focus {outline:none;}
+    input:active,select:active,input[type="text"]:focus,.button:active {background: linear-gradient(to left top, #292929, #121212)};
+    .button,input,select {font-family: Tahoma, Arial, sans-serif;}
+    input:active,select:active,input[type="text"]:focus,.button:active {
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
+      border-color: rgba(0,0,0,0);
+    }
+    details,input,select,.button {border: var(--border) #292929 solid;box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);}
+    input,select {
+      transition: box-shadow 500ms ease, border 500ms ease;
+      background: linear-gradient(to left top, #121212, #292929);
+      color: currentcolor;
+      font-size: 13px;
+      padding: 10px;
+      margin: 2px;
+      border-radius: var(--radius);
+      min-width:0px;
+    }
+    input:hover,select:hover,.button:hover {border-color: var(--hover);}
+    .smallinput {width:10em}
+    .button {
+      display: inline-flex;
+      flex-direction: row;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+      cursor: pointer;
+      background: linear-gradient(to left top, #121212, #292929);
+      color: currentColor;
+      transition: box-shadow 500ms ease, border 500ms ease;
+      font-size: 13px;
+      padding: 8px;
+      margin: 4px;
+      border-radius: var(--radius);
+      min-width: 100px;
+    }
+    .t-tagctrl {float:right;}
+    hcont {
+    	display:block;
+    }
+    .t-tagrep {
+    	margin: 10px 0px;
+    }
+    .t-run {margin: 15px 0px;}
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>Templater</h1>
+  <div id="controls">
+  <div class="t-tagctrl">
+  	<button class="sbtn gbtn">+</button><button class="sbtn rbtn">-</button>
+  </div>
+  <div class="t-tags">
+  
+  <div class="t-tagrep">
+  <input type="text" placeholder="Match" title="Templater will search for {Match} (Uses regex!)"></input>
+  <input type="text" placeholder="Replacer" title="Uses regex!"></input>
+  </div>
+  
+  </div>
+  <hr/>
+  <button class="t-run button">Run</button>
+  <div class="flexhor">
+  <textarea placeholder="{Template}" class="t-temp"></textarea>
+  <hr class="vd"></hr>
+  <textarea placeholder="Output" class="t-outp"></textarea>
+  </div>
+  </div>
+  <div id="t-elms">
+  	<template class="t-tagreptemp">
+  		<div class="t-tagrep">
+  		<input type="text" placeholder="Match" title="Templater will search for {Match} (Uses regex!)"></input>
+  		<input type="text" placeholder="Replacer" title="Uses regex!"></input>
+  		</div>
+  	</template>
+  </div>
+  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <script>
+    const control = document.getElementById("controls");
+    const tempinp = control.getElementsByClassName("t-temp")[0];
+    const tempout = control.getElementsByClassName("t-outp")[0];
+    const tagctrl = control.getElementsByClassName("t-tagctrl")[0];
+    const tagcont = control.getElementsByClassName("t-tags")[0];
+    const elms = document.getElementById("t-elms");
+    const tagrepelm = elms.getElementsByClassName("t-tagreptemp")[0];
+    let tags = tagcont.getElementsByClassName("t-tagrep");
+    function trig0f(e) {
+      let procs = tempinp.value;
+
+      for(let i=0;i<tags.length;i++){
+      	procs = procs.replaceAll("{"+parseRegex(tags[i].children[0].value)+"}",parseRegex(tags[i].children[1].value));
+      }
+
+      tempout.value = procs;
+      return;
+    }
+    function parseRegex(s){
+      let o = "";
+      let prevSlash = false;
+      for(let i=0;i<s.length;i++){
+        if(prevSlash){
+          switch(s[i]){
+            case "\\":
+              o += "\\";
+              break;
+            case "n":
+              o += "\n";
+              break;
+            case "t":
+              o += "\t";
+              break;
+          }
+          prevSlash = false;
+        }else if(s[i] == "\\"){
+          prevSlash = true;
+        }else{
+          o += s[i];
+        }
+      }
+      return o;
+    }
+    controls.getElementsByClassName("t-run")[0].addEventListener("click", trig0f);
+    tempinp.addEventListener("input", trig0f);
+    tagctrl.children[0].addEventListener("click",e=>{let nelm = tagrepelm.content.cloneNode(true);tagcont.appendChild(nelm);tags = tagcont.getElementsByClassName("t-tagrep");});
+    tagctrl.children[1].addEventListener("click",e=>{if(tags.length>0){tags[tags.length-1].remove();tags = tagcont.getElementsByClassName("t-tagrep");}});
+    window.onbeforeunload = e=>{if(tempinp.value.length > 0){return "Did you save?"}}
+  </script>
+</body>
+</html>
