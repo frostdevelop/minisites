@@ -149,6 +149,9 @@
   </div>
   <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
+    //Test Override:
+    //console.log = m=>{window.parent.document.getElementById("consolee").value += m + "\n"};
+    console.log = window.parent.vcnslog;
     //class for draw
     class mfpaint {
       constructor(canv,inp2) {
@@ -324,45 +327,113 @@
       }
     }
     class NeuralJS {
-      static Layer = class Layer {
-        constructor(){
-          this.weights = new Float32Array;
-          this.biases = new Float32Array;
-        }
-        static randVals(){
-          //Randomize w/b
-        }
-        static LinearFC = class LinearFC extends Layer{
-          constructor(inum,onum){
-            
+      static Loss = class Loss {
+        static mse(itsr,otsr){
+          if(itsr.length != otsr.length){throw RangeError("Input and Output lengths in MSE are unequal!")}
+          let err = 0;
+          for(let i=0;i<itsr.length;i++){
+            err += (itsr[i]-otsr[i])**2;
           }
-          compute(i){
-            
+          return err/istr.length;
+        }
+      }
+      static Activation = class Activation {
+        static reLU(tensor){
+          for(let i=0;i<tensor.length;i++){
+            tensor[i] = Math.max(tensor[i],0);
+          }
+          return tensor;
+        }
+        static sigmoid(tensor){
+          for(let i=0;i<tensor.length;i++){
+            tensor[i] = 1/(1+Math.exp(-tensor[i])); // (Math.E**-tensor[i])
+          }
+          return tensor;
+        }
+        static lreLU(tensor,a){
+          for(let i=0;i<tensor.length;i++){
+            if(tensor[i] <= 0){
+              tensor[i] = a*tensor[i];
+            }
+          }
+          return tensor;
+        }
+        static tanh(tensor){
+          for(let i=0;i<tensor.length;i++){
+            tensor[i] = Math.tanh(tensor[i]);
+          }
+          return tensor;
+        }
+        static step(tensor,a){
+          for(let i=0;i<tensor.length;i++){
+            tensor[i] = tensor[i]>=a;
+          }
+          return tensor;
+        }
+      }
+      static Layer = class Layer {
+        constructor(wlen,blen){
+          this.weights = new Float32Array(wlen);
+          this.biases = new Float32Array(blen);
+        }
+        randVals(wran=1,bran=1){
+          //Randomize w/b
+          for(let i=0;i<this.weights.length;i++){
+            this.weights[i] = (Math.random()*(wran*2))-wran;
+          }
+          for(let i=0;i<this.biases.length;i++){
+            this.biases[i] = (Math.random()*(bran*2))-bran;
+          }
+        }
+        static Linear = class Linear extends Layer{
+          constructor(inum,onum){
+            super(inum*onum,onum);
+            this.incount = inum;
+            this.outcount = onum;
+          }
+          compute(tensor){
+            if(tensor.length != this.incount){throw RangeError("Layer input length is not equal to the input count of the Linear transformation!")};
+            let otensor = new Float32Array(this.outcount);
+            for(let j=0;j<this.outcount;j++){
+              for(let i=0;i<tensor.length;i++){
+                otensor[j] += tensor[i]*this.weights[(j*this.incount)+i];
+              }
+              otensor[j] += this.biases[j];
+            }
+            return otensor;
           }
         }
       }
       static Network = class Network {
         constructor(shape,options){
-          //enum activation 0:Sigmoid 1:ReLU 2:LReLU 3:Tanh
+          //enum activation 0:Sigmoid 1:ReLU 2:LReLU 3:Tanh 4:Step 5:ELU
           //enum loss 0:MSE 1:CROSSENTROPY
           //enum opti 0:SGD 1: BGD 2: MBGD
           //enum oactiv 0:Softmax 1:Linear 2:Sigmoid
-          this.learnRate = options.learnRate || 0.2;
-          this.activation = options.activation || 0;
+          this.learnRate = options.learnRate ?? 0.2;
+          this.activation = options.activation ?? 0;
           switch(this.activation){
             case 2:
-              this.lreluA = options.lreluA;
+              if(!options.lreluA){console.warn("LeakyRELU activation network missing alpha option, setting default!")};
+              this.lreluA = options.lreluA ?? 0.2;
+              break;
+            case 4:
+              if(!options.stepA){console.warn("Step activation network missing alpha option, setting default!")};
+              this.stepA = options.stepA ?? 2;
               break;
           }
-          this.oActiv = options.oActiv || 0;
-          this.loss = options.loss || 0;
-          this.opti = options.opti || 0;
-          switch(opti){
+          this.oActiv = options.oActiv ?? 0;
+          this.loss = options.loss ?? 0;
+          this.opti = options.opti ?? 0;
+          switch(this.opti){
             case 2:
-              this.mbgdsize = options.mgbdsize || 1;
+              this.mbgdsize = options.mgbdsize ?? 1;
               break;
           }
           this.shape = shape;
+        }
+        randAll(wran=1,bran=1){
+          for(let i=0;i<this.shape.length;i++){this.shape[i].randVals(wran,bran);}
         }
         forward(itensor){
           let otensor = itensor
@@ -371,28 +442,51 @@
             if(i<this.shape.length-1){
               switch(this.activation){
                 case 0:
+                  otensor = NeuralJS.Activation.sigmoid(otensor);
                   break;
                 case 1:
+                  otensor = NeuralJS.Activation.reLU(otensor);
                   break;
                 case 2:
+                  otensor = NeuralJS.Activation.lreLU(otensor,this.lreluA);
                   break;
                 case 3:
+                  otensor = NeuralJS.Activation.tanh(otensor);
+                  break;
+                case 4:
+                  otensor = NeuralJS.Activation.step(otensor,this.stepA);
                   break;
               }
             }else{
               switch(this.oActiv){
                 case 0:
                   break;
-                case 1:
-                  break;
                 case 2:
+                  otensor = NeuralJS.Activation.sigmoid(otensor);
                   break;
               }
             }
+            //console.log(otensor)
           }
           return otensor;
         }
-        train(itensor){
+        train(ttensor){
+          //Sigmoid derivative: s(x)(1-s(x))
+          //ReLU/Lrelu derivative: x>0 ? 1 : 1*a || 0
+          switch(this.opti){
+            case 0:
+              //sgd ttensor = [itensor,otensor]
+              const otensor = this.forward(ttensor[0]);
+              const loss = this.loss ? 0 : NeuralJS.Loss.mse(ttensor[0],ttensor[1]);
+              break;
+            case 1:
+              
+              break;
+            case 2:
+              
+              break;
+              
+          }
           
         }
       }
@@ -443,6 +537,7 @@
         return this.type;
       }
     }
+    
     class MnistFrontend {
       constructor(top,bot,paint){
         
@@ -451,7 +546,32 @@
     //try{
     let painter = new mfpaint(document.getElementById("controls").getElementsByClassName("canvascont")[0].children[0],document.getElementById("controls").getElementsByClassName("topConpaint")[0]);
     //}catch(e){alert(e)}
-    //const mnistdb = Float32Array.of(0.0); //await translating mnist to float32array
+    
+    /*
+    //Success
+    try{
+    let testnn = new NeuralJS.Network([new NeuralJS.Layer.Linear(3,5),new NeuralJS.Layer.Linear(5,7),new NeuralJS.Layer.Linear(7,10)],{activation: 0,oActiv:2});
+    testnn.randAll(2,3);
+    console.log(testnn.forward([1,2,3]));
+    }catch(e){alert(e)}
+    */
+    //console.log(NeuralJS.Activation.sigmoid([0,0,0]))
+    
+    /*
+    try{
+    let testlay = new NeuralJS.Layer.Linear(3,4);
+    testlay.randVals(2,2);
+    console.log(testlay.incount)
+    alert(testlay.weights)
+    }catch(e){alert(e)}
+    */
+    
+    /*
+    //Success
+    try{
+    alert(NeuralJS.Activation.reLU([2,3,1,0,-2,-3,-4]))
+    }catch(e){alert(e)}
+    */
   </script>
 </body>
 </html>
