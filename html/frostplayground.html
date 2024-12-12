@@ -1,53 +1,1517 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <title>String Array Maker</title>
+  <title>Frost Playground</title>
   <style>
-    html {
-      padding: 5%;
-      color: #EEE;
+    body {
+      color: white;
       font-family: Courier New, monospace;
       font-size: 20px;
-      /* color-scheme: dark; */
-    }
-
-    body {
+      padding: 0;
+      margin: 0;
       background: #222;
+      overflow-x: hidden;
+      color-scheme: dark;
+      transition: background .1s linear;
+      --layer0: #000;
+      --layer1: #111;
+      --layer2: #222;
+      --layer3: #444;
+      --layer4: #555;
+      --top0: white;
+      --top1: #eee;
+      --top2: #888;
+      --sel: #52d1ff;
+      /* --sel: #8df094 even if green = style, blue still ux favor */
     }
-
-    input, button, textarea {
-      border: black solid 1px;
-      border-radius: 2px;
-      box-shadow: 0px 0px 5px black;
+    body.light {
+      color: black;
+      color-scheme: light;
+      background: #eee;
+      --layer0: #fff;
+      --layer1: #ddd;
+      --layer2: #aaa;
+      --layer3: #bbb;
+      --layer4: #eee;
+      --top0: black;
+      --top1: #111;
+      --top2: #333;
+      --sel: #3a3f99;
+      /* --sel: #04b310; */
+    }
+    input, button, textarea, iframe {
+      border: rgba(0,0,0,0.2) solid 1px;
+      border-radius: 2px
+      box-shadow: 0px 0px 2px rgba(0,0,0,0.5);
       padding: 5px;
     }
-
-    textarea {
-       height: 80vh;
-       width: 80vw;
+    hr {
+      border-color: currentcolor;
     }
-    input {
+    textarea:focus, input:focus{
+       outline: 0;
+    }
+    textarea::selection {
+      background: var(--sel);
+      color: var(--layer0);
+    }
+    .flexsect {display:flex;height:calc(96vh - 2px);width:100vw;}
+    iframe {
+      padding: 0 !important;
+      margin: 0 !important;
+      /*resize: both;
+      height: 100vh;*/
+      background: white;
+    }
+    .sect{
+      display: inline-block;
+      box-sizing: content-box;
+      border: rgba(0,0,0,0.2) solid 1px;
+      padding: 0 !important;
+      margin: 0 !important;
+      flex-grow: 1;
+      flex-shrink: 1;
+      height: 100%;
+      width: 100%;
+      resize: horizontal;
+      line-height: 14px;
+      font-size: 12px;
+      overflow-y:auto;
+      overflow-x:hidden;
+    }
+    .sect textarea{
+      border-radius: 0;
+      font-size: 12px;
+      display: flex;
+      width: 100%;
+      height: inherit !important;
+      flex-grow: 1;
+      flex-shrink: 1;
+      resize: none;
+      margin: 0;
+      padding: 0;
+      border: none;
+      line-height: 14px;
+      overflow-y: hidden;
+      overflow-x: auto;
+      background: var(--layer1);
+    }
+    .sect iframe {
+      border-radius: 0;
+      display: flex;
+      width: 100%;
+      height: 100%;
+      border: none;
+      margin: 0;
+      padding: 0;
+    }
+    #closebtn {
+      position: fixed;
+      right:0;
+      font-size:20px;
+      display:none;
+      z-index: max(infinity);
+    }
+    input[type="text"] {
+      display: block;
       width: 80vw;
     }
+    input[type="text"].smol {
+      display: inline;
+      width: 30vw;
+    }
+    #topbtn {
+      position: absolute;
+      display: flex;
+      align-content: center;
+      justify-content: center;
+      height: 4vh;
+      width: 70vw;
+      left: 50%;
+      transform: translate(-50%,0);
+    }
+    .sect .lnnumb{
+      color: #5ac91e;
+      width: 20px;
+      text-align: right;
+      text-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+    }
+    .sect .lnnumb span{
+      counter-increment: lnnumb;
+      display: block;
+    }
+    .sect .lnnumb span::before{
+      content: counter(lnnumb);
+    }
+    .edcontainer {
+      display: flex;
+      min-height: 100%;
+    }
+    .finrep {
+      display: grid;
+      grid-template-columns: 25% 25% 25% 25%;
+      grid-template-rows: 60% 40%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      transition: height 0.2s ease, opacity 0.2s ease;
+    }
+    .finrep.hid {
+      pointer-events: none;
+      opacity: 0;
+      height: 0%;
+    }
+    .finrep.sho {
+      pointer-events: auto;
+      opacity: 1;
+      height: 10%;
+    }
+    .finrep input, .finrep button{
+      width: 100%;
+      grid-column: span 2;
+      padding: 0;
+      margin: 0;
+      border: none;
+    }
+    .finrep button {
+      grid-column: span 1;
+    }
+    #saves {
+      display: block;
+      font-family: Arial;
+      /*flex-direction: column;*/
+      width: 100vw;
+      background: var(--layer2);
+      position:fixed;z-index:9000;height:100vh;left:0;top:0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: opacity .1s linear;
+    }
+    #saves.hid {
+      opacity:0;
+      pointer-events: none;
+    }
+    #saves.sho {
+      pointer-events: auto;
+      opacity:1;
+    }
+    #saves .filesect .header .filetitle {
+      padding: 5px;
+      margin: 10px 10px 10px 0;
+      background: var(--layer1);
+      box-shadow: 0 5px 5px rgba(0,0,0,0.4);
+      border: 2px rgba(0,0,0,0.3) solid;
+      font-size: 25px;
+      border-radius: 0 10px 10px 0;
+    }
+    #saves .filedate {
+      padding: 0 10px;
+      display: flex;
+      transition: background .1s linear;
+    }
+    #saves .filedate:hover,#menubar .menuitem .menutrigger:hover,#menubar .menuitem .menudd .menuddi:not([disabled]):hover,.pagemodal .contentmodal .item:hover{
+      background: rgba(255,255,255,0.2);
+    }
+    #saves .filedate .del {
+      width: 20px;
+      margin-left: auto;
+      margin-right: 20px;
+      transition: transform .2s ease;
+    }
+    #saves .filedate .del:hover {
+      transform: rotate(-30deg);
+    }
+    #menubar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      height: 4vh;
+    }
+    #menubar .menuitem .menutrigger{
+      padding: 4px 8px;
+      height:3.5vh;
+      border: none;
+      margin: 2px;
+      background: none;
+      box-shadow: none;
+    }
+    #menubar .menuitem .menudd {
+      display: block;
+      background: var(--layer3);
+      position: absolute;
+      min-width: 15vw;
+      max-width: 20vw;
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+      border-radius: 5px;
+      overflow-x: hidden;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: opacity .1s linear, transform .1s linear;
+    }
+    #menubar .menuitem .menudd .menuddi {
+      background: var(--layer4);
+      width: 100%;
+      text-align: left;
+      box-shadow: none;
+      border: none;
+      border-radius: 0;
+    }
+    #menubar .menuitem .menudd hr {
+      margin: 0;
+      border: #888 solid 1px;
+    }
+    dialog {
+      border: none;
+      display: inline;
+      pointer-events: none;
+      opacity: 0;
+      font-family: Arial;
+      border-radius: 5px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      /*animation: fadeOut .3s ease forwards;*/
+    }
+    dialog[open] {
+      opacity: 1;
+      pointer-events: auto;
+      animation: fadeIn .2s ease forwards;
+    }
+    dialog[open]::backdrop {
+      animation: fadeIn .5s ease forwards;
+    }
+    @keyframes fadeIn {
+      0% {opacity:0;}
+      100% {opacity:1;}
+    }
+    @keyframes fadeOut {
+      0% {opacity:1;}
+      100% {opacity:0;}
+    }
+    dialog::backdrop {
+      backdrop-filter: blur(5px);
+      background: rgba(0,0,0,0.2);
+    }
+    .closebtn {
+      font-size: 1.2em;
+      width: 1.7em;
+      height: 1.7em;
+      border: none;
+      border-radius: 50%;
+      background: none;
+      transition: background .1s linear, transform .1s linear;
+      background: rgba(0,0,0,0.3);
+    }
+    .closebtn:hover {background: var(--layer4);transform: rotate(90deg)}
+    dialog .topmodal .close {
+      margin-left: auto;
+      margin-right: 0;
+      display: block;
+    }
+    .pagemodal {min-width: 70vw;overflow:hidden;}
+    .pagemodal .contentmodal {
+      display: flex;
+      flex-direction: column;
+      height: 60vh;
+      overflow: auto;
+    }
+    .pagemodal .contentmodal .item {
+      transition: background .1s linear;
+    }
+    dialog .headermodal h2 {
+      font-weight: normal;
+      margin: 0 0 20px 0;
+    }
+    #consolee,
+    #txt0e,
+    #topbtn button {width: 100%;}
+    #consolee {overflow: auto;}
+    .cnscont {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      /*resize: vertical;*/
+      overflow:auto;
+      box-shadow: 0 0 5px rgba(0,0,0,0.8);
+      transition: opacity .2s ease, height .2s ease;
+    } 
+    .cnscont .cnsinput {
+      display: flex;
+      height: 10%;
+    }
+    .cnscont.hid {
+      height: 0px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .sbtn {
+      font-size: 15px;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
+      transition: opacity .1s ease;
+    }
+    .sbtn.hid {pointer-events: none;opacity:0}
+    .gbtn {
+      background: linear-gradient(135deg,#33ff33,#11c011);
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.8),-2px -2px 8px #33ff33;
+    }
+    .gbtn:hover {background: linear-gradient(-45deg,#33ff33,#11c011);}
+    .gbtn:active {box-shadow: inset 2px 2px 8px rgba(0,0,0,0.8),inset -2px -2px 8px #33ff33;}
+    .rbtn {
+      background: linear-gradient(135deg,#f95353,#a51212);
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.8),-2px -2px 8px #f95353;
+    }
+    .gbtn,.rbtn {border: none;margin: 6px;}
+    .rbtn:hover {background: linear-gradient(-45deg,#f95353,#a51212);}
+    .rbtn:active {box-shadow: inset 2px 2px 8px rgba(0,0,0,0.8), inset -2px -2px 8px #f95353;}
+    .sect.hid,#svgcontainer,iframe.hid {display: none;}
+    .frame {display: flex;flex-direction:column;}
+    #playframe {resize: vertical;height: 100%;overflow:auto;}
+    #menubar .menuitem .menudd.hid {pointer-events:none;opacity:0;transform:scale(0.9);}
+    #menubar .menuitem .menudd.sho {pointer-events:auto;opacity:1;}
+    /*#framecont {position:fixed;left:0;top:0;width:100vw;height:100vh;}*/
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+      border: 2px solid rgba(0,0,0,0.5);
+      margin-left: auto;
+      margin-right: auto;
+    }
+    th {border: 1px solid green;}
+    td {border: 1px solid rgba(0,0,0,0.5);}
   </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
 </head>
 
 <body lang="en">
-  <h1>String Array Maker</h1>
-  <h2>split your strings!</h2>
-  <button id="trig0e">Run</button>
-  <input id="inp1e"></input>
-  <textarea type="text" id="inp0e"></textarea>
-  <textarea id="out0e"></textarea>
-  <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
+  <button id="closebtn" class="closebtn">×</button>
+  <div id="overlays">
+    <div id="saves" class="hid"></div>
+    <dialog id="helpmodal" class='pagemodal'>
+      <div class='topmodal'>
+        <button class='close closebtn'>×</button>
+      </div>
+      <div class="headermodal">
+        <h2>Help</h2>
+      </div>
+      <hr/>
+      <div class='contentmodal'>
+        <h3>Introduction</h3>
+        <p>
+        Greetings programmers!<br/>
+        So you've decided to get my ABSOLUTELY WONDERFUL ONLINE IDE!<br/>
+        (Or offline if you downloaded it)<br/>
+        Anyways here's a list of keyboard shortcuts that you should use (and a guide under it):
+        </p>
+        <h3>Shortcuts</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Shortcut</th>
+              <th>Context</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ctrl+?</td>
+              <td>Global</td>
+              <td>Open help (obviously)</td>
+            </tr>
+            <tr>
+              <td>Ctrl+o</td>
+              <td>Global</td>
+              <td>Open save manager</td>
+            </tr>
+            <tr>
+              <td>Ctrl+e</td>
+              <td>Global</td>
+              <td>Download current code</td>
+            </tr>
+            <tr>
+              <td>Ctrl+s</td>
+              <td>Global</td>
+              <td>Save to Browser (save manager)</td>
+            </tr>
+            <tr>
+              <td>Ctrl+p</td>
+              <td>Global</td>
+              <td>Open preferences</td>
+            </tr>
+            <tr>
+              <td>Ctrl+h</td>
+              <td>A field</td>
+              <td>Open find&replace</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Guide</h3>
+        <h4>How to use the editor!</h4>
+        <p>
+          So when you came to this webapp, you wre greeted 4 different sections. 
+          Three of which are for coding.<br/>
+          To the very left, you have your HTML field,
+          to the left-middle, you have the css,
+          to the right-middle, you have js, 
+          and to the very right, you have an iframe view and a console window!<br/>
+          In order to start the program, you can just start typing (or press run from the edit menu at the top.<br/>
+          But now that we have a program, how are we supposed to save it?
+        </p>
+        <h4>Savng</h4>
+        <p>
+          FrostPlayground gives 3 different methods of saving.</br>
+          If you want to save to your computer, use "Ctrl+e" or "Download' from the file menu.<br/>
+          If you want a data url for your application, click download url (only use for small applications) <br/>
+          If you're still testing and want to iteratively save it, use "Ctrl+s". Keep in mind that your browser is in charge of this data and it may be wiped randomly by your browser due to being temporary. Which brings us to our next topic!
+        </p>
+        <h4>Managing saves</h4>
+        <p>
+          So, you saved some program and want to get it back. So how are we supposed to do that?<br/>
+          In order to access the save management UI, you can press "Ctrl+o" or the "Load Save" item on the file menu. There you can rename the different files, delete saves, and merge them!<br/>
+          "But still, I don't want my saves to be wiped by my browser!" Well you're in luck because I created a feature based exactly on that! You can export (and import) your file database through the file menu! But why are all the files called "Untitled" and how do I change it?
+        </p>
+        <h4>Preferences</h4>
+        <p>
+          Say, you hate that there's NO WRAPPING! <br/>
+          Or want to turn off the autoindent! <br/>
+          Well, it's time to consult the preferences!
+          These have settings to allow autoindent control, the indent when you press tab and shift+tab, wrap, and the Save Name!
+          But what are all these controls for the text?
+        </p>
+        <h4>Text Hotkeys</h4>
+        <p>
+          In order to indent the current line, press tab (and un-indenting is shift+tab). There's also a hotkey for finding certain text and replacing it by pressing "Ctrl+h". When using quotes or parentheses, they will be automatically closed. When using a { it will also automatically indent.<br/>
+          To undo or redo, use "Ctrl+Z" to undo and "Ctrl+Shift+Z" or "Ctrl+Y" to redo! Keep in mind that if you modify while undoing, your redo history will be wiped.
+        </p>
+        <h4>Top Buttons</h4>
+        <p>
+          You may have noticed the 6 giant buttons with different names at the top.<br/>
+          The first four toggle the visibility of the HTML, CSS, JS, and the console window. Just click to make them disappear/reappear.
+          <br/>
+          After that, there's a theme button (if you want light mode...)
+          <br/>
+          And finally, we have the Fullscreen button which puts the iframe into Fullscreen!
+        </p>
+      </div>
+    </dialog>
+    <dialog id="historymodal" class='pagemodal'>
+      <div class='topmodal'>
+        <button class='close closebtn'>×</button>
+      </div>
+      <div class="headermodal">
+        <h2>History Manager</h2>
+      </div>
+      <hr/>
+      <div class='contentmodal'>
+        hi source coder :3
+      </div>
+    </dialog>
+    <dialog id="pref" class='pagemodal'>
+      <div class='topmodal'>
+        <button class='close closebtn'>×</button>
+      </div>
+      <div class="headermodal">
+        <h2>Preferences</h2>
+      </div>
+      <hr/>
+      <div class='contentmodal'>
+      <div class='item'>
+        Name: <input type="text" class="smol iinput" placeholder="Untitled" id="fne"></input>
+      </div>
+      <div class='item'>
+      Indent:
+      <select id="sel0" class="iinput">
+        <option value="  ">2space</option>
+        <option value=" ">1space</option>
+        <option value="&Tab;">1tab</option>
+      </select>
+      </div>
+      <div class='item'>
+      Wrap:
+      <select id="sel1" class="iinput">
+        <option value="nw">None</option>
+        <option value="bw">Break</option>
+        <option value="ww">Word</option>
+        <option value="ab">Break All</option>
+      </select>
+      </div>
+      <div class='item'>
+      <input type="checkbox" class="iinput" checked id="chk0">Autoindent</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk1">Auto-Close Parentheses</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk2">Auto-Close Quotes</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk3">Auto-Update</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk4">Undo History</input>
+      </div>
+      <div class='item'>
+        <button class="iinput">Delete History</input>
+      </div>
+      <div class='item'>
+       Tab size: <input type="number" class="smol iinput" value="4" id="tse"></input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk5">Update Lines</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" checked id="chk6">Console Divider</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" id="chk7">Bundle Cursor and Hotkeys</input>
+        <!-- Consumer default = uncheck -->
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" id="chk8" checked>Auto-cancel closing closed paren</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" id="chk9">Auto-cancel closing closed quote</input>
+      </div>
+      <div class='item'>
+        <input type="checkbox" class="iinput" id="chk10" checked>Enable console output</input>
+      </div>
+      </div>
+      <footer>Copyright 2024 Pacifiky. All rights reserved.<br/>Thank you Aaron for testing!</footer>
+    </dialog>
+  </div>
+  <div id="topbtn"><button id="trig5e">HTML</button><button id="trig6e">CSS</button><button id="trig7e">JS</button><button id="trig18e">Prev</button><button id="trig9e" value="true">Console</button><button id="trig8e" value="true">Theme</button><button id="trig1e">Fullscreen</button></div>
+  <div id="menubar">
+    <div class="menuitem">
+      <button class="menutrigger">File</button>
+      <div class="menudd hid" id="filemenu">
+        <button class="menuddi" id="trig2e">Download (ctrl+e)</button>
+        <button class="menuddi" id="trig3e">Download URL</button>
+        <hr/>
+        <button class="menuddi" id="trig10e">Export Database</button>
+        <button class="menuddi" id="trig11e">Import Database</button>
+        <hr/>
+        <button class="menuddi" id="trig12e">Save (ctrl+s)</button>
+        <button class="menuddi" id="trig13e">Load (ctrl+o)</button>
+        <hr/>
+        <button class="menuddi" disabled>Exit (NO ESCAPE)</button>
+      </div>
+    </div>
+    <div class="menuitem">
+      <button class="menutrigger">Edit</button>
+      <div class="menudd hid" id="editmenu">
+        <button class="menuddi" id="trig0e">Run</button>
+        <button class="menuddi" id="trig16e">Replace (ctrl+h)</button>
+        <hr/>
+        <button class="menuddi" id="trig14e">Preferences (ctrl+p)</button>
+        <button class="menuddi" id="trig17e">Help (ctrl+?)</button>
+        <button class="menuddi" id="trig19e">Goto</button>
+        <button class="menuddi" id="trig20e">History Manager</button>
+        <button class="menuddi" id="trig15e" disabled>Plugins</button>
+      </div>
+    </div>
+  </div>
+  <div class="flexsect">
+  <div class="sect">
+  <div class="finrep hid">
+    <input type="text" placeholder="Find" class="finputfr"></input>
+    <input type="text" placeholder="Replace" class="rinputfr"></input>
+    <button class="repbtn">Replace</button>
+    <button class="close">Close</button>
+  </div>
+  <div class="edcontainer">
+  <div class="lnnumb">
+  <span></span>
+  </div>
+  <textarea id="htmlie" class="input" spellcheck="false" style="white-space: nowrap;" placeholder="HTML" ></textarea>
+  </div>
+  </div>
+  <div class="sect">
+  <div class="finrep hid">
+    <input type="text" placeholder="Find"></input>
+    <input type="text" placeholder="Replace"></input>
+    <button class="repbtn">Replace</button>
+    <button class="close">Close</button>
+  </div>
+  <div class="edcontainer">
+  <div class="lnnumb">
+  <span></span>
+  </div>
+  <textarea id="cssie" class="input" style="white-space: nowrap;" spellcheck="false" placeholder="CSS"></textarea>
+  </div>
+  </div>
+  <div class="sect">
+  <div class="finrep hid">
+    <input type="text" placeholder="Find"></input>
+    <input type="text" placeholder="Replace"></input>
+    <button class="repbtn">Replace</button>
+    <button class="close">Close</button>
+  </div>
+  <div class="edcontainer">
+  <div class="lnnumb">
+  <span></span>
+  </div>
+  <textarea id="jsie" class="input" style="white-space: nowrap;" spellcheck="false" placeholder="JS"></textarea>
+  </div>
+  </div>
+  <!-- frame sector -->
+  <div class="sect frame">
+  <iframe id="playframe" srcdoc="<div style='font-family:Arial'><h1>Frost Playground</h1><p>Your code will show up here</p></div>"></iframe>
+  <div class="cnscont">
+  <textarea id="consolee" readonly></textarea>
+  <div class="cnsinput">
+  <input id="txt0e" placeholder="Command" type="text" spellcheck="false"></input>
+  <button id="trig4e">Clear</button>
+  </div>
+  </div>
+  </div>
+  </div>
+  <div id="svgcontainer">
+    <svg id="trashsvg" class="svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="11" y="10" width="2" height="11" rx="1" fill="currentcolor"/>
+    <rect x="4" y="7" width="16" height="16" rx="1" stroke="currentcolor" stroke-width="2"/>
+    <rect x="2" y="3" width="20" height="4" rx="1" stroke="currentcolor" stroke-width="2"/>
+    <rect x="7" y="10" width="2" height="11" rx="1" fill="currentcolor"/>
+    <rect x="15" y="10" width="2" height="11" rx="1" fill="currentcolor"/>
+    <mask id="mask0_2282_1246" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="8" y="0" width="8" height="2">
+    <rect x="8" width="8" height="2" fill="#D9D9D9"/>
+    </mask>
+    <g mask="url(#mask0_2282_1246)">
+    <rect x="10" width="4" height="4" rx="2" fill="currentcolor"/>
+    </g>
+    </svg>
+  </div>
   <script>
-    let inp0 = document.getElementById("inp0e");
-    let trig0 = document.getElementById("trig0e");
-    let out0 = document.getElementById("out0e");
-	function parseRegex(s){
+    //mar:topscript
+    const pagem = document.getElementsByClassName("pagemodal");
+    const consolee = document.getElementById("consolee");
+    const filebtn = document.getElementById("filemenu").getElementsByClassName("menuddi");
+    const editbtn = document.getElementById("editmenu").getElementsByClassName("menuddi");
+    const topbtn = document.getElementById("topbtn").children;
+    const trig4 = document.getElementById("trig4e");
+    const pref = document.getElementById("pref");
+    const help = document.getElementById("helpmodal");
+    const historyMod = document.getElementById("historymodal");
+    const txt0 = document.getElementById("txt0e");
+    const htmli = document.getElementById("htmlie");
+    const cssi = document.getElementById("cssie");
+    const jsin = document.getElementById("jsie");
+    const playframe = document.getElementById("playframe");
+    const prefite = pref.getElementsByClassName("contentmodal")[0].getElementsByClassName("item");
+    const prefinp = new Array(prefite.length);
+    for(let i=0;i<prefinp.length;i++){prefinp[i] = prefite[i].getElementsByClassName("iinput")[0]};
+    const inps = document.getElementsByClassName("input");
+    const nums = document.getElementsByClassName("lnnumb");
+    const savechars = [":",";","!","+","=","-","Enter","?",".",">","<","*","//","&","|"]; //removed backspace
+    const parencharso = new Uint8Array([40,91,123,60]) //ascii codes, charcodeat
+    const parencharsc = new Uint8Array([41,93,125,62])
+    //mar:from
+    const commitDelay = 2000; //Undo stack commit delay (of one keydown to another)
+    let chnbuf = [false,0,[0,[],0,0]]; //[status,index,[finalCursor,[stringofdeleted],lengthofadd,curoffset (accumulative)]]
+    let lastInputTime = 0; //use +new Date
+    let updateen = true;
+    var fieldHistory = new Array(inps.length).fill().map(()=>[[],[]]);
+    const delsvg = document.getElementById("trashsvg");
+    function vcnslog(m){if(prefinp[15].checked){consolee.value += m + "\n";consolee.scrollTop=consolee.scrollHeight};};
+    function vcnsdir(o){if(prefinp[15].checked){const props = Object.getOwnPropertyNames(o);for(let i=0;i<props.length;i++){consolee.value+=props[i]+": "+o[props[i]]+"\n"};consolee.scrollTop=consolee.scrollHeight}};
+    function vcnsclr(){consolee.value = "";consolee.placeholder = "Console cleared"}
+    playframe.contentWindow.console = {log: vcnslog,error: function (m){vcnslog("Error:" + m)},warn: function (m){vcnslog("Warn:" + m)},info: function (m){vcnslog("Info:" + m)},debug: function (m){vcnslog("Debug:" + m)},clear: vcnsclr,dir: vcnsdir};
+    //mar: class def
+    class fileSys {
+      constructor (container,filesid,filekeyid){
+        this.container = container;
+        this.files = JSON.parse(localStorage.getItem(filesid)) || [];
+        this.filekey = JSON.parse(localStorage.getItem(filekeyid)) || [];
+        this.filesid = filesid;
+        this.filekeyid = filekeyid;
+        this.sectors = new Array(this.filekey.length);
+        this._closeLocalStorage = this._closeLocalStorage.bind(this); 
+        this._closeLocalStorageKey = this._closeLocalStorageKey.bind(this);
+      }
+      renderPosts(i,datediv,keyfor){
+        //todo (Making object variables? // finished this stuff)
+        for(let j=this.files[i].length-1;j>=0;j--){
+          //you cant eventlistner pseudoelements >~<
+          let timef = this.files[i][j][0];
+          let date = document.createElement("div");
+          date.classList.add("filedate");
+          date.innerText = new Date(this.files[i][j][0]).toUTCString();
+          date.addEventListener("click",e=>{
+            setEnv(this.filekey[i],this.files[i][j][1],this.files[i][j][2],this.files[i][j][3]);
+            trig0f(null);
+            intUpdLn.call(htmli);
+            intUpdLn.call(cssi);
+            intUpdLn.call(jsin);
+            this._closeLocalStorage(e);
+          });
+          let ndel = delsvg.cloneNode();
+          ndel.innerHTML = delsvg.innerHTML;
+          ndel.classList.add("del");
+          ndel.addEventListener("click",e=>{
+            e.stopPropagation();
+            let yn = prompt("Are you sure you want to delete? (y/n)").toLowerCase();
+            if(yn === "y"){
+              date.remove();
+              let indexofsect = this.filekey.indexOf(keyfor);
+              let indexofelem = 0;
+              for(let k=0;k<this.files[indexofsect].length;k++){
+                if(this.files[indexofsect][k][0] === timef) indexofelem = k;
+              }
+              this.files[indexofsect].splice(indexofelem,1);
+              if(this.files[indexofsect].length === 0) {
+                this.filekey.splice(indexofsect,1);
+                this.files.splice(indexofsect,1);
+                this.sectors[i].remove();
+              };
+              localStorage.setItem(this.filesid,JSON.stringify(this.files))
+              localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey))
+            }
+          })
+          date.appendChild(ndel);
+          datediv.appendChild(date);
+        }
+      }
+      openUI(){
+        if(this.container.classList.contains("hid")){
+          this.update();
+          document.getElementById("closebtn").addEventListener("click",this._closeLocalStorage);
+          document.getElementById("closebtn").style="display:inline";
+          document.addEventListener("keydown",this._closeLocalStorageKey);
+          this.container.classList.add("sho");
+          this.container.classList.remove("hid");
+        } else {
+          this._closeLocalStorage(null);
+        }
+      }
+      update(){
+        //todo figure out wht not updating after localStorage?
+        this.files = JSON.parse(localStorage.getItem(this.filesid)) || [];
+        this.filekey = JSON.parse(localStorage.getItem(this.filekeyid)) || [];
+        this.container.innerHTML = "";
+        if(!(this.filekey === null)){
+          for(let i=0;i<this.filekey.length;i++){
+            this.sectors[i] = document.createElement("div");
+            this.sectors[i].classList.add("filesect");
+            let header = document.createElement("div");
+            header.classList.add("header");
+            const head = document.createElement("input");
+            const updatebtn = document.createElement("button");
+            const resetbtn = document.createElement("button");
+            let keyfor = this.filekey[i];
+            let datediv = document.createElement("div");
+            updatebtn.classList.add("updatetxt");
+            updatebtn.classList.add("sbtn");
+            updatebtn.classList.add("hid");
+            updatebtn.classList.add("gbtn");
+            updatebtn.innerText = "✓";
+            resetbtn.classList.add("restxt");
+            resetbtn.classList.add("sbtn");
+            resetbtn.classList.add("rbtn");
+            resetbtn.classList.add("hid");
+            resetbtn.innerText = "×";
+            datediv.classList.add("dateCont");
+            head.setAttribute("spellcheck","false");
+            head.value = keyfor;
+            head.classList.add("filetitle");
+            head.addEventListener("keydown",e=>{
+              //set filekey (turn into function later?)
+              //Add button for update aswell
+              if(e.key === "Enter"){
+              keyfor = this.updateCat(head,keyfor,i);
+              updatebtn.classList.remove("sho");resetbtn.classList.remove("sho");updatebtn.classList.add("hid");resetbtn.classList.add("hid");
+              }
+            });
+            head.addEventListener("input",e=>{if(head.value != keyfor){updatebtn.classList.add("sho");resetbtn.classList.add("sho");updatebtn.classList.remove("hid");resetbtn.classList.remove("hid")}else{updatebtn.classList.remove("sho");resetbtn.classList.remove("sho");updatebtn.classList.add("hid");resetbtn.classList.add("hid")}})
+            resetbtn.addEventListener("click",e=>{head.value = keyfor;updatebtn.classList.remove("sho");resetbtn.classList.remove("sho");updatebtn.classList.add("hid");resetbtn.classList.add("hid")})
+            updatebtn.addEventListener("click",e=>{keyfor = this.updateCat(head,keyfor,i);updatebtn.classList.remove("sho");resetbtn.classList.remove("sho");updatebtn.classList.add("hid");resetbtn.classList.add("hid")})
+            header.appendChild(head);
+            header.appendChild(updatebtn);
+            header.appendChild(resetbtn);
+            this.sectors[i].appendChild(header);
+            this.sectors[i].appendChild(datediv);
+            //mar:render
+            this.renderPosts(i,datediv,keyfor);
+            this.container.appendChild(this.sectors[i]);
+            this.sectors[i].appendChild(document.createElement("hr"));
+          }
+        }
+      };
+      updateCat(head,keyfor,i) {
+        head.value = head.value || "Untitled";
+        if(this.filekey.indexOf(head.value) === -1){
+          this.filekey[this.filekey.indexOf(keyfor)] = head.value;
+          localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey));
+        } else if(!(head.value === keyfor)){
+          let yn = prompt("Are you sure you want to merge? (y/n)").toLowerCase();
+          if(yn === "y"){
+            //Create a loop for date sorting. (use time field).
+            //use current filekey and merger filekey.
+            let originind = this.filekey.indexOf(keyfor);
+            this.filekey.splice(originind,1);
+            let originarr = this.files.splice(originind,1)[0];
+            let nind = this.filekey.indexOf(head.value);
+            let nkey = head.value;
+            head.value = "";
+            this.files[nind] = this.files[nind].concat(originarr);
+            //every save do this?
+            this.files[nind].sort((a,b)=>{
+              return a[0]-b[0];
+            });
+            //Style
+            this.sectors[i].remove();
+            let nstysec = null;
+            for(let j=0;j<this.container.children.length;j++){
+              let chilsec = this.container.children[j];
+              if(chilsec.getElementsByClassName("filetitle")[0].value === nkey){
+                nstysec = chilsec;
+              }
+            }
+            let nstyseccont = nstysec.getElementsByClassName("dateCont")[0];
+            nstyseccont.innerHTML = "";
+            this.renderPosts(nind,nstyseccont,nkey);
+            localStorage.setItem(this.filesid,JSON.stringify(this.files));
+            localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey));
+          }
+        }
+        return head.value;
+      }
+      _closeLocalStorage(e) {
+        this.container.classList.add("hid");
+        this.container.classList.remove("sho");
+        document.getElementById("closebtn").style="";
+        document.getElementById("closebtn").removeEventListener("click",this._closeLocalStorage);
+        document.body.removeEventListener("keydown",this._closeLocalStorageKey);
+      };
+      _closeLocalStorageKey(e) {e.key === "Escape" && this._closeLocalStorage(e)};
+      saveTo() {
+        //todo
+        let rvalue = prefinp[0].value || "Untitled"; 
+        if(this.files === null || this.filekey === null){
+          this.files = [];
+          this.filekey = [];
+        }
+        
+        let keyindex = this.filekey.indexOf(rvalue);
+        if(keyindex === -1){
+          this.files.push([[Date.now(),htmli.value,cssi.value,jsin.value]]);
+          this.filekey.push(rvalue);
+        } else {
+          this.files[keyindex].push([Date.now(),htmli.value,cssi.value,jsin.value]);
+        }
+        localStorage.setItem(this.filesid,JSON.stringify(this.files));
+        localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey));
+      };
+    };
+    class menuSys {
+      constructor (menubar) {
+        this.menu = menubar;
+        this.items = this.menu.getElementsByClassName("menuitem");
+        for(let i=0;i<this.items.length;i++){
+          let trig = this.items[i].getElementsByClassName('menutrigger')[0];
+          let dd = this.items[i].getElementsByClassName('menudd')[0];
+          document.addEventListener("click",e=>{
+            if(dd.classList.contains("sho") && e.target != dd && !(e.target === trig)){dd.classList.add("hid");dd.classList.remove("sho");};
+          });
+          trig.addEventListener("click",e=>{dd.classList.toggle("sho");dd.classList.toggle("hid");});
+          dd.addEventListener("mouseover",e=>{dd.classList.add("mouse");dd.classList.remomve("notmouse")});
+          dd.addEventListener("mouseleave",e=>{dd.classList.add("notmouse");dd.classList.remove("mouse")});
+          dd.classList.add("notmouse");
+        }
+      }
+    };
+    let menub = new menuSys(document.getElementById('menubar'));
+    var savedb = new fileSys(document.getElementById("saves"),"saves","saveskey");
+    //Textarea loops
+    for(let i=0;i<inps.length;i++){
+      let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];
+      let finput = finrep.getElementsByClassName("finputfr")[0];
+      let rinput = finrep.getElementsByClassName("rinputfr")[0];
+
+      inps[i].addEventListener("focusin", e=>{for(let j=0;j<inps.length;j++){inps[j].classList.remove("active");};inps[i].classList.add("active");});
+      
+      //doesn't detect linebreaks due to preventdefault but that could be to advantage!
+      inps[i].addEventListener("beforeinput", e=>checkInput(e,i));
+      
+      inps[i].addEventListener("input", e=>{
+        fpar = flipParen(e.data)
+        if(fpar){
+          if(prefinp[4].checked){
+          let orig = inps[i].selectionStart;
+          inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + fpar + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
+          inps[i].selectionStart = inps[i].selectionEnd = orig;
+          checkInput({inputType:"insertText",data:fpar},i);
+          }
+          saveHistory();
+          chnbuf[0] = false;
+        }else{
+          switch(e.data){
+            case ")":
+            case "]":
+            case "}":
+              if(inps[i].value[inps[i].selectionEnd] == e.data && prefinp[13].checked){
+                const orig = inps[i].selectionStart;
+                inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + inps[i].value.substring(inps[i].selectionEnd+1)
+                inps[i].selectionStart = inps[i].selectionEnd = orig;
+              }
+              break;
+            case "'":
+            case '"':
+            case "`":
+              if(inps[i].value[inps[i].selectionEnd] == e.data && prefinp[14].checked){
+                const orig = inps[i].selectionStart;
+                inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + inps[i].value.substring(inps[i].selectionEnd+1)
+                inps[i].selectionStart = inps[i].selectionEnd = orig;
+              }else{
+                if(prefinp[5].checked){
+                  const orig = inps[i].selectionStart;
+                  inps[i].value = inps[i].value.substring(0,inps[i].selectionStart) + e.data + inps[i].value.substring(inps[i].selectionEnd,inps[i].value.length);
+                  inps[i].selectionStart = inps[i].selectionEnd = orig;
+                  checkInput({inputType:"insertText",data:e.data},i);
+                }
+              }
+              saveHistory();
+              chnbuf[0] = false;
+              break;
+          }
+        }
+        updateen && trig0f.call(inps[i]);
+        prefinp[10].checked && intUpdLn.call(inps[i])
+      })
+      //https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
+      inps[i].addEventListener("keydown",e=>{
+        switch(e.key){
+          case "Tab":
+            if(e.shiftKey){
+              e.preventDefault()
+              //mar:need tab handling with new history
+              //mar:issue with cursor movement on this (seems to be unfixable) I should've used codemirror's action class method or just turned all the replacements into a single action (using string concat)
+              let spos = st = inps[i].selectionStart;
+              let epos = en = inps[i].selectionEnd;
+              let lines = [];
+              for(let j=inps[i].selectionStart-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
+              for(let j=inps[i].selectionEnd;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
+              //fill list
+              let plb = st;
+              for(let j=st;j<en;j++){
+                if(inps[i].value[j]==="\n"){
+                  lines.push([plb,j]);
+                  plb = j+1;
+                }
+              }
+              lines.push([plb,en+1]);
+              let soil = 0;
+              let foil = true;
+              for(let j=0;j<lines.length;j++){
+                let lndata = inps[i].value.substring(lines[j][0]+soil,lines[j][1]+soil);
+                //inps[i].value = inps[i].value.substring(0,st) + inps[i].value.substring(en+1,inps[i].value.length);
+                let oi = "";
+                for(let j=0;j<lndata.length;j++){
+                  if(lndata[j]===" " || lndata[j]==="\t"){oi+=lndata[j]}else{break}
+                }
+                let eni = lndata.substring(oi.length,lndata.length);
+                let poi = oi.length;
+                oi = oi.replace(prefinp[1].value,"");
+                if(oi.length-poi===0 && j===0) foil=false;
+                inps[i].selectionStart = lines[j][0]+soil;
+                inps[i].selectionEnd = lines[j][1]+soil;
+                checkInput({inputType:"insertFromPaste",data:oi+eni},i);
+                saveHistory();
+                chnbuf[0] = false;
+                inps[i].value = inps[i].value.substring(0,lines[j][0]+soil) + oi + eni + inps[i].value.substring(lines[j][1]+soil);
+                soil+=oi.length-poi;
+              }
+              inps[i].selectionStart = foil ? spos-prefinp[1].value.length : spos;
+              inps[i].selectionEnd = epos+soil;
+            }else{
+              e.preventDefault();
+              let spos = st = inps[i].selectionStart;
+              let epos = en = inps[i].selectionEnd;
+              let lines = [];
+              for(let j=inps[i].selectionStart-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
+              for(let j=inps[i].selectionEnd;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
+              //fill list
+              let plb = st;
+              for(let j=st;j<en;j++){
+                if(inps[i].value[j]==="\n"){
+                  lines.push([plb,j]);
+                  plb = j+1;
+                }
+              }
+              lines.push([plb,en+1]);
+              for(let j=0;j<lines.length;j++){
+                let lndata = inps[i].value.substring(lines[j][0]+j*prefinp[1].value.length,lines[j][1]+j*prefinp[1].value.length);
+                //alert(lndata);
+                //inps[i].value = inps[i].value.substring(0,st) + inps[i].value.substring(en+1,inps[i].value.length);
+                let oi = "";
+                for(let j=0;j<lndata.length;j++){
+                  if(lndata[j]===" " || lndata[j]==="\t"){oi+=lndata[j]}else{break}
+                }
+                let eni = lndata.substring(oi.length,lndata.length);
+                //let strels = spos-(st+oi.length);
+                //let strele = epos-(en+oi.length);
+                oi = oi + prefinp[1].value;
+                inps[i].selectionStart = lines[j][0]+j*prefinp[1].value.length;
+                inps[i].selectionEnd = lines[j][1]+j*prefinp[1].value.length;
+                checkInput({inputType:"insertFromPaste",data:oi+eni},i);
+                saveHistory();
+                chnbuf[0] = false;
+                inps[i].value = inps[i].value.substring(0,lines[j][0]+j*prefinp[1].value.length) + oi + eni + inps[i].value.substring(lines[j][1]+j*prefinp[1].value.length);
+                //strels = strels < 0 ? 0 : strels;
+                //inps[i].selectionStart = st + oi.length + strels;
+                //alert(inps[i].selectionStart);
+                //inps[i].selectionEnd = inps[i].selectionStart;
+              }
+              inps[i].selectionStart = spos+prefinp[1].value.length;
+              inps[i].selectionEnd = epos+prefinp[1].value.length*lines.length;
+            }
+            break;
+          case "Enter":
+            if(prefinp[3].checked){
+              e.preventDefault();
+              
+              let spos = st = en = inps[i].selectionStart;
+              //console.log(spos);
+              for(let j=spos-1;j>=0&&inps[i].value[j]!="\n";j--){st=j};
+              for(let j=spos;j<inps[i].value.length&&inps[i].value[j]!="\n";++j){en=j};
+              //console.log(inps[i].value.substring(st,en));
+              let as = "";
+              let lndata = inps[i].value.substring(st,en);
+              //for(let j=0;j<countl(inps[i].value.substring(st,en+1),"\t");j++){as+="\t"};
+              for(let j=0;j<lndata.length;j++){
+                if(lndata[j]===" " || lndata[j]==="\t"){as+=lndata[j]}else{break}
+              }
+              //let paren = false;
+              let cursoroff = 1;
+              //indent adder for pars
+              switch((inps[i].value[inps[i].selectionStart-1] || "\x00").charCodeAt(0)){
+                case 40:
+                case 91:
+                case 123:
+                case 62:
+                  switch((inps[i].value[inps[i].selectionStart] || "\x00").charCodeAt(0)){
+                    case 41:
+                    case 93:
+                    case 125:
+                    case 60:
+                      cursoroff-=as.length+1
+                      as += prefinp[1].value + "\n" + as;
+                      break;
+                    default:
+                      //In case f only open paren indent!
+                      as += prefinp[1].value;
+                  }
+                  //cursoroff-= (inps[i].value[inps[i].selectionStart]==="}" || inps[i].value[inps[i].selectionStart]==="<") ? as.length+1 : 0;as += prefinp[1].value + ((inps[i].value[inps[i].selectionStart]==="}" || inps[i].value[inps[i].selectionStart]==="<") ? "\n" + as : "");
+              }
+              //check for { or } here.
+              
+              inps[i].selectionStart = spos;
+              checkInput({inputType:"insertFromPaste",data:("\n"+as)},i);
+              
+              inps[i].value = inps[i].value.substring(0, inps[i].selectionStart) + "\n" + as + inps[i].value.substring(inps[i].selectionEnd);
+              inps[i].selectionStart = spos+as.length+cursoroff;
+              inps[i].selectionEnd = inps[i].selectionStart;
+              prefinp[10].checked && intUpdLn.call(inps[i]); //Prevents input so need this
+            }
+            break;
+          default:
+            if(e.ctrlKey){
+              switch(e.key){
+                case "Z":
+                case "y":
+                  redoHistory(i);
+                  break;
+                case "z":
+                  e.preventDefault();
+                  undoHistory(i);
+                  break;
+                case "h":
+                  e.preventDefault();
+                  finrep.classList.toggle("hid");
+                  finrep.classList.toggle("sho");
+                  //mar:cur
+                  break;
+              }
+            }else if(prefinp[7].checked && savechars.includes(e.key)){saveHistory();chnbuf[0] = false;};
+        }
+        //console.log(chnbuf); //here's he prob?
+      });
+      finrep.getElementsByClassName("close")[0].addEventListener("click",e=>{
+        finrep.classList.remove("sho");
+        finrep.classList.add("hid");
+      });
+      finrep.getElementsByClassName("repbtn")[0].addEventListener("click",e=>{
+        //fine to rem
+        let rf = parseRegex(finput.value);
+        let rr = parseRegex(rinput.value);
+        const replaceval = inps[i].value.replaceAll(rf,rr);
+        saveHistory();
+        chnbuf[0] = false;
+        inps[i].selectionStart = 0;
+        inps[i].selectinEnd = inps[i].value.length-1;
+        checkInput({inputType:"insertFromPaste",data:replaceval},i);
+        saveHistory();
+        chnbuf[0] = false;
+        inps[i].selectionStart = inps[i].selectionEnd = 0;
+        inps[i].value = replaceval;
+        prefinp[10].checked && intUpdLn.call(inps[i]);
+        //mar:issue two options: manual replacement (which causes cursor issues) or just plain text delete and add
+      });
+    }
+    // https://stackoverflow.com/questions/1995370/adding-line-numbers-to-html-textarea
+    function intUpdLn(e){
+      const num = this.parentNode.getElementsByClassName("lnnumb")[0];
+      const nl = this.value.split("\n").length;
+      if(num.children.length != nl){
+        let span = document.createElement("span");
+        num.innerHTML = "";
+        for(let j=0;j<nl;j++){
+          num.appendChild(span);
+          span = span.cloneNode();
+        }
+      }
+    }
+    //mar:todo
+    //make a subfunction for undo and redo actions using a boolean?
+    function undoHistory(i){
+      let unddat;
+      if(chnbuf[0]){
+        if(chnbuf[1] === i){
+          unddat = chnbuf[2];
+          chnbuf[0] = false;
+        }
+        else{
+          saveHistory(); //Have to because need to add undo actions into history
+          if(fieldHistory[i][0].length === 0){inps[i].value = "";return;}
+          unddat = fieldHistory[i][0].pop();
+        }
+        //unddat = chnbuf;
+      }else{
+        if(fieldHistory[i][0].length === 0){inps[i].value = "";return;}
+        unddat = fieldHistory[i][0].pop();
+        //saveHistory();
+      }
+      
+      let [chndat,ptext] = restoreChange(unddat,inps[i].value);
+      inps[i].value = ptext;
+      //(fieldHistory[i][0].length > 0 ? fieldHistory[i][0][fieldHistory[i][0].length-1][3] : 0) not because shows exactly before chaning
+      inps[i].selectionStart = inps[i].selectionEnd = chndat[0];
+      //alert(chndat)
+      //fieldHistory[i][1].push(unddat); need to push !unddat to redo hist
+      fieldHistory[i][1].push(chndat);
+      
+      /*
+      chnbuf[0] = true; //figure out way to combine all redo stack actions into one change on beforeinput 
+      chnbuf[1] = i; //actually just push redo stack actions onto undo stack each as an action 
+      chnbuf[2] = chndat;
+      */
+      
+      updateen && trig0f(null);
+      prefinp[10].checked && intUpdLn.call(inps[i]);
+    }
+    function redoHistory(i){
+      if(fieldHistory[i][1].length === 0) return;
+      let [chndat,ptext] = restoreChange(fieldHistory[i][1].pop(),inps[i].value);
+      inps[i].value = ptext;
+      inps[i].selectionStart = inps[i].selectionEnd = chndat[0]+chndat[3];
+      fieldHistory[i][0].push(chndat);
+      updateen && trig0f(null);
+      prefinp[10].checked && intUpdLn.call(inps[i]);
+    }
+    function restoreChange(rstdat,ptext){
+      let chndat = [rstdat[0],[],rstdat[1].length,rstdat[3]];
+      if(rstdat[2] > 0){
+        chndat[0] -= rstdat[2];
+        chndat[1] = ptext.substr(chndat[0],rstdat[2]).split("").reverse();
+        ptext = ptext.substring(0,chndat[0]) + ptext.substring(chndat[0]+rstdat[2]);
+      }
+      if(rstdat[1].length > 0){
+        ptext = ptext.substring(0,chndat[0]) + rstdat[1].reverse().join("") + ptext.substring(chndat[0]);
+        chndat[0] += rstdat[1].length
+      }
+      return [chndat,ptext];
+    }
+    function saveHistory(){if(chnbuf[0] && (chnbuf[2][2] > 0 || chnbuf[2][1].length > 0)){fieldHistory[chnbuf[1]][0].push([chnbuf[2][0],chnbuf[2][1].slice(),chnbuf[2][2],chnbuf[2][3]])}};
+    function logHistory(){
+      let out = "--Begin HistoryLog--\n{\n";
+      for(let i=0;i<fieldHistory.length;i++){
+        out += "  Undo"+i.toString()+"{\n"
+        for(let j=0;j<fieldHistory[i][0].length;j++){
+          out += "    Change"+j.toString()+"{\n      Cursor: "+fieldHistory[i][0][j][0]+"\n      DelArr: ["+fieldHistory[i][0][j][1].join(",")+"]\n      nAdd: "+fieldHistory[i][0][j][2]+"\n      Curoff: "+fieldHistory[i][0][j][3]+"\n    }\n";
+        }
+        out += "  }\n  Redo"+i.toString()+"{\n"
+        for(let j=0;j<fieldHistory[i][1].length;j++){
+          out += "    Change"+j.toString()+"{\n      Cursor: "+fieldHistory[i][1][j][0]+"\n      DelArr: ["+fieldHistory[i][1][j][1].join(",")+"]\n      nAdd: "+fieldHistory[i][1][j][2]+"\n      Curoff: "+fieldHistory[i][1][j][3]+"\n    }\n";
+        }
+        out += "  }\n"
+      }
+      out += "}\n--End HistoryLog--"
+      return out;
+    }
+    function checkInput(e,i){
+        //console.log(chnbuf); // temp prob here
+        //needs chnbuf check if correct field. 
+        if(!chnbuf[0]){
+          //console.log("invchng")
+          chnbuf[2][0] = inps[i].selectionEnd;
+          chnbuf[2][1].length = 0;
+          chnbuf[2][2] = 0;
+          chnbuf[2][3] = 0;
+          lastInputTime = Date.now();
+        }else if(Date.now()-lastInputTime > commitDelay || chnbuf[1] != i){
+          //console.log("comdelay")
+          saveHistory();
+          chnbuf[1] = i;
+          chnbuf[2][0] = inps[i].selectionEnd;
+          chnbuf[2][1].length = 0;
+          chnbuf[2][2] = 0;
+          chnbuf[2][3] = 0;
+        }
+        
+        if(fieldHistory[i][1].length > 0){
+          /*
+          for(let j=0;j<fieldHistory[i][1].length;j++){
+            fieldHistory.push(fieldHistory[i][1][j]);
+          }
+          */
+          fieldHistory[i][0] = fieldHistory[i][0].concat(fieldHistory[i][1]);
+          fieldHistory[i][1].length = 0;
+        }
+        
+        let seldata = "";
+        const ssrbound = inps[i].selectionStart <= chnbuf[2][0];
+        const serbound = inps[i].selectionEnd <= chnbuf[2][0];
+        const sslbound = inps[i].selectionStart >= chnbuf[2][0]-chnbuf[2][2];
+        const selbound = inps[i].selectionEnd >= chnbuf[2][0]-chnbuf[2][2];
+        //(ssrbound && serbound && (sslbound || selbound))
+        //don't need others because yk (start < end, end > start)
+        //console.log(chnbuf);
+        const soperable = (serbound && selbound);
+        
+        if(inps[i].selectionStart != inps[i].selectionEnd){
+          //console.log("--Selection!--");
+          //SelectionStart will always be less than end
+          //no way of bundling over bound?
+          //changed old (!sslbound && !selbound) || (!ssrbound || !serbound) to soperable
+          //yep it works
+          if(!soperable){
+            //If both are not in bound
+            //make boolean?
+            saveHistory();
+            chnbuf[1] = i;
+            //chnbuf[2][0] = inps[i].selectionStart nothing is really dependent and it's auto set
+            chnbuf[2][1].length = 0;
+            chnbuf[2][2] = 0;
+            chnbuf[2][3] = 0;
+          }
+          seldata = inps[i].value.substring(inps[i].selectionStart,inps[i].selectionEnd);
+        }else if(inps[i].selectionEnd != chnbuf[2][0]+chnbuf[2][3]){
+          if(prefinp[12].checked && soperable){
+            chnbuf[2][3] = inps[i].selectionEnd-chnbuf[2][0];
+            //can't handle if it's out of lft bound but possibly selection can
+          }else{
+            saveHistory();
+            chnbuf[1] = i;
+            chnbuf[2][1].length = 0;
+            chnbuf[2][2] = 0;
+            chnbuf[2][3] = 0;
+          }
+          //console.log("--Cursor Move--");
+        }
+        
+        //remove because some changes ned to see old cursr
+        //prefinp[12].checked === bundlecheck
+        //tomake curoffset support
+        
+        switch(e.inputType){
+          case "insertText":
+          case "insertLineBreak":
+            if(seldata){
+              //mar:todo add option for saving line breaks
+              if(prefinp[12].checked && soperable){
+                let oba = 0;
+                let outd = 0;
+                if(!sslbound){
+                  for(let j=(chnbuf[2][0]-chnbuf[2][2])-1;j>=inps[i].selectionStart;j--){
+                    chnbuf[2][1].push(inps[i].value[j]);
+                    outd++;
+                  }
+                  oba += inps[i].selectionEnd-(chnbuf[2][0]-chnbuf[2][2]);
+                }else{
+                  oba += inps[i].selectionEnd-inps[i].selectionStart;
+                }
+                chnbuf[2][2] -= oba-1;
+                //tomake cursor calc
+                //no matter where you delete (in bound or out, it'll always lower cursor)
+                chnbuf[2][0] -= outd+oba-1; //Need adjustment from del
+                chnbuf[2][3] = (inps[i].selectionStart+1)-chnbuf[2][0];
+              }else{
+                saveHistory();
+                chnbuf[2][1] = seldata.split("").reverse();
+                chnbuf[2][2] = 1;
+                chnbuf[2][0] = inps[i].selectionStart+1;
+                chnbuf[2][3] = 0;
+              }
+            }else{
+              //alert(chnbuf[2][2])
+              chnbuf[2][2]++;
+              chnbuf[2][0]++;
+              chnbuf[2][3] = (inps[i].selectionStart+1)-chnbuf[2][0];
+            }
+            break;
+          case "deleteContentBackward":
+          case "deleteByCut":
+            if(inps[i].value.length > 0){
+              if(seldata){
+                //tomake 12 support
+                if(prefinp[12].checked && soperable){
+                  let oba = 0;
+                  let outd = 0;
+                  if(!sslbound){
+                    for(let j=(chnbuf[2][0]-chnbuf[2][2])-1;j>=inps[i].selectionStart;j--){
+                      chnbuf[2][1].push(inps[i].value[j]);
+                      outd++;
+                    }
+                    oba += inps[i].selectionEnd-(chnbuf[2][0]-chnbuf[2][2]);
+                  }else{
+                    oba += inps[i].selectionEnd-inps[i].selectionStart;
+                    //alert(oba)
+                  }
+                  chnbuf[2][2] -= oba;
+                  //tomake cursor calc
+                  chnbuf[2][0] -= oba+outd;
+                  chnbuf[2][3] = inps[i].selectionStart-chnbuf[2][0];
+                }else{
+                  //alert(soperable) //mar:temp
+                  //alert(selbound)
+                  //alert(`Begincalc ${chnbuf[2][0]-chnbuf[2][2]} Cur: ${chnbuf[2][0]} Add: ${chnbuf[2][2]}`)
+                  //alert(chnbuf)
+                  saveHistory();
+                  chnbuf[1] = i;
+                  chnbuf[2][2] = 0;
+                  chnbuf[2][1] = seldata.split("").reverse();
+                  chnbuf[2][0] = inps[i].selectionStart;
+                  chnbuf[2][3] = 0;
+                }
+              }else{
+                if(chnbuf[2][2] > 0){
+                  chnbuf[2][2]--;
+                }else{
+                  chnbuf[2][1].push(inps[i].value[inps[i].selectionEnd-1])
+                }
+                chnbuf[2][0]--;
+              }
+            }
+            break;
+          case "historyUndo":
+            alert("Native Undo Error!")
+            break;
+          case "insertFromPaste":
+          case "insertFromDrop":
+            if(prefinp[12].checked && (!seldata || soperable)){
+              if(seldata){
+                //Alr checked within
+                let oba = 0;
+                let outd = 0;
+                if(!sslbound){
+                  //add deleted to buffer
+                  for(let j=(chnbuf[2][0]-chnbuf[2][2])-1;j>=inps[i].selectionStart;j--){
+                    chnbuf[2][1].push(inps[i].value[j]);
+                    outd++;
+                  }
+                  //calculate new length
+                  //selectionend isn't included in selection so negate 1
+                  oba += inps[i].selectionEnd-(chnbuf[2][0]-chnbuf[2][2]);
+                  //tomake cursor calc
+                }else{
+                  //((inps[i].selectionEnd-1)-Math.max(inps[i].selectionStart,chnbuf[2][0]-chnbuf[2][2]));
+                  oba += inps[i].selectionEnd-inps[i].selectionStart;
+                }
+                //console.log(`oba: ${oba} outd: ${outd}`);
+                chnbuf[2][2] += e.data.length-oba;
+                chnbuf[2][0] += e.data.length-(oba+outd);
+                chnbuf[2][3] = (inps[i].selectionStart+e.data.length)-chnbuf[2][0];
+              }else{
+                /*
+                if(){
+                  
+                }else{
+                  chnbuf[2][2]+=e.data.length;
+                  chnbuf[2][0]+=e.data.length;
+                }
+                */
+                //handle cursor movement oh wait this alr works cuz length (and out of bound check)
+                chnbuf[2][2]+=e.data.length;
+                chnbuf[2][0]+=e.data.length;
+              }
+            }else{
+              saveHistory();
+              chnbuf[1] = i;
+              chnbuf[2][1] = seldata.split("").reverse();
+              chnbuf[2][2] = e.data.length;
+              //alert(e.data.length)
+              //Commit paste data
+              chnbuf[2][0] = inps[i].selectionStart+e.data.length;
+              chnbuf[2][3] = 0;
+            }
+            break;
+        }
+        chnbuf[0] = true
+        lastInputTime = Date.now();
+    }
+    function flipParen(s){
+      switch(s){
+        case "(":
+          return ")"
+        case "[":
+          return "]"
+        case "{":
+          return "}"
+        default:
+          return ""
+      }
+    }
+    function trig0f(e) {
+      playframe.click();
+      playframe.srcdoc = `<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>var console = {log: parent.vcnslog,error: function (m){parent.vcnslog("Error:" + m)},warn: function (m){parent.vcnslog("Warn:" + m)},info: function (m){parent.vcnslog("Info:" + m)},debug: function (m){parent.vcnslog("Debug:" + m)},clear: parent.vcnsclr,dir: parent.vcnsdir};try{${jsin.value}}catch(e){console.error(e.stack)}<\/script><\/html>`;
+      if(prefinp[11].checked && consolee.value.length > 0 && consolee.value[consolee.value.length-2]+consolee.value[consolee.value.length-3] != "--"){
+        consolee.value += "--"+(new Date).toLocaleString()+"--\n";
+      }
+      return;
+    }
+    function setEnv(name,html,css,js){
+      prefinp[0].value = name;
+      htmli.value = html;
+      cssi.value = css;
+      jsin.value = js;
+    }
+    
+    function dwnl(txt, name) {
+      let dwnelem = document.createElement("a");
+      dwnelem.download = name;
+      dwnelem.type = "text/html";
+      let dwndata = new Blob([txt]);
+      dwnelem.href = URL.createObjectURL(dwndata);
+      document.body.appendChild(dwnelem);
+      dwnelem.click();
+      dwnelem.remove();
+    }
+    function fulls(e) {
+      document.getElementById("closebtn").addEventListener("click",intSetFullFrame);
+      document.addEventListener("keydown",intEscFullFrame);
+      playframe.style = "position:fixed;z-index:calc(max(infinity)-1);width:100vw;height:100vh;left:0;top:0;";
+      document.getElementById("closebtn").style="display:inline";
+    }
+    function intSetFullFrame(e) {
+      playframe.style="";document.getElementById("closebtn").style="";document.getElementById("closebtn").removeEventListener("click",intSetFullFrame);document.removeEventListener("keydown",intEscFullFrame);
+    }
+    function intEscFullFrame(e){e.key === "Escape" && intSetFullFrame(e);}
+    function updTS(){
+      for(let i=0;i<inps.length;i++){inps[i].style.tabSize = prefinp[9].value}
+    }
+    function savefil(){
+      dwnl(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`,prefinp[0].value === "" ? "Untitled-FrostPlayground.html" : prefinp[0].value + "-FrostPlayground.html")
+    }
+    function parseRegex(s){
       let o = "";
       let prevSlash = false;
       for(let i=0;i<s.length;i++){
@@ -72,18 +1536,127 @@
       }
       return o;
     }
-    function trig0f(e) {
-      let inpv = inp0.value;
-
-      let output = '["' + inpv.split(parseRegex(document.getElementById("inp1e").value)).join('","') + '"]';
-
-      out0.value = output;
-      return;
+    //mar:dcm
+    document.body.addEventListener("keydown", (e)=>{
+      if(e.key === "e" && e.ctrlKey){e.preventDefault();savefil();}
+      else if(e.key === "o" && e.ctrlKey){
+        e.preventDefault();
+        if(document.getElementById("saves").classList.contains("hid")){
+          savedb.openUI();
+        } else {
+          savedb._closeLocalStorage(null);
+        }
+      } else if(e.key === "s" && e.ctrlKey) {
+        e.preventDefault();
+        savedb.saveTo();
+      } else if(e.key === "p" && e.ctrlKey) {
+        e.preventDefault();
+        if(!(pref.open)){pref.showModal();prefinp[6].checked = updateen}else{pref.close()};
+      } else if(e.key === "/" && e.ctrlKey) {
+        e.preventDefault();
+        if(!(help.open)){help.showModal()}else{help.close()};
+      }
+    });
+    window.addEventListener("load",e=>{
+    editbtn[0].addEventListener("click", trig0f);
+    topbtn[6].addEventListener("click", fulls);
+    filebtn[0].addEventListener("click", (e)=>{savefil()});
+    filebtn[1].addEventListener("click", (e)=>{dwnl("data:text/html;charset=utf-8,%0A" + encodeURIComponent(`<!DOCTYPE html><html>${htmli.value}<style>${cssi.value}<\/style><script>${jsin.value}<\/script><\/html>`),"CodeURL-FrostPlayground.txt");});
+    trig4.addEventListener("click",(e)=>{playframe.contentWindow.console.clear()});
+    topbtn[0].addEventListener("click",(e)=>{htmli.parentNode.parentNode.classList.toggle("hid")});
+    topbtn[1].addEventListener("click",(e)=>{cssi.parentNode.parentNode.classList.toggle("hid")});
+    topbtn[2].addEventListener("click",(e)=>{jsin.parentNode.parentNode.classList.toggle("hid")});
+    topbtn[3].addEventListener("click",(e)=>{playframe.classList.toggle("hid");
+      if(playframe.classList.contains("hid") && playframe.parentNode.getElementsByClassName("cnscont")[0].classList.contains("hid")){playframe.parentNode.classList.add("hid")}else{playframe.parentNode.classList.remove("hid")};
+      if(playframe.classList.contains("hid")){updateen = false}else{updateen = true}
+    });
+    topbtn[4].addEventListener("click",e=>{const csncontv = playframe.parentNode.getElementsByClassName("cnscont")[0];
+      csncontv.classList.toggle("hid")
+      if(playframe.classList.contains("hid") && csncontv.classList.contains("hid")){playframe.parentNode.classList.add("hid")}else{playframe.parentNode.classList.remove("hid")};
+    });
+    /*topbtn[5].addEventListener("click",(e)=>{if(topbtn[5].value === "true"){document.body.style="color-scheme: light;background: #FFF;color:black";topbtn[5].value="false"}else{document.body.style="";topbtn[5].value="true"};});*/
+    topbtn[5].addEventListener("click",e=>{document.body.classList.toggle("light")});
+    filebtn[4].addEventListener("click",e=>savedb.saveTo());
+    filebtn[5].addEventListener("click",e=>savedb.openUI());
+    editbtn[2].addEventListener("click",e=>pref.showModal());
+    editbtn[3].addEventListener("click",e=>help.showModal());
+    prefinp[8].addEventListener("click",e=>{for(let i=0;i<fieldHistory.length;i++){fieldHistory[i][0].length = 0;fieldHistory[i][1].length = 0};});
+    editbtn[1].addEventListener("click",e=>{for(let i=0;i<inps.length;i++){if(inps[i].classList.contains("active")){let finrep = inps[i].parentNode.parentNode.getElementsByClassName("finrep")[0];finrep.classList.toggle("hid");finrep.classList.toggle("sho")}}});
+    editbtn[4].addEventListener("click",e=>{const line = parseInt(prompt("Enter line number:"));if(line){for(let i=0;i<inps.length;i++){if(inps[i].classList.contains("active")){let curline = 1;for(let j=0;j<inps[i].value.length;j++){if(inps[i].value[j] === "\n" && ++curline === line){inps[i].setSelectionRange(j+1,j+1);inps[i].focus();break;}}}}}}); //goto
+    editbtn[5].addEventListener("click",e=>{historyMod.showModal();historyMod.getElementsByClassName("contentmodal")[0].innerText = logHistory()});
+    prefinp[9].addEventListener("input",updTS);
+    for(let i=0;i<pagem.length;i++){
+      pagem[i].getElementsByClassName("close")[0].addEventListener("click",e=>{pagem[i].close()});
     }
-
-    trig0.addEventListener("click", trig0f);
-    inp0.addEventListener("change", trig0f);
+    prefinp[2].addEventListener("input",e=>{
+       for(let i=0;i<inps.length;i++){
+         switch(prefinp[2].value){
+         case "ww":
+           inps[i].style="word-wrap:normal;"
+           break;
+         case "bw":
+           inps[i].style="word-wrap:break-word;";
+           break;
+         case "ab":
+           inps[i].style="word-break: break-all;";
+           break;
+         default:
+           inps[i].style="white-space: nowrap;";
+           break;
+         }
+       }
+    });
+    prefinp[6].addEventListener("input",e=>{updateen = prefinp[6].checked});
+    txt0.addEventListener("keydown",e=>{
+    if(e.key==="Enter"){
+      e.preventDefault();
+      consolee.value += ">" + txt0.value + "\n";
+      try{
+      let ret = playframe.contentWindow.eval(txt0.value);
+      consolee.value += ret + "\n";
+      if(typeof ret === "object" && !Array.isArray(ret)){
+        const props = Object.getOwnPropertyNames(ret);
+        for(let i=0;i<props.length;i++){consolee.value+=props[i]+": "+ret[props[i]]+"\n"};
+      };
+      }catch(e){consolee.value += e.stack + "\n";};
+      txt0.value = "";
+      consolee.scrollTop=consolee.scrollHeight;
+    }
+    });
+    filebtn[2].addEventListener("click",e=>{
+      dwnl(JSON.stringify([JSON.parse(localStorage.getItem("saveskey")),JSON.parse(localStorage.getItem("saves"))]),"FrostPlaygroundDB.fdb");
+    });
+    filebtn[3].addEventListener("click",e=>{
+      let yn = prompt("Are you sure you want to Import? (This is irreversable) (y/n)");
+      if(yn === "y"){
+        let uploader = document.createElement("input");
+        uploader.setAttribute("type","file");
+        uploader.setAttribute("accept",".fdb,.json");
+        uploader.addEventListener("change",e=>{
+          const fr = new FileReader;
+          fr.onload = ()=>{
+            try{
+            let jsondata = JSON.parse(fr.result);
+            localStorage.setItem("saveskey",JSON.stringify(jsondata[0]));
+            localStorage.setItem("saves",JSON.stringify(jsondata[1]));
+            }catch(e){alert("File Error: " + e)}
+          }
+          fr.readAsText(uploader.files[0]);
+          uploader.remove();
+        });
+        uploader.click();
+      }
+    })
+    updTs();
+    })
+    window.onbeforeunload = function(){
+      if(htmli.value != "" || cssi.value != "" || jsin.value != ""){return 'Are you sure you have saved your work?';}else{return;}
+    };
+    function countl(s,l){
+      let c = 0;
+      for(let i=0;i<s.length;i++){s[i]===l && c++}
+      return c;
+    }
   </script>
 </body>
-
-</html> 
+</html>
