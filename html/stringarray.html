@@ -38,26 +38,51 @@
 <body lang="en">
   <h1>String Array Maker</h1>
   <h2>split your strings!</h2>
-  <input type="text" id="inp0e"></input>
-  <input type="text" id="inp1e"></input>
   <button id="trig0e">Run</button>
+  <input id="inp1e"></input>
+  <textarea type="text" id="inp0e"></textarea>
   <textarea id="out0e"></textarea>
   <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
     let inp0 = document.getElementById("inp0e");
     let trig0 = document.getElementById("trig0e");
     let out0 = document.getElementById("out0e");
+	function parseRegex(s){
+      let o = "";
+      let prevSlash = false;
+      for(let i=0;i<s.length;i++){
+        if(prevSlash){
+          switch(s[i]){
+            case "\\":
+              o += "\\";
+              break;
+            case "n":
+              o += "\n";
+              break;
+            case "t":
+              o += "\t";
+              break;
+          }
+          prevSlash = false;
+        }else if(s[i] == "\\"){
+          prevSlash = true;
+        }else{
+          o += s[i];
+        }
+      }
+      return o;
+    }
     function trig0f(e) {
       let inpv = inp0.value;
 
-      let output = '["' + inpv.split(document.getElementById("inp1e").value).join('","') + '"]';
+      let output = '["' + inpv.split(parseRegex(document.getElementById("inp1e").value)).join('","') + '"]';
 
       out0.value = output;
       return;
     }
 
     trig0.addEventListener("click", trig0f);
-    inp0.addEventListener("keydown", (e)=>{if(e.key == "Enter"){e.preventDefault();trig0f(e)}});
+    inp0.addEventListener("change", trig0f);
   </script>
 </body>
 
