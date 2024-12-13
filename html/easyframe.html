@@ -203,7 +203,7 @@
     const openbtn = document.getElementById("openmodal");
     function trig0f(e) {
       let dwnelem = document.createElement("a");
-      if(inp1.value.includes(".")){dwnelem.download = inp1.value == "" ? "Export - EasyFrame.html" : inp1.value;}else{dwnelem.download = inp1.value == "" ? "Export - Textpad.txt" : inp1.value + ".txt";}
+      if(inp1.value.includes(".")){dwnelem.download = inp1.value == "" ? "Export - EasyFrame.html" : inp1.value;}else{dwnelem.download = inp1.value == "" ? "Export - EasyFrame.html" : inp1.value + ".html";}
       dwnelem.type = "text/html";
       let dwndata = new Blob([inp0.value]);
       dwnelem.href = URL.createObjectURL(dwndata);
