@@ -1,0 +1,267 @@
+<!DOCTYPE html><html><head>
+  <title>EasyFrame</title>
+  <style>
+    body {
+      padding: 0 5%;margin: 0;color: #EEE;font-family: Courier New, monospace;color-scheme: dark;font-size: 15px;margin-top: 5px;overflow: hidden;
+    }
+    input, button, select{
+      border: #444 outset 2px;
+      border-radius: 5px;
+      box-shadow: 0px 2px 10px rgba(0,0,0,0.4);
+      padding: 5px;
+      background: #111;
+      font-size: 15px;
+    }
+    button:active,input:active,select:active {border: #444 inset 2px;}
+    input {width: 40vw;}
+    textarea {
+      min-height: 100%;
+      width: calc(100% - 30px);
+      overflow-y: hidden;
+      padding: 0;
+      border: none;
+      font-size: inherit;
+      line-height: inherit;
+      resize: none;
+    }
+    .ed textarea:focus, input:focus, select:focus {outline: none;}
+    .ed {
+      display: flex;
+      min-height: 100%;
+      width: 100%;
+      font-size: 13px;
+      line-height: calc(1em + 1px);
+    }
+    .edcont {
+      display: block;
+      height: 80vh;
+      width: 90vw;
+      background: #221;
+      margin: 10px 0;
+      padding: 0;
+      border: 1px solid black;
+      border-radius: 5px;
+      box-shadow: 0px 5px 10px rgba(0,0,0,0.5);
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    .lnnumb{
+      color: #5ac91e;
+      width: 30px;
+      text-align: right;
+    }
+    .lnnumb span{
+      counter-increment: lnnumb;
+      display: block;
+      /*margin: 1px;*/
+    }
+    .lnnumb span::before{
+      content: counter(lnnumb);
+      margin: 0; /* Adjust spacing from edge */
+    }
+    .inps {
+      margin: 5px 0;
+    }
+    dialog {
+      border: none;
+      display: inline;
+      pointer-events: none;
+      opacity: 0;
+      font-family: Arial;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      /*animation: fadeOut .3s ease forwards;*/
+    }
+    dialog[open] {
+      opacity: 1;
+      pointer-events: auto;
+      animation: fadeIn .2s ease forwards;
+    }
+    dialog[open]::backdrop {
+      animation: fadeIn .5s ease forwards;
+    }
+    @keyframes fadeIn {
+      0% {opacity:0;}
+      100% {opacity:1;}
+    }
+    @keyframes fadeOut {
+      0% {opacity:1;}
+      100% {opacity:0;}
+    }
+    .closebtn {
+      font-size: 1.2em;
+      width: 1.7em;
+      height: 1.7em;
+      border: none;
+      border-radius: 50%;
+      background: none;
+      transition: background .1s linear, transform .1s linear;
+      background: rgba(0,0,0,0.3);
+    }
+    .closebtn:hover {background: rgba(0,0,0,0.1);transform: rotate(90deg)}
+    .closebtn:active {border:none}
+    dialog .topmodal .close {
+      margin-left: auto;
+      margin-right: 0;
+      display: block;
+    }
+    .pagemodal {min-width: 70vw;overflow:hidden;}
+    .pagemodal .contentmodal {
+      display: flex;
+      flex-direction: column;
+      height: 60vh;
+      overflow: auto;
+    }
+    dialog .headermodal h2 {
+      font-weight: normal;
+      margin: 0 0 20px 0;
+    }
+    dialog::backdrop {
+      background: rgba(0,0,0,0.3)
+    }
+    #mainframe {
+      border: none;
+      margin: none;
+      padding: none;
+      height: 100vh;
+      width: 100vw;
+      position:absolute;
+      left: 0;
+      top: 0;
+    }
+    #inputmodal {
+      z-index: 100;
+      background: rgba(0,0,0,0.2);
+      backdrop-filter: blur(5px);
+    }
+    #openmodal {
+      z-index: 99;
+      position: fixed;
+      right: 10px;
+      top: 10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 12px;
+      background: rgba(0,0,0,0.4);
+      font-weight: bold;
+      box-shadow: none;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <button id="openmodal">^</button>
+  <dialog id="inputmodal" class='pagemodal'>
+    <div class='topmodal'>
+      <button class='close closebtn'>×</button>
+    </div>
+    <div class='contentmodal'>
+      <div class="edcont">
+      <div class="ed">
+      <div class="lnnumb">
+      <span></span>
+      </div>
+      <textarea id="inp0e" style="white-space: nowrap"></textarea>
+      </div>
+      </div>
+      <div class="inps">
+      <input type="text" placeholder="Export - EasyFrame" id="inp1e"></input>
+      <input type="number" value="13" id="inp2e"></input>
+      </div>
+      <div id="buttons" class="inps">
+      <button id="trig0e">Download</button>
+      <button id="trig1e">Upload</button>
+      Wrap:
+      <select id="sel1">
+        <option value="nw">None</option>
+        <option value="bw">Break</option>
+        <option value="ww">Word</option>
+        <option value="ab">Break All</option>
+      </select>
+      <input type="file" style="display: none;" id="fi0e"></input>
+      </div>
+    </div>
+    <footer>Copyright 2024 Pacifiky All Rights Reserved</footer>
+  </dialog>
+  <iframe id="mainframe" srcdoc="<html style='font-family: Arial, sans-serif;'>Welcome to EasyFrame. Press the button on the top right to begin.<html>"></iframe>
+  <script>
+    let inp0 = document.getElementById("inp0e");
+    let inp1 = document.getElementById("inp1e");
+    let inp2 = document.getElementById("inp2e");
+    let trig0 = document.getElementById("trig0e");
+    let trig1 = document.getElementById("trig1e");
+    let fi0 = document.getElementById("fi0e");
+    let sel1 = document.getElementById("sel1");
+    let nums = document.getElementsByClassName("lnnumb")[0];
+    const pagem = document.getElementsByClassName("pagemodal");
+    const textmodal = document.getElementById("inputmodal");
+    const mainframe = document.getElementById("mainframe");
+    const openbtn = document.getElementById("openmodal");
+    function trig0f(e) {
+      let dwnelem = document.createElement("a");
+      if(inp1.value.includes(".")){dwnelem.download = inp1.value == "" ? "Export - EasyFrame.html" : inp1.value;}else{dwnelem.download = inp1.value == "" ? "Export - Textpad.txt" : inp1.value + ".txt";}
+      dwnelem.type = "text/html";
+      let dwndata = new Blob([inp0.value]);
+      dwnelem.href = URL.createObjectURL(dwndata);
+      document.body.appendChild(dwnelem);
+      dwnelem.click();
+      dwnelem.remove();
+      return;
+    };
+    function uploadfile(e){
+      const fr = new FileReader;
+      fr.onload = ()=>{inp0.value=fr.result;updNum(null)};
+      fr.readAsText(this.files[0]);
+    };
+    sel1.addEventListener("input",e=>{
+      switch(sel1.value){
+        case "ww":
+          inp0.style="word-wrap:normal;";
+          break;
+        case "bw":
+          inp0.style="word-wrap:break-word;";
+          break;
+        case "ab":
+          inp0.style="word-break: break-all;";
+          break;
+        default:
+          inp0.style="white-space: nowrap;";
+          break;
+      }
+    });
+    function updNum(e) {
+      let span = document.createElement("span");
+      nums.innerHTML = "";
+      for(let j=0;j<inp0.value.split("\n").length;j++){
+        nums.appendChild(span);
+        span = span.cloneNode();
+      };
+      mainframe.srcdoc = inp0.value;
+    };
+    for(let i=0;i<pagem.length;i++){pagem[i].getElementsByClassName("close")[0].addEventListener("click",e=>{pagem[i].close()});};
+    /*
+    document.body.addEventListener("keydown", (e)=>{
+      if(e.key == "o" && e.ctrlKey){
+        e.preventDefault();
+        if(!(textmodal.open)){textmodal.showModal();mainframe.srcdoc = "hi";}else{textmodal.close();mainframe.srcdoc = "bye";};
+      }
+    });
+    Document.body doesn't include iframe windows.
+    */
+    openbtn.addEventListener("click",e=>{
+      if(!(textmodal.open)){textmodal.showModal();}else{textmodal.close();};
+    });
+    trig0.addEventListener("click", trig0f);
+    trig1.addEventListener("click", e=>{fi0.click()});
+    inp0.addEventListener("keydown", (e)=>{if(e.key == "s" && e.ctrlKey){e.preventDefault();trig0f(e)}});
+    inp0.addEventListener("input",updNum);
+    inp0.addEventListener("keyup",updNum);
+    fi0.addEventListener("change",uploadfile);
+    inp2.addEventListener("change",e=>{inp0.parentNode.style = "font-size: " + inp2.value + "px";});
+  </script>
+</body>
+</html>
