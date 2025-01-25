@@ -336,6 +336,7 @@
   <h1>Your Message:</h1>
   <textarea id="um-inputmsg" class="um-blockarea" placeholder="Input"></textarea>
   <input type="text" placeholder="Redirection" id="um-red" class="largeinp"></input>
+  <input type="number" placeholder="Reditection delay (s)" id="um-redint" class="largeinp"></input>
   <input type="text" placeholder="Alert" id="um-alert" class="largeinp"></input>
   <input type="text" placeholder="Prompt" id="um-prmt" class="largeinp"></input>
   <div class="slidercontainer" title="Is the prompt link a webhook?">
@@ -351,6 +352,7 @@
     <button class="button largebtn" id="um-activate">Encode</button>
   </div>
   <textarea id="um-outputmsg" class="um-blockarea" placeholder="Output"></textarea>
+  <footer>Copyright 2025 Pacifiky. All rights reserved.<br/>Licenced under CC BY-NC-SA 4.0</footer>
   <script>
     const activ = document.getElementById("um-activate");
     const inputmsg = document.getElementById("um-inputmsg");
@@ -360,13 +362,16 @@
     const prompttext = document.getElementById("um-prmt");
     const prompturl = document.getElementById("um-plink");
     const ishook = document.getElementById("um-ishook");
+    const reddel = document.getElementById("um-redint");
     const params = new URLSearchParams(window.location.search);
     const msg = params.get("m");
     const red = params.get("r");
+    const redd = params.get("rd");
     const ale = params.get("a");
     const pro = params.get("p");
     const prourl = params.get("pu");
     const prohook = params.get("wh");
+    if(window.location.hash){inputmsg.value = window.location.hash.substr(1);}
     if(msg){inputmsg.value = msg;}
     if(ale){alert(ale);alerttext.value=ale;}
     if(pro){
@@ -382,11 +387,23 @@
             "Content-type": "application/json; charset=UTF-8"
           }
         }).then(()=>{
-          if(red){window.location.href = red;}
+          if(red && !prourl){
+            if(redd){
+              setTimeout(()=>{window.location.href=red},parseInt(redd));
+            }else{
+              window.location.href = red;/*redict.value=red;*/
+            }
+          }
         });
       }
     }
-    if(red && !prourl){window.location.href = red;/*redict.value=red;*/}
+    if(red && !prourl){
+      if(redd){
+        setTimeout(()=>{window.location.href=red},parseInt(redd));
+      }else{
+        window.location.href = red;/*redict.value=red;*/
+      }
+    }
     activ.addEventListener("click",()=>{
       let ostr = window.location.origin + window.location.pathname+"?";
       if(inputmsg.value){ostr+="m="+encodeURIComponent(inputmsg.value)+"&";}
@@ -399,10 +416,10 @@
           if(ishook.checked){ostr+="wh&";}
         }
       }
+      if(reddel.value){ostr+="rd="+reddel.value+"&";}
       outputmsg.value = ostr.substr(0,ostr.length-1);
     });
     outputmsg.value = window.location.href;
   </script>
-  <footer>Copyright 2025 Pacifiky. All rights reserved.<br/>Licenced under CC BY-NC-SA 4.0</footer>
 </body>
 </html>
