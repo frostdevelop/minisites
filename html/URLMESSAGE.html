@@ -371,7 +371,7 @@
     const pro = params.get("p");
     const prourl = params.get("pu");
     const prohook = params.get("wh");
-    if(window.location.hash){inputmsg.value = window.location.hash.substr(1);}
+    if(window.location.hash){inputmsg.value = decodeURIComponent(window.location.hash.substr(1));}
     if(msg){inputmsg.value = msg;}
     if(ale){alert(ale);alerttext.value=ale;}
     if(pro){
@@ -418,6 +418,9 @@
       }
       if(reddel.value){ostr+="rd="+reddel.value+"&";}
       outputmsg.value = ostr.substr(0,ostr.length-1);
+    });
+    window.addEventListener('hashchange',e=>{
+      inputmsg.value = decodeURIComponent(window.location.hash.substr(1));
     });
     outputmsg.value = window.location.href;
   </script>
