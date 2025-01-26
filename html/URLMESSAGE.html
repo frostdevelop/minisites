@@ -377,7 +377,9 @@
     if(pro){
       prompttext.value = pro;
       const proval = prompt(pro);
+      //alert(prourl);
       if(prourl){
+        //alert(red);
         prompturl.value = prourl;
         ishook.checked = prohook!=null;
         fetch(prourl, {
@@ -387,7 +389,9 @@
             "Content-type": "application/json; charset=UTF-8"
           }
         }).then(()=>{
-          if(red && !prourl){
+          //alert("calledss");
+          if(red){
+            //alert("called");
             if(redd){
               setTimeout(()=>{window.location.href=red},parseInt(redd));
             }else{
@@ -399,7 +403,7 @@
     }
     if(red && !prourl){
       if(redd){
-        setTimeout(()=>{window.location.href=red},parseInt(redd));
+        setTimeout(()=>{window.location.href=red},parseFloat(redd)*1000);
       }else{
         window.location.href = red;/*redict.value=red;*/
       }
