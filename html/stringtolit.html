@@ -338,9 +338,9 @@
     const controls = document.getElementById("controls").children;
     function trig0f(e) {
       let inpv = controls[0].value;
-
-      let output = inpv.replaceAll(controls[2].value,"\\"+controls[2].value).replaceAll('\n','\\n');
-
+    
+      let output = inpv.replaceAll("“","\"").replaceAll("”","\"").replaceAll(controls[2].value,"\\"+controls[2].value).replaceAll('\n','\\n');
+    
       controls[5].value = output;
       return;
     }
