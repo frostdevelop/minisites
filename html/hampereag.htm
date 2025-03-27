@@ -144,9 +144,9 @@
   <script>
     const controls = document.getElementById("controls").children;
     function trig0f(e) {
-      controls[4].innerText = (parseFloat(controls[0].value)*14316.392269148173/1200).toString(); //39370.1 inches per km, 3600 sec per hour. An eagle's caw is around 3 seconds and a hamburger is around 2.75 inches tall
-    	//14316.392269148173/1200 = 11.930326890956811
-      return;
+	  controls[4].innerText = (parseFloat(controls[0].value)*9842.51968503937/1200).toString(); //39370.1 inches per km, 3600 sec per hour. An eagle's caw is around 3 seconds and a hamburger is around 4 inches in diameter
+	  //9842.51968503937/1200 = 8.202099737532809
+	  return;
     }
     controls[2].addEventListener("click", trig0f);
   </script>
