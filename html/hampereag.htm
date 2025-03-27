@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>KM/H to Hamburgers per Eagle</title>
+  <style>
+    html {
+      color-scheme: dark;
+    }
+    
+    body {
+      padding: 2vh 5vw;
+      color: #EEE;
+      font-size: 20px;
+      font-family: Arial, sans-serif;
+      text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      background: #222;
+      scroll-behavior:smooth;
+    }
+
+    ::-webkit-scrollbar {width: 10px;}
+    ::-webkit-scrollbar-track {
+      background: #111;
+   }
+    ::-webkit-scrollbar-thumb {
+      background: #666;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {background:#777;}
+    ::-webkit-scrollbar-thumb:active {box-shadow: 0 0 10px white;}
+    
+    /*begin pacifikyneodark*/
+    :root {
+      --hover: #4f4f4f;
+      --border: 2px;
+      --radius: 45px;
+      --height: 6px;
+    }
+    textarea{resize:none;border-radius:20px !important;font-family:inherit;}
+    input:focus,select:focus,textarea:focus {outline:none;}
+    input:active,select:active,input[type="text"]:focus,.button:active {background-image: linear-gradient(to left top, #292929, #121212)};
+    .button,input,select {font-family: Tahoma, Arial, sans-serif;}
+    input:active,select:active,input[type="text"]:focus,.button:active {
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
+      border-color: rgba(0,0,0,0);
+    }
+    details,input,select,.button,.contsolid,textarea {border: var(--border) #292929 solid;box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);}
+    input,select,textarea {
+      transition: box-shadow 500ms ease, border 500ms ease;
+      background-image: linear-gradient(to left top, #121212, #292929);
+      color: currentcolor;
+      font-size: 13px;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: var(--radius);
+      min-width:0px;
+    }
+    select {background-color:#222}
+    input:hover,select:hover,.button:hover,textarea:hover {border-color: var(--hover);}
+    .smallinput {width:10em}
+    .button {
+      display: inline-flex;
+      flex-direction: row;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+      cursor: pointer;
+      background-image: linear-gradient(to left top, #121212, #292929);
+      color: currentColor;
+      transition: box-shadow 500ms ease, border 500ms ease;
+      font-size: 13px;
+      padding: 8px;
+      margin: 4px;
+      border-radius: var(--radius);
+      min-width: 100px;
+    }
+    .iconbutton {
+      min-width: 0;
+      width: 45px;
+      height: 45px;
+      font-size: 30px;
+      border-radius: 50%;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+    .icon {
+      display: inline;
+      height: 25px;
+      width: 25px;
+    }
+    .smallbutton {min-width:5em;}
+    details {
+      border-radius: 20px;
+      padding: 10px;
+      margin: 10px;
+      /*background-image: linear-gradient(to left top, #121212, #292929);*/
+    }
+    details[open] > summary {
+      border-bottom: rgba(255,255,255,0.2) solid 2px;
+      margin-bottom: 10px;
+    }
+    .indent {
+      margin: 5px 10px;
+    }
+    
+    hr {width:95%;border-color: #3d3d3d;margin:10px auto;}
+    h2 {
+      font-size: 17px;
+      font-weight: 600;
+    }
+    
+    h3 {
+      color: #bfbfbf;
+      font-weight: 500;
+      font-size: 12px;
+      margin: 2px;
+    }
+    
+    #content {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    /*End PacifikyNeoDark*/
+		.lmargin{
+			margin: 30px 0;
+		}
+		.ltext{font-size: 6vmax;}
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>KM/H to Hamburgers per Eagle.</h1>
+  <div id="controls">
+  <input type="text" placeholder='?km/h'></input> Km/H<br/>
+  <button class="button">Convert</button>
+  <hr class='lmargin'/>
+  <span class='ltext'>Null</span><br/>Ham/Eag
+  </div>
+	<hr class='lmargin'/>
+  <footer>Copyright 2025 Frost. All rights reserved.</footer>
+  <script>
+    const controls = document.getElementById("controls").children;
+    function trig0f(e) {
+      controls[4].innerText = (parseFloat(controls[0].value)*14316.392269148173/1200).toString(); //39370.1 inches per km, 3600 sec per hour. An eagle's caw is around 3 seconds and a hamburger is around 2.75 inches tall
+    	//14316.392269148173/1200 = 11.930326890956811
+      return;
+    }
+    controls[2].addEventListener("click", trig0f);
+  </script>
+</body>
+</html>
