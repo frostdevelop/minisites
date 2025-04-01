@@ -1,0 +1,87 @@
+<!DOCTYPE html><html><head>
+<title>Simple Image Viewer</title>
+</head>
+<body>
+<h1>Simple Image Viewer</h1>
+<label>
+<input type='file' accept='image/*' id='imginp' multiple></input>
+<span class='button large'>Upload</span>
+</label>
+<br/>
+<div id='imgcont'>
+</div>
+<hr/>
+<footer>
+Copyright Frost 2025<br/>
+Licensed under CC-BY-NC-SA 4.0
+</footer>
+<!-- creative commons attribution non commercial sharealike 4.0 -->
+</body><style>body {
+	padding: 0 20px;
+	margin:0;
+	font-family: Arial, sans-serif;
+	color-scheme: dark;
+	background: #222222;
+	color: white;
+	text-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+img {
+	width:100%;
+}
+h1 {
+	font-size: 40px;
+}
+input[type='file']{
+	display:none;
+}
+
+.button {
+	background: #006ef5; /*linear-gradient(to top right, #006ef5, #4599ff);*/
+	padding: 5px;
+	border: #555 solid 1px;
+	box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+	transition: background .2s ease, box-shadow .2s ease;
+	cursor:pointer;
+	font-size: 20px;
+}
+.button.large {
+	font-size: 30px;
+	padding: 10px;
+}
+.button:hover {
+	background: #333; /*linear-gradient(to top right, #111, #333);*/
+	box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+.button:active {
+	background: #666;
+}
+
+#imgcont {
+	background: white;
+	border: #BBB dashed 4px;
+	height: 60vh;
+	margin: 20px 0;
+	overflow-y: auto;
+}
+hr {
+	border-color: #666666;
+}</style><script>const input = document.getElementById('imginp');
+const imgcont = document.getElementById('imgcont');
+input.addEventListener('change',()=>{
+	if(input.files.length == 0){
+		alert('Please upload some files');
+		return;
+	}
+	imgcont.innerHTML = '';
+	for(let i=0;i<input.files.length;i++){
+		const img = document.createElement('img');
+		img.className = 'v-img';
+		img.src = URL.createObjectURL(input.files[i]);
+		img.onload = ()=>{
+			URL.revokeObjectURL(img.src);
+		}
+		img.title = input.files[i].name;
+		imgcont.appendChild(img);
+		imgcont.appendChild(document.createElement('hr'));
+	}
+});</script></html>
