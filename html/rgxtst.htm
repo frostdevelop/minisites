@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RegexTester</title>
+  <style>
+  	@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Doto:wght@100..900&display=swap');
+    html {
+      color-scheme: dark;
+    }
+    
+    body {
+      padding: 0;
+      margin:0;
+      color: #EEE;
+      font-size: 20px;
+      font-family: Arial, sans-serif;
+      /*color-scheme: dark;*/
+      background: #222;
+      scroll-behavior:smooth;
+      display:grid;
+      grid-template-rows: 0.1fr 1fr 0.08fr;
+      grid-template-columns: 1fr;
+      width:100vw;
+      height:100vh;
+      overflow:hidden;
+    }
+
+    ::-webkit-scrollbar {width: 10px;}
+    ::-webkit-scrollbar-track {
+      background: #111;
+   }
+    ::-webkit-scrollbar-thumb {
+      background: #666;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {background:#777;}
+    ::-webkit-scrollbar-thumb:active {box-shadow: 0 0 10px white;}
+    textarea:focus {outline:none;}
+    textarea{resize:none;}
+    .psu-area .psu-in{
+    	opacity: 1;
+    	border:none;
+    	border-radius:0;
+    	overflow:hidden;
+    	font-size:inherit;
+    	font-family:inherit;
+    	background:#111;
+    }
+    .psu-area .psu-out {
+    	position:relative;
+    }
+    .psu-area .psu-out,.psu-area .psu-curcont {
+    	z-index:5;
+    	pointer-events:none;
+    	display:inline-block;
+    }
+    .psu-area .psu-in,.psu-area .psu-curcont{
+    	position:absolute;
+    	top:0;
+    	left:0;
+    } 
+    .psu-area .psu-out, .psu-area .psu-curcont, .psu-area .psu-in{min-height:100%;width:100%;white-space:pre-wrap;word-wrap: inherit;overflow:hidden;padding: 10px;box-sizing:border-box;margin:0;vertical-align:top;}
+    .psu-area .psu-curcont,.psu-area .psu-in {
+    	color:rgba(0,0,0,0);
+    }
+    .psu-area {
+    	overflow:scroll;
+    	position: relative;
+    	overflow-x:hidden;
+    	overflow-y:auto;
+    	word-wrap: inherit;
+    }
+    .psu-like, .psu-area {
+    	color:white;
+    	font-family: 'DM Mono', monospace, Arial, sans-serif;
+    	font-size: 15px;
+    }
+    .psu-like {border:none;border-radius:0;background:#111;padding:10px;}
+    .psu-area .psu-cur {
+    	border:lightblue solid 1px;
+    	height: 0.95em;
+    	margin-top: 0.05em;
+    	box-sizing:border-box;
+    	animation: blink .5s ease-in infinite alternate .3s,bout .3s ease-in;
+    	position:absolute;
+    	border-radius: 2px;
+    	box-shadow: 0 0 2px lightblue;
+    }
+    .psu-area .psu-cont {
+    	position:relative;
+    	min-height: 100%;
+    	width: 100%;
+    }
+    @keyframes bout {
+    	0% {filter:blur(2px);}
+    }
+    @keyframes blink {
+    	100% {opacity: 0;}
+    }
+    @keyframes grow {
+    	0% {margin-right:-0.6em;color:#47ff47;text-shadow: 0 0 5px currentcolor;}
+    }
+    .grower {
+    	animation: grow .4s ease-out;
+    }
+    @keyframes types {
+    	0% {font-size:2em;filter:blur(1px)}
+    }
+    .types {
+    	z-index:10;
+    	animation: types .4s ease-out,grow .4s ease-out;
+    }
+    @keyframes shrink {
+    	0% {margin-right:0.6em;color:#47ff47;text-shadow: 0 0 3px currentcolor;}
+    }
+    .shrinker {
+    	animation: shrink .4s ease-out;
+    }
+    @keyframes light {
+    	0% {text-shadow: 0 0 3px currentcolor;}
+    }
+    .light{
+    	animation: light .4s ease-out;
+    }
+    .rgx-layout{
+    	display:grid;
+    	grid-template-columns: 1fr 0.5fr 0.5fr;
+    	grid-template-rows: 0.5fr 1fr 1fr;
+    	width:100%;
+		grid-column-gap: 5px;
+		grid-row-gap: 5px;
+		background:black;
+		overflow:hidden;
+		word-wrap: break-word;
+    }
+    .rgx-txt {
+    	grid-column: 1;
+    	grid-row: 2 / span 2;
+    }
+    .rgx-out {
+    	grid-column: 2/4;
+    	grid-row: 3;
+    }
+    .rgx-match {
+    	grid-column: 2/4;
+    	grid-row: 2;
+    }
+    #reg-htxt{
+      margin:0;
+      font-size: 40px;
+      font-weight:bold;
+      color: #3b86ff;
+      rotate: -20deg;
+      text-shadow: 0 5px 20px black;
+      transition: text-shadow .3s ease-out;
+    }
+    #reg-htxt:hover {
+      text-shadow: 0 0 20px currentcolor;
+    }
+    header {
+      display:flex;
+      align-items:center;
+      grid-area: 1 / 1 / 2 / 2;
+      padding: 10px;
+    }
+    #tst-main {
+      grid-area: 2 / 1 / 3 / 2;
+    }
+    footer {
+      padding: 5px;
+      font-size: 10px;
+      display:flex;
+      align-items:center;
+      grid-area: 3 / 1 / 4 / 2;
+      border-top: 2px black dashed;
+    }
+    .rgx-exp {
+      grid-area: 1 / 1 / 2 / 3
+    }
+    #reg-out {
+      margin: 0 auto;
+      text-align:center;
+      width:100%;
+      display:inline-block;
+    }
+    #hcont {
+      width: 100%;
+    }
+    .rgx-flg {
+      grid-area: 1 / 3 / 2 / 4;
+    }
+    .nowrap {
+      white-space: pre;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <header>
+      <span id='reg-htxt'>RT</span>
+      <span id='reg-out'>//gm</span>
+  </header>
+  <div class='rgx-layout' id='tstmain'>
+  	<div class="psu-area rgx-exp" data-placeholder='Enter expression here!'></div>
+  	<textarea class="psu-like rgx-flg" placeholder='Enter flags here!'>gm</textarea>
+  	<div class="psu-area rgx-txt" data-placeholder='Enter your text here!'></div>
+  	<textarea class="psu-like nowrap rgx-match" placeholder='Your matches go here'></textarea>
+  	<textarea class="psu-like nowrap rgx-out" placeholder='Your output goes here'></textarea>
+  </div>
+  <footer>Running v1.0<br/>Running EmeraldTXT v1.1a<br/>Copyright 2025 Frost. CC-BY-SA-NC 4.0</footer>
+  <script>
+    //EMTXT
+  	let lsel = 0;
+  	const psuareas = document.getElementsByClassName('psu-area');
+  	for(let i=0;i<psuareas.length;i++){
+  		const pinp = document.createElement('textarea');//psuareas[i].getElementsByClassName('psu-in')[0];
+  		const pout = document.createElement('span');//psuareas[i].getElementsByClassName('psu-out')[0];
+  		const ccnt = document.createElement('span');//psuareas[i].getElementsByClassName('psu-curcont')[0];
+  		const acont = document.createElement('div');
+  		const fcont = document.createElement('div');
+  		pinp.placeholder = psuareas[i].dataset.placeholder;
+  		pinp.value = psuareas[i].value = psuareas[i].dataset.value || '';
+  		pinp.classList.add('psu-in');
+  		pout.classList.add('psu-out');
+  		ccnt.classList.add('psu-curcont');
+  		acont.classList.add('psu-cont')
+  		acont.appendChild(pout);
+  		acont.appendChild(ccnt);
+  		acont.appendChild(pinp);
+  		psuareas[i].appendChild(acont);
+  		const updc = ()=>{
+  			ccnt.innerText = pinp.value.substr(0,pinp.selectionEnd-1);
+    		const espan = document.createElement('span');
+    		espan.innerText = pinp.value[pinp.selectionEnd-1] || '';
+    		ccnt.appendChild(espan);
+    		espan.classList.add(pinp.selectionEnd < lsel ? 'shrinker' : 'grower');
+        	const cur = document.createElement('span');cur.classList.add('psu-cur');ccnt.appendChild(cur);
+        	lsel = pinp.selectionEnd;
+  		}
+    	const updd = e=>{
+    		const san = document.createElement('p');
+    		san.innerText = pinp.value;const sant = san.innerHTML;san.remove();
+    		pout.innerHTML = sant;
+    		switch(e.type){
+    		case 'input':
+    			//alert('bye')
+    			psuareas[i].value = pinp.value;
+    			const espan = document.createElement('span');
+    			ccnt.innerText = pinp.value.substr(0,pinp.selectionEnd-1);
+    			//alert(e.inputType);
+    			switch(e.inputType){
+    				case 'insertText':
+    				case 'insertFromPaste':
+    				case 'insertParagraph':
+    				case 'insertLineBreak':
+    					espan.classList.add('types');
+    					break;
+    				case 'deleteWordBackward':
+    				case 'deleteByCut':
+    				case 'deleteContentBackward':
+    					espan.classList.add('shrinker');
+    					break;
+    			}
+    			espan.innerText = pinp.value[pinp.selectionEnd-1] || '';
+    			ccnt.appendChild(espan);
+    			const cur = document.createElement('span');cur.classList.add('psu-cur');ccnt.appendChild(cur);
+    			lsel = pinp.selectionEnd;
+    			break;
+    		case 'selectionchange':
+    			if(pinp.selectionEnd != lsel){
+    				updc();
+    			}
+    			break;
+    		}
+    	};
+    	pinp.addEventListener('selectionchange',updd);
+    	pinp.addEventListener('keydown',e=>{if(e.key == 'Tab'){e.preventDefault();const start = pinp.selectionStart;pinp.value = pinp.value.substr(0,pinp.selectionEnd)+'\t'+pinp.value.substr(pinp.selectionEnd);pinp.selectionEnd=pinp.selectionStart=start+1;pinp.dispatchEvent(new Event('selectionchange'));}}); //new InputEvent('input',{inputType:'insertText',ata:'\t'})
+    	pinp.addEventListener('input',updd);
+    	pinp.addEventListener('focus',updc);
+    	pinp.addEventListener('focusout',()=>{ccnt.innerHTML = '';});
+    	psuareas[i].update = s=>{
+    	  pinp.value = s;
+    	  pinp.dispatchEvent(new Event('selectionchange'));
+    	}
+    	//pinp.addEventListener('mousdown',updd);
+    	//pinp.addEventListener('mousemove',updd);
+  	}
+  	
+  	//Start rgx
+  	//const maintst = document.getElementById('tstmain');
+  	const dispexp = document.getElementById('reg-out');
+  	const rgxs = document.getElementsByClassName('rgx-layout');
+  	for(let i=0;i<rgxs.length;i++){
+  	  const expinp = rgxs[i].getElementsByClassName('rgx-exp')[0];
+  	  const txtinp = rgxs[i].getElementsByClassName('rgx-txt')[0];
+  	  const matchout = rgxs[i].getElementsByClassName('rgx-match')[0];
+  	  const outout = rgxs[i].getElementsByClassName('rgx-out')[0];
+  	  const flginp = rgxs[i].getElementsByClassName('rgx-flg')[0];
+  	  const updexp = ()=>{
+  	    dispexp.innerText = '/'+(expinp.value || '')+'/'+(flginp.value||'');
+  	    try{
+  	      if(expinp.value){
+  	        const exp = new RegExp(expinp.value,flginp.value);
+  	        let marr;
+  	        let out = '';
+  	        let amt = 0;
+  	        while((marr = exp.exec(txtinp.value || '')) !== null){
+  	          out+=marr.join(' | ')+'\n';
+  	          amt++;
+  	        }
+  	        matchout.value = out;
+  	        outout.value = 'Success\nMatches:'+amt.toString();
+  	      }else{
+  	        throw new SyntaxError('Empty expression!');
+  	      }
+  	    }catch(e){outout.value = e.stack;}
+  	  }
+  	  expinp.addEventListener('input',updexp);
+  	  flginp.addEventListener('input',updexp);
+  	  txtinp.addEventListener('input',updexp);
+  	}
+  </script>
+</body>
+</html>
