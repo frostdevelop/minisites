@@ -58,7 +58,6 @@
     }
     .psu-area {
     	resize:both;
-    	font-size:30px;
     	overflow:scroll;
     	position: relative;
     	height: 1020px;
@@ -143,18 +142,22 @@
 
 <body lang="en">
   <h1>EmeraldText</h1>
-  <div class="psu-area" data-placeholder='Type "rainbow"!'>
+  <div class="psu-area" data-placeholder='Type "rainbow"!' style='font-size:30px'>
   <!--
   <span class='psu-out'></span>
   <span class='psu-curcont'></span>
   <textarea class='psu-in'></textarea>
   -->
   </div>
+  <input type='number' id='em-fsize' min='1' value='30' title='Font Size'/>
+  <hr/>
   <footer>Copyright 2025 Frost. CC-BY-SA-NC 4.0</footer>
   <script>
   	let ltime = null;
   	let lsel = 0;
+	const infsize = document.getElementById('em-fsize');
   	const psuareas = document.getElementsByClassName('psu-area');
+	infsize.addEventListener('input',()=>{psuareas[0].style.fontSize = infsize.value+'px';})
   	for(let i=0;i<psuareas.length;i++){
   		const pinp = document.createElement('textarea');//psuareas[i].getElementsByClassName('psu-in')[0];
   		const pout = document.createElement('span');//psuareas[i].getElementsByClassName('psu-out')[0];
