@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EmeraldText</title>
+  <style>
+  	@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Doto:wght@100..900&display=swap');
+    html {
+      color-scheme: dark;
+    }
+    
+    body {
+      padding: 2vh 5vw;
+      color: #EEE;
+      font-size: 20px;
+      font-family: Arial, sans-serif;
+      /*color-scheme: dark;*/
+      background: #222;
+      scroll-behavior:smooth;
+    }
+
+    ::-webkit-scrollbar {width: 10px;}
+    ::-webkit-scrollbar-track {
+      background: #111;
+   }
+    ::-webkit-scrollbar-thumb {
+      background: #666;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {background:#777;}
+    ::-webkit-scrollbar-thumb:active {box-shadow: 0 0 10px white;}
+    textarea:focus {outline:none;}
+    textarea{resize:none;}
+    .psu-area .psu-in{
+    	opacity: 1;
+    	border:none;
+    	border-radius:0;
+    	overflow:hidden;
+    	font-size:inherit;
+    	font-family:inherit;
+    	background: #111;
+    }
+    .psu-area .psu-out {
+    	position:relative;
+    }
+    .psu-area .psu-out,.psu-area .psu-curcont {
+    	z-index:5;
+    	pointer-events:none;
+    	display:inline-block;
+    }
+    .psu-area .psu-in,.psu-area .psu-curcont{
+    	position:absolute;
+    	top:0;
+    	left:0;
+    } 
+    .psu-area .psu-out, .psu-area .psu-curcont, .psu-area .psu-in{min-height:100%;width:100%;white-space:pre-wrap;word-wrap: break-word;overflow:hidden;padding: 10px;box-sizing:border-box;margin:0;vertical-align:top;}
+    .psu-area .psu-curcont,.psu-area .psu-in {
+    	color:rgba(0,0,0,0);
+    }
+    .psu-area {
+    	resize:both;
+    	font-size:30px;
+    	overflow:scroll;
+    	position: relative;
+    	height: 1020px;
+    	width: 100%;
+    	font-family: 'DM Mono', monospace, Arial, sans-serif;
+    	overflow-x:hidden;
+    	overflow-y:auto;
+    }
+    .psu-area .psu-cur {
+    	border:lightblue solid 1px;
+    	height: 0.95em;
+    	margin-top: 0.05em;
+    	box-sizing:border-box;
+    	animation: blink .5s ease-in infinite alternate .3s,bout .3s ease-in;
+    	position:absolute;
+    	border-radius: 2px;
+    	box-shadow: 0 0 2px lightblue;
+    }
+    .psu-area .psu-cont {
+    	position:relative;
+    	min-height: 100%;
+    	width: 100%;
+    }
+    @keyframes rainbk {
+    	0% {background:red;}
+    	17% {background:orange;}
+    	34% {background:yellow;}
+    	51% {background:green;}
+    	68% {background:blue;}
+    	85% {background:purple;}
+    	100% {background:red;}
+    } 
+    @keyframes bksc {
+    	0% {background-position:0%}
+    	100% {background-position:100%}
+    }
+    @keyframes bout {
+    	0% {filter:blur(2px);}
+    }
+    @keyframes blink {
+    	100% {opacity: 0;}
+    }
+    .rainbow {
+    	background: linear-gradient(in hsl longer hue to right, red 0 100%);
+    	background-size: 2000%;
+    	/*animation:rainbk 4s linear infinite;*/
+    	animation:bksc 4s linear infinite;
+    	border-radius: 5px;
+    	background-clip:text;
+    	color:rgba(0,0,0,0);
+    	font-weight: 600;
+    }
+    @keyframes grow {
+    	0% {margin-right:-0.6em;color:#47ff47;text-shadow: 0 0 5px currentcolor;}
+    }
+    .grower {
+    	animation: grow .4s ease-out;
+    }
+    @keyframes types {
+    	0% {font-size:2em;filter:blur(1px)}
+    }
+    .types {
+    	z-index:10;
+    	animation: types .4s ease-out,grow .4s ease-out;
+    }
+    @keyframes shrink {
+    	0% {margin-right:0.6em;color:#47ff47;text-shadow: 0 0 3px currentcolor;}
+    }
+    .shrinker {
+    	animation: shrink .4s ease-out;
+    }
+    @keyframes light {
+    	0% {text-shadow: 0 0 3px currentcolor;}
+    }
+    .light{
+    	animation: light .4s ease-out;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>EmeraldText</h1>
+  <div class="psu-area" data-placeholder='Type "rainbow"!'>
+  <!--
+  <span class='psu-out'></span>
+  <span class='psu-curcont'></span>
+  <textarea class='psu-in'></textarea>
+  -->
+  </div>
+  <footer>Copyright 2025 Frost. CC-BY-SA-NC 4.0</footer>
+  <script>
+  	let ltime = null;
+  	let lsel = 0;
+  	const psuareas = document.getElementsByClassName('psu-area');
+  	for(let i=0;i<psuareas.length;i++){
+  		const pinp = document.createElement('textarea');//psuareas[i].getElementsByClassName('psu-in')[0];
+  		const pout = document.createElement('span');//psuareas[i].getElementsByClassName('psu-out')[0];
+  		const ccnt = document.createElement('span');//psuareas[i].getElementsByClassName('psu-curcont')[0];
+  		const acont = document.createElement('div');
+  		const fcont = document.createElement('div');
+  		pinp.placeholder = psuareas[i].dataset.placeholder;
+  		pinp.classList.add('psu-in');
+  		pout.classList.add('psu-out');
+  		ccnt.classList.add('psu-curcont');
+  		acont.classList.add('psu-cont')
+  		acont.appendChild(pout);
+  		acont.appendChild(ccnt);
+  		acont.appendChild(pinp);
+  		psuareas[i].appendChild(acont);
+  		const updc = ()=>{
+  			ccnt.innerText = pinp.value.substr(0,pinp.selectionEnd-1);
+    		const espan = document.createElement('span');
+    		espan.innerText = pinp.value[pinp.selectionEnd-1] || '';
+    		ccnt.appendChild(espan);
+    		espan.classList.add(pinp.selectionEnd < lsel ? 'shrinker' : 'grower');
+        	const cur = document.createElement('span');cur.classList.add('psu-cur');ccnt.appendChild(cur);
+        	lsel = pinp.selectionEnd;
+  		}
+    	const updd = e=>{
+    		const san = document.createElement('p');
+    		san.innerText = pinp.value;const sant = san.innerHTML;san.remove();
+    		pout.innerHTML = sant.replaceAll(/[rR][aA][iI][nN][bB][oO][wW]/g,s=>{return '<span class="rainbow">'+s+'</span>'});
+    		pout.classList.add('light');
+    		if(!ltime){ltime = setTimeout(()=>{pout.classList.remove('light');ltime = null},400)};
+    		switch(e.type){
+    		case 'input':
+    			//alert('bye')
+    			const espan = document.createElement('span');
+    			ccnt.innerText = pinp.value.substr(0,pinp.selectionEnd-1);
+    			//alert(e.inputType);
+    			switch(e.inputType){
+    				case 'insertText':
+    				case 'insertFromPaste':
+    				case 'insertParagraph':
+    				case 'insertLineBreak':
+    					espan.classList.add('types');
+    					break;
+    				case 'deleteWordBackward':
+    				case 'deleteByCut':
+    				case 'deleteContentBackward':
+    					espan.classList.add('shrinker');
+    					break;
+    			}
+    			espan.innerText = pinp.value[pinp.selectionEnd-1] || '';
+    			ccnt.appendChild(espan);
+    			const cur = document.createElement('span');cur.classList.add('psu-cur');ccnt.appendChild(cur);
+    			lsel = pinp.selectionEnd;
+    			break;
+    		case 'selectionchange':
+    			if(pinp.selectionEnd != lsel){
+    				updc();
+    			}
+    			break;
+    		}
+    	};
+    	pinp.addEventListener('selectionchange',updd);
+    	pinp.addEventListener('keydown',e=>{if(e.key == 'Tab'){e.preventDefault();const start = pinp.selectionStart;pinp.value = pinp.value.substr(0,pinp.selectionEnd)+'\t'+pinp.value.substr(pinp.selectionEnd);pinp.selectionEnd=pinp.selectionStart=start+1;pinp.dispatchEvent(new Event('selectionchange'));}}); //new InputEvent('input',{inputType:'insertText',ata:'\t'})
+    	pinp.addEventListener('input',updd);
+    	pinp.addEventListener('focus',updc);
+    	pinp.addEventListener('focusout',()=>{ccnt.innerHTML = '';});
+    	//pinp.addEventListener('mousdown',updd);
+    	//pinp.addEventListener('mousemove',updd);
+  	}
+  </script>
+</body>
+</html>
