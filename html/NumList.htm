@@ -214,7 +214,9 @@
       const midi = (output.length/2)-0.5;
       const lowqt = midi-(output.length/4);
       const upqt = midi+(output.length/4);
-      controls[3].value = output.join(' ')+'\nLowest: '+Math.min(...output)+'\nHighest: '+Math.max(...output)+'\nMedian: '+((midi % 2) ? ((output[Math.floor(midi)]+output[Math.ceil(midi)])/2) : output[midi]).toString()+'\nLower Quartile: '+((lowqt % 2) ? ((output[Math.floor(lowqt)]+output[Math.ceil(lowqt)])/2) : output[lowqt]).toString()+'\nUpper Quartile: '+((upqt % 2) ? ((output[Math.floor(upqt)]+output[Math.ceil(upqt)])/2) : output[upqt]).toString()+'\nMean: '+(total/output.length).toString()+'\nTotal: '+total.toString();
+      const low = Math.min(...output);
+      const high = Math.max(...output);
+      controls[3].value = output.join(' ')+'\nLowest: '+low.toString()+'\nHighest: '+high.toString()+'\nRange: '+(high-low).toString()+'\nMedian: '+((midi % 2) ? ((output[Math.floor(midi)]+output[Math.ceil(midi)])/2) : output[midi]).toString()+'\nLower Quartile: '+((lowqt % 2) ? ((output[Math.floor(lowqt)]+output[Math.ceil(lowqt)])/2) : output[lowqt]).toString()+'\nUpper Quartile: '+((upqt % 2) ? ((output[Math.floor(upqt)]+output[Math.ceil(upqt)])/2) : output[upqt]).toString()+'\nMean: '+(total/output.length).toString()+'\nTotal: '+total.toString();
       //}catch(e){alert(e.stack)}
       return;
     }
