@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>$test</title>
+  <style>
+    html {
+      color-scheme: dark;
+    }
+    
+    body {
+      padding: 2vh 5vw;
+      color: #EEE;
+      font-size: 20px;
+      font-family: Arial, sans-serif;
+      /*color-scheme: dark;*/
+      text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      background: #222;
+      scroll-behavior:smooth;
+    }
+
+    ::-webkit-scrollbar {width: 10px;}
+    ::-webkit-scrollbar-track {
+      background: #111;
+   }
+    ::-webkit-scrollbar-thumb {
+      background: #666;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {background:#777;}
+    ::-webkit-scrollbar-thumb:active {box-shadow: 0 0 10px white;}
+    
+    /*begin pacifikyneodark*/
+    :root {
+      --hover: #4f4f4f;
+      --border: 2px;
+      --radius: 45px;
+      --height: 6px;
+    }
+    textarea{resize:none;border-radius:20px !important;font-family:inherit;}
+    .neo-lta{width: 40%;height:60vh;border-radius:10px !important;background:#222;box-sizing:border-box;vertical-align:top;overflow-x:auto;white-space:pre;}
+    input:focus,select:focus,textarea:focus {outline:none;}
+    input:active,select:active,input[type="text"]:focus,.button:active {background-image: linear-gradient(to left top, #292929, #121212)};
+    .button,input,select {font-family: Tahoma, Arial, sans-serif;}
+    input:active,select:active,input[type="text"]:focus,.button:active {
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
+      border-color: rgba(0,0,0,0);
+    }
+    details,input,select,.button,.contsolid,textarea {border: var(--border) #292929 solid;box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);}
+    input,select,textarea {
+      transition: box-shadow 500ms ease, border 500ms ease;
+      background-image: linear-gradient(to left top, #121212, #292929);
+      color: currentcolor;
+      font-size: 13px;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: var(--radius);
+      min-width:0px;
+    }
+    select {background-color:#222}
+    input:hover,select:hover,.button:hover,textarea:hover {border-color: var(--hover);}
+    .smallinput {width:10em}
+    .button {
+      display: inline-flex;
+      flex-direction: row;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+      cursor: pointer;
+      background-image: linear-gradient(to left top, #121212, #292929);
+      color: currentColor;
+      transition: box-shadow 500ms ease, border 500ms ease;
+      font-size: 13px;
+      padding: 8px;
+      margin: 4px;
+      border-radius: var(--radius);
+      min-width: 100px;
+    }
+    .iconbutton {
+      min-width: 0;
+      width: 45px;
+      height: 45px;
+      font-size: 30px;
+      border-radius: 50%;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+    .icon {
+      display: inline;
+      height: 25px;
+      width: 25px;
+    }
+    .smallbutton {min-width:5em;}
+    details {
+      border-radius: 20px;
+      padding: 10px;
+      margin: 10px;
+      /*background-image: linear-gradient(to left top, #121212, #292929);*/
+    }
+    details[open] > summary {
+      border-bottom: rgba(255,255,255,0.2) solid 2px;
+      margin-bottom: 10px;
+    }
+    .gbtn {
+      background-image: linear-gradient(135deg,#33ff33,#11c011);
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.8),-2px -2px var(--height) #33ff33;
+      border-color:#11c011;
+    }
+    .gbtn:hover {border-color:#33ff33;}
+    .gbtn:active {background: linear-gradient(-45deg,#33ff33,#11c011);box-shadow: inset 2px 2px var(--height) rgba(0,0,0,0.8),inset -2px -2px var(--height) #33ff33;}
+    .rbtn {
+      background-image: linear-gradient(135deg,#f95353,#a51212);
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.8),-2px -2px var(--height) #f95353;
+      border-color: #a51212;
+    }
+    .rbtn:hover {border-color: #f95353}
+    .rbtn:active {background-image: linear-gradient(-45deg,#f95353,#a51212);box-shadow: inset 2px 2px var(--height) rgba(0,0,0,0.8), inset -2px -2px var(--height) #f95353;}
+    .disabled {
+      background: #ffcb85 !important;
+      color: #595959 !important;
+      box-shadow: none !important;
+    }
+    .indent {
+      margin: 5px 10px;
+    }
+    
+    hr {width:95%;border-color: #3d3d3d;margin:0 auto;}
+    h2 {
+      font-size: 17px;
+      font-weight: 600;
+    }
+    
+    h3 {
+      color: #bfbfbf;
+      font-weight: 500;
+      font-size: 12px;
+      margin: 2px;
+    }
+    
+    #content {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .iconbutton {
+      width: 45px;
+      height: 45px;
+    }
+    
+    .icon {
+      display: inline;
+      height: 25px;
+      width: 25px;
+    }
+    
+    .buttonicon {
+      width: 20px;
+      height: 20px;
+    }
+    
+    label.iconbutton {
+      height: 25px !important;
+      width: 25px !important;
+    }
+    
+    label {
+      font-weight: 600;
+      font-size: 12px;
+    }
+    
+    .center-container-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .contanter-padding {
+      margin: 5px;
+      align-items: left;
+    }
+    
+    footer {
+      margin: 10px;
+      font-size: 10px;
+    }
+    /*End PacifikyNeoDark*/
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>Hardy-weinberg Tool</h1>
+  <div id="controls">
+  <button class="button">Run</button>
+  <br/>
+  <textarea class='neo-lta' placeholder='Homozygous Recessive' title='Homozygous Recessive'></textarea>
+  <textarea class='neo-lta' placeholder='Output' title='Output'></textarea>
+  </div>
+  <footer>Copyright 2025 Frost. CC-BY-SA-NC 4.0</footer>
+  <script>
+    const controls = document.getElementById("controls").children;
+    function trig0f(e) {
+      let inpv = controls[2].value;
+
+      let rr = parseFloat(inpv);
+      const r = Math.sqrt(rr);
+      const R = 1-r;
+
+      controls[3].value = 'Homozygous Recessive: '+rr.toString()+'\nHeterozygous: '+(r*R*2).toString()+'\nHomozygous Dominant: '+(R**2).toString()+'\nFreq Reccessive: '+r.toString()+'\nFreq Dominant: '+R.toString();
+      return;
+    }
+    controls[0].addEventListener("click", trig0f);
+    controls[2].addEventListener("change", e=>{e.preventDefault();trig0f(e)});
+  </script>
+</body>
+</html>
