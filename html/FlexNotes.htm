@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Flex Notes</title>
+  <style>
+    body {
+      color: #EEE;
+      font-size: 20px;
+      font-family: Arial, sans-serif;
+      padding:0;
+      margin:0;
+      overflow: hidden;
+    }
+    #sn-main {
+      padding:0;
+      margin:0;
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    
+    .sn-row {
+      width: 100vw;
+      height: 100%;
+      display: grid;
+      grid-template-rows: 1fr;
+    }
+    
+    .sn-area {
+      border-radius:0;
+      resize: none;
+      width: 1fr;
+      height: 1fr;
+      border: 3px black solid;
+      padding: 5px;
+    }
+    
+    .sn-row-cont {
+      display:flex;
+      algin-items:center;
+      align-content:center;
+      min-height: 0;
+      max-width: 150vw;
+    }
+    
+    .sn-add {
+      background: linear-gradient(to top right, blue, #7db1ff);
+      color: white;
+      border: darkblue 2px solid;
+      box-shadow: 0px 0px 20px lightblue;
+      font-size: 45px;
+      border-radius: 50px;
+      width: 50px;
+      height: 50px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin: 5px;
+      transition: transform .3s ease;
+    }
+    
+    .sn-add-red {
+      background: linear-gradient(to top right, #ad0202, #ff5c5c);
+      border-color: #850505;
+    }
+    
+    .sn-row-add .sn-add {
+      	transform: translateX(120%);
+    }
+    
+    .sn-row-add {
+    	display:flex;
+    	flex-direction: column;
+    	justify-content: center;
+    	/*right: 10px; calc - 10px)*/
+      	transform:translate(-100%, 0%);
+      	padding-right: 10px;
+      	background: linear-gradient(to left, rgba(0,0,0,0.5), rgba(0,0,0,0));
+      	opacity:0;
+      	transition: opacity .3s linear;
+    }
+    
+    .sn-col-add .sn-add {
+      	transform: translateY(150%);
+    }
+    
+    .sn-col-add {
+    	display:flex;
+    	justify-content:center;
+    	width: 100%;
+    	bottom: 0px;
+    	padding-bottom: 10px;
+    	position: absolute;
+    	opacity: 0;
+      	background: linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0));
+      	transition: opacity .3s linear;
+    }
+    
+    .sn-row-add:hover {
+    	opacity: 1;
+    }
+    
+    .sn-col-add:hover {
+    	opacity: 1;
+    }
+    
+    .sn-row-add:hover .sn-add {
+    	transform:translateX(0%);
+    }
+    
+    .sn-col-add:hover .sn-add {
+    	transform:translateY(0%);
+    }
+    
+    .sn-spacer {
+    	position:absolute;top:0;left:0;pointer-events:none;
+    }
+    
+    .sn-divider-cont {
+    	width:100vw;transform:translate(0%,-50%);
+    	display:flex;
+    	align-items:center;
+    	justify-content:center;
+    	pointer-events: all;
+    	cursor: row-resize;
+    	position:absolute;
+    }
+    
+    .sn-divider-cont:active .sn-divider {
+    	width: 100vw;
+    }
+    
+    .sn-divider-cont:hover .sn-divider {
+    	opacity:1;
+    }
+    
+    .sn-divider-cont .sn-divider {
+    	width:90vw;
+    	opacity:0.75;
+    	background: white;
+    	height: 3px;
+    	transition: width .2s ease-out, opacity .2s ease-out;
+    }
+    
+    /*begin pacifikyneodark*/
+    :root {
+      --hover: #4f4f4f;
+      --border: 2px;
+      --radius: 45px;
+      --height: 6px;
+    }
+    input:focus,select:focus,textarea:focus {outline:none;}
+    input:active,select:active,input[type="text"]:focus,.button:active {background-image: linear-gradient(to left top, #292929, #121212)};
+    .button,input,select {font-family: Tahoma, Arial, sans-serif;}
+    input:active,select:active,input[type="text"]:focus,.button:active {
+      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
+      border-color: rgba(0,0,0,0);
+    }
+    details,input,select,.button,.contsolid {border: var(--border) #292929 solid;box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);}
+    input,select {
+      transition: box-shadow 500ms ease, border 500ms ease;
+      background-image: linear-gradient(to left top, #121212, #292929);
+      color: currentcolor;
+      font-size: 13px;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: var(--radius);
+      min-width:0px;
+    }
+    select {background-color:#222}
+    input:hover,select:hover,.button:hover {border-color: var(--hover);}
+    /*End PacifikyNeoDark*/
+    
+    #sn-header-cont {
+    	width: 100vw;
+    	height: 5px;
+    	position:absolute;
+    	top:0;
+    	left:0;
+    }
+    
+    #sn-header-cont:hover .sn-header {
+    	transform: translate(0%,0%);
+    	box-shadow: 0 0 10px black;
+    }
+    
+    .sn-header {
+    	transform: translate(0%,-100%);
+    	transition: transform .3s ease, box-shadow .3s ease;
+    	backdrop-filter: brightness(0.5) blur(5px);
+    	height: 30px;
+    	display:block;
+    	width: 100%;
+    	display:flex;
+    	align-items:center;
+    	flex-direction:row;
+    }
+    
+    .sn-header-menu {
+    	display: inline-block;
+    }
+    
+    .sn-header-btn {
+    	border-radius: 5px;
+    	padding: 3px 5px;
+    	margin: 2px;
+    	border: none;
+    	background: none;
+    	color: white;
+    	transition: background .2s linear;
+    }
+    
+    .sn-header-btn:hover {
+    	background: rgba(0,0,0,0.5);
+    }
+    
+    .sn-header-version {
+    	margin-left: auto;
+    	margin-right: 10px;
+    	font-size: 20px;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <div id='sn-main' style='grid-template-rows: 1fr;'>
+    <div class='sn-row-cont'></div>
+  </div>
+  <div id='sn-over'>
+  	<div class='sn-col-add'>
+  		<button class='sn-add'>+</button>
+  		<button class='sn-add sn-add-red'>-</button>
+  	</div>
+  	<div id='sn-header-cont'>
+  		<div class='sn-header'>
+  			<div class='sn-header-menu' id='sn-file-btn'>
+  				<button class='sn-header-btn'>Save</button>
+  			</div>
+  			<div class='sn-header-menu' id='sn-edit-btn'>
+  				<button class='sn-header-btn'>Load</button>
+  			</div>
+  			<div class='sn-header-version'>
+  				v0.1.0
+  			</div>
+  		</div>
+  	</div>
+  </div>
+  <!--
+    <div class='sn-row-cont'>
+      <div class='sn-row' style='grid-template-columns: 1fr;'>
+      <textarea class='sn-area'></textarea>
+      </div>
+      <div class='sn-row-add'>
+      	<button class='sn-add'>+</button>
+      </div>
+      <div class='sn-vdiv'></div>
+    </div>
+  -->
+  <script>
+  	class SNRow {
+  		constructor(elm){
+  			this.add = this.add.bind(this);
+  			this.rem = this.rem.bind(this);
+  			this.cont = elm;
+  			this.row = document.createElement('div');
+  			this.row.classList.add('sn-row');
+  			this.row.style.gridTemplateColumns = '1fr';
+  			this.cont.appendChild(this.row)
+  			const initArea = document.createElement('textarea');
+  			initArea.classList.add('sn-area');
+  			this.row.appendChild(initArea);
+  			this.areas = [initArea];
+  			const addCont = document.createElement('div');
+  			addCont.classList.add('sn-row-add');
+  			this.cont.appendChild(addCont);
+  			this.addBtn = document.createElement('button');
+  			this.addBtn.classList.add('sn-add');
+  			this.addBtn.appendChild(document.createTextNode('+'));
+  			addCont.appendChild(this.addBtn);
+  			this.remBtn = document.createElement('button');
+  			this.remBtn.className = 'sn-add sn-add-red';
+  			this.remBtn.appendChild(document.createTextNode('-'));
+  			addCont.appendChild(this.remBtn);
+  			this.addBtn.addEventListener('click',this.add);
+  			this.remBtn.addEventListener('click',this.rem);
+  		}
+  		add(){
+  			const newArea = document.createElement('textarea');
+  			newArea.classList.add('sn-area');
+  			this.row.appendChild(newArea);
+  			this.areas.push(newArea);
+  			this.row.style.gridTemplateColumns = '1fr';
+  			for(let i=1;i<this.areas.length;i++){
+  				this.row.style.gridTemplateColumns += ' 1fr';
+  			}
+  		}
+  		rem(){
+  			if(this.areas.length == 1 || !(confirm('Are you sure you want to delete the textarea?'))){return;}
+  			const remArea = this.areas.pop();
+  			remArea.remove();
+  			this.row.style.gridTemplateColumns = '1fr';
+  			for(let i=1;i<this.areas.length;i++){
+  				this.row.style.gridTemplateColumns += ' 1fr';
+  			}
+  		}
+  	}
+  	
+  	const cont = document.getElementById('sn-main');
+  	const over = document.getElementById('sn-over');
+  	const rowLengths = [1]
+  	const rows = [];
+  	const dividers = [];
+  	
+  	/*
+  	function updRowHeight(){
+  		const addBtns = cont.getElementsByClassName('sn-row-add');
+  		for(let i=0;i<addBtns.length;i++){
+  			addBtns[i].style.height = addBtns[i].parentElement.getBoundingClientRect().height.toString() + 'px';
+  		}
+  	}
+  	*/
+  	
+  	function addCol(){
+  		try{
+  		const divy = 1/(rows.length+1);
+  		const rowFrs = cont.style.gridTemplateRows.split(' ');
+  		const rowElms = Array.from(cont.children);
+  		rowLengths.length = 0;
+  		//alert(rowFrs);
+  		for(let i=0;i<rowFrs.length;i++){
+  			rowFrs[i] = parseFloat(rowFrs[i]); //*rowFrs.length
+  		}
+  		const otherScale = 1-divy;
+  		//alert(rowFrs);
+  		let newStyle = '';
+  		for(let i=0;i<rowFrs.length;i++){
+  			if(isNaN(rowFrs[i])){continue;}
+  			rowLengths.push(rowFrs[rowElms.indexOf(rows[i].cont)]*otherScale) //divy*
+  			newStyle += rowLengths[rowLengths.length-1].toString()+'fr ';
+  			//alert(rowElms.indexOf(rows[i].cont))
+  		}
+  		rowLengths.push(divy);
+   		const newCol = document.createElement('div');
+  		newCol.classList.add('sn-row-cont');
+  		cont.appendChild(newCol);
+  		rows.push(new SNRow(newCol));
+  		newStyle += divy.toString()+'fr';
+  		cont.style.gridTemplateRows = newStyle;
+  		
+  		//updRowHeight();
+  		/*
+  		let down = 0;
+  		for(let i=0;i<rowFrsNew.length;i++){
+  			const test = document.createElement('div');
+  			test.style = 'height:50px;width:50px;background:green;position:absolute;';
+  			down += (rowFrsNew[i]*window.innerHeight);
+  			test.style.top = (down).toString()+'px';
+  			document.body.appendChild(test);
+  		}
+  		*/
+  		//alert(rowLengths)
+  		let downDist = 0;
+  		for(let i=0;i<dividers.length;i++){
+  			downDist += rowLengths[i];
+  			dividers[i].style.paddingTop = (downDist*100).toString()+'vh';
+  		}
+  		const divInd = rowLengths.length-1;
+  		const contOver = document.createElement('div');
+  		contOver.classList.add('sn-spacer');
+  		downDist += rowLengths[dividers.length]
+  		contOver.style.paddingTop = (downDist*100).toString()+'vh';
+  		const divCont = document.createElement('div');
+  		divCont.classList.add('sn-divider-cont')
+  		const divider = document.createElement('div');
+  		divider.classList.add('sn-divider')
+  		divCont.appendChild(divider);
+  		contOver.appendChild(divCont);
+  		document.body.appendChild(contOver);
+  		dividers.push(contOver);
+  		
+  		let divDwn = false;
+  		divCont.addEventListener('mousedown',()=>{
+  			divDwn = true;
+  		});
+  		document.body.addEventListener('mouseup',()=>{
+  			divDwn = false;
+  		});
+  		document.body.addEventListener('mousemove',e=>{
+  			if(divDwn){
+  				let initSpace = 0;
+  				for(let i=0;i<divInd-1;i++){
+  					initSpace += rowLengths[i];
+  				}
+  				const newdist = Math.max(e.clientY/window.innerHeight,0.05+initSpace);
+  				contOver.style.paddingTop = (newdist*100).toString()+'vh';
+  				try{
+  				const fullSize = rowLengths[divInd]+rowLengths[divInd-1];
+  				rowLengths[divInd-1] = newdist-initSpace;
+  				rowLengths[divInd] = fullSize-(newdist-initSpace);
+  				let newStyle = '';
+  				for(let i=0;i<rowLengths.length;i++){
+  					newStyle += rowLengths[i].toString()+'fr ';
+  				}
+  				cont.style.gridTemplateRows = newStyle;
+  				}catch(e){alert(e.stack)}
+  			}
+  		});
+  		
+  		}catch(e){alert(e.stack)}
+  	}
+  	
+  	function remCol(){
+  		//try{
+  		if(rows.length == 1 || !confirm('Are you sure you want to delete the last column?')){return;}
+  			
+  		(rows.pop()).cont.remove();
+  		(dividers.pop()).remove();
+  		
+  		const rowFrs = cont.style.gridTemplateRows.split(' ');
+  		const divy = 1/rows.length;
+  		const rowElms = Array.from(cont.children);
+  		
+  		rowLengths.length = 0;
+  		for(let i=0;i<rowFrs.length;i++){
+  			rowFrs[i] = parseFloat(rowFrs[i]);
+  		}
+  		let otherScale = 1-rowFrs[rowFrs.length-1];
+  		let newStyle = '';
+  		for(let i=0;i<rows.length;i++){
+  			rowLengths.push(rowFrs[rowElms.indexOf(rows[i].cont)]/otherScale)
+  			newStyle += rowLengths[rowLengths.length-1].toString()+'fr ';
+  		}
+  		cont.style.gridTemplateRows = newStyle;
+  		
+  		let downDist = 0;
+  		for(let i=0;i<dividers.length;i++){
+  			downDist += rowLengths[i];
+  			dividers[i].style.paddingTop = (downDist*100).toString()+'vh';
+  		}
+  		
+  		//}catch(e){alert(e.stack)}
+  	}
+  	
+  	console.log = parent.vcnslog
+  	
+  	function saveConfig(){
+  		/*
+  		8 0xe588984046521a57 Magic number
+  		2 i16 version
+  		2 i16 row count
+  		4 f32 (xrows) row size
+  		2 i16 row 1 column count
+  		4 i32 r1c1 byte count
+  		- letters
+  		4 i32 r1c2 byte count
+  		- letters
+  		...
+  		2 i16 row 2 column count
+  		...
+  		*/
+  		let totCol = 0;
+  		let totTxt = 0;
+  		for(let i=0;i<rows.length;i++){
+  			totCol+=rows[i].areas.length;
+  			for(let j=0;j<rows[i].areas.length;j++){
+  				totTxt += rows[i].areas[j].value.length;
+  			}
+  		}
+  		//alert(12+(6*rows.length)+(4*totCol)+totTxt);
+  		//try{
+  		const file = new ArrayBuffer(12+(6*rows.length)+(4*totCol)+totTxt); //8+2+2+(4*rows)+(2*rows)+(4*columns)+letters
+  		const fileView = new DataView(file);
+  		const fileArr = new Uint8Array(file);
+  		fileView.setBigUint64(0,BigInt("16539637033343261271"));
+  		fileView.setUint16(8,0);
+  		fileView.setUint16(10,rows.length);
+  		let ind = 12;
+  		const rowFrs = cont.style.gridTemplateRows.split(' ');
+  		for(let i=0;i<rowFrs.length;i++){
+  			fileView.setFloat32(ind,parseFloat(rowFrs[i]));
+  			ind += 4;
+  		}
+  		const te = new TextEncoder();
+  		for(let i=0;i<rows.length;i++){
+  			fileView.setUint16(ind,rows[i].areas.length);
+  			ind += 2;
+  			for(let j=0;j<rows[i].areas.length;j++){
+  				fileView.setUint32(ind,rows[i].areas[j].value.length);
+  				ind+=4;
+  				fileArr.set(te.encode(rows[i].areas[j].value),ind);
+  				ind+=rows[i].areas[j].value.length;
+  			}
+  		}
+  		const dwnAnch = document.createElement('a');
+  		dwnAnch.download = 'export.fn';
+  		dwnAnch.href = URL.createObjectURL(new Blob([file]));
+  		dwnAnch.click();
+  		URL.revokeObjectURL(dwnArch.href);
+  		//}catch(e){alert(e.stack)}
+  	}
+  	
+  	function loadConfig(){
+  		if(!confirm('Are you sure you want to load a file? (Your work will be replaced!)')){return;}
+  		const fileInp = document.createElement('input');
+  		fileInp.type = 'file';
+  		fileInp.accept = '.fn';
+  		fileInp.addEventListener('change',()=>{
+  			fileInp.remove();
+  			if(fileInp.files.length == 0){
+				alert('Please upload some files');
+				return;
+			}
+			const fR = new FileReader();
+			fR.onload = ()=>{
+				try{
+				const file = fR.result;
+				const fileView = new DataView(file);
+				if(fileView.getBigUint64(0) != BigInt("16539637033343261271")){alert('Invalid File!');return;};
+				if(fileView.getUint16(8) > 0){alert('Invalid File!');return;}
+				const rowCount = fileView.getUint16(10);
+				let ind = 12;
+				
+				for(let i=0;i<rows.length;i++){
+					rows[i].cont.remove();
+				}
+				for(let i=0;i<dividers.length;i++){
+					dividers[i].remove();
+				}
+				rowLengths.length = 0;
+				rows.length = 0;
+				dividers.length = 0;
+				cont.style.gridTemplateRows = '';
+				
+				let newStyle = '';
+				let prevLen = 0;
+				for(let i=0;i<rowCount;i++){
+					rowLengths.push(fileView.getFloat32(ind));
+					newStyle += rowLengths[rowLengths.length-1].toString()+'fr ';
+					
+					const newCol = document.createElement('div');
+  					newCol.classList.add('sn-row-cont');
+  					cont.appendChild(newCol);
+  					rows.push(new SNRow(newCol));
+  					
+  					if(i>0){
+  						const contOver = document.createElement('div');
+  						contOver.classList.add('sn-spacer');
+  						contOver.style.paddingTop = (prevLen*100).toString()+'vh';
+  						const divCont = document.createElement('div');
+  						divCont.classList.add('sn-divider-cont')
+  						const divider = document.createElement('div');
+  						divider.classList.add('sn-divider')
+  						divCont.appendChild(divider);
+  						contOver.appendChild(divCont);
+  						document.body.appendChild(contOver);
+  						dividers.push(contOver);
+  						
+  						let divDwn = false;
+  						divCont.addEventListener('mousedown',()=>{
+  							divDwn = true;
+  						});
+  						document.body.addEventListener('mouseup',()=>{
+  							divDwn = false;
+  						});
+  						document.body.addEventListener('mousemove',e=>{
+  							if(divDwn){
+  								let initSpace = 0;
+  								for(let j=0;j<i-1;j++){
+  									initSpace += rowLengths[j];
+  								}
+  								const newdist = Math.max(e.clientY/window.innerHeight,0.05+initSpace);
+  								contOver.style.paddingTop = (newdist*100).toString()+'vh';
+  								const fullSize = rowLengths[i]+rowLengths[i-1];
+  								rowLengths[i-1] = newdist-initSpace;
+  								rowLengths[i] = fullSize-(newdist-initSpace);
+  								let newStyle = '';
+  								for(let j=0;j<rowLengths.length;j++){
+  									newStyle += rowLengths[j].toString()+'fr ';
+  								}
+  								cont.style.gridTemplateRows = newStyle;
+  							}
+  						});
+  					}
+  					
+					ind += 4;
+					prevLen += rowLengths[rowLengths.length-1];
+				}
+				cont.style.gridTemplateRows = newStyle;
+				
+				const td = new TextDecoder();
+				for(let i=0;i<rowCount;i++){
+					const colCount = fileView.getUint16(ind);
+					ind += 2;
+					for(let j=0;j<colCount;j++){
+						const newText = new Uint8Array(new ArrayBuffer(fileView.getUint32(ind)));
+						ind+=4;
+						for(let i=0;i<newText.buffer.byteLength;i++){
+							newText[i] = fileView.getUint8(ind);
+							ind++;
+						}
+						if(j!=0){rows[i].add()};
+						rows[i].areas[j].value = td.decode(newText);
+					}
+				}
+				
+				}catch(e){alert(e.stack)}
+			}
+			fR.readAsArrayBuffer(fileInp.files[0]);
+  		});
+  		fileInp.click();
+  	}
+  	
+  	const colAddBtn = document.getElementsByClassName('sn-add')[0];
+  	colAddBtn.addEventListener('click',addCol);
+  	const colRemBtn = document.getElementsByClassName('sn-add-red')[0];
+  	colRemBtn.addEventListener('click',remCol);
+  	const fileBtn = document.getElementById('sn-file-btn').getElementsByClassName('sn-header-btn')[0];
+  	fileBtn.addEventListener('click',saveConfig);
+  	const editBtn = document.getElementById('sn-edit-btn').getElementsByClassName('sn-header-btn')[0];
+  	editBtn.addEventListener('click',loadConfig);
+  	const i_rows = document.getElementsByClassName('sn-row-cont');
+  	for(let i=0;i<i_rows.length;i++){
+  		rows.push(new SNRow(i_rows[i]))
+  	}
+  	//updRowHeight();
+  	window.onbeforeunload=()=>{if(rows.length>1){return 0};if(rows[0].areas.length>1){return 0};if(rows[0].areas[0].value.length>0){return 0}};
+  </script>
+</body>
+</html>
