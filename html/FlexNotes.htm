@@ -152,8 +152,7 @@
       --height: 6px;
     }
     input:focus,select:focus,textarea:focus {outline:none;}
-    input:active,select:active,input[type="text"]:focus,.button:active {background:none;};
-    .button,input,select {font-family: Tahoma, Arial, sans-serif;}
+    .button,input,select {font-family: Arial, sans-serif;}
     input:active,select:active,input[type="text"]:focus,.button:active {
       box-shadow: 2px 2px var(--height) rgba(0,0,0,0.6) inset, -2px -2px var(--height) rgba(240,240,240,0.6) inset;
       border-color: rgba(0,0,0,0);
@@ -240,6 +239,7 @@
     	align-items:center;
     	justify-content:center;
     	transition: opacity .3s ease;
+    	z-index: 100;
     }
     
     .sn-modal-cont.hidden {
@@ -864,27 +864,27 @@
   		if(e.ctrlKey){
   			switch(e.key){
   				case 's':
-  				saveConfig();
   				e.preventDefault();
+  				saveConfig();
   				break;
   				case 'i':
   				loadConfig();
   				break;
   				case 'j':
-  				addCol();
   				e.preventDefault();
+  				addCol();
   				break;
   				case 'k':
-  				remCol();
   				e.preventDefault();
+  				remCol();
   				break;
   				case 'p':
-  				prefModal.classList.toggle('hidden');
   				e.preventDefault();
+  				prefModal.classList.toggle('hidden');
   				break;
   				case '/':
-  				helpModal.classList.toggle('hidden');
   				e.preventDefault();
+  				helpModal.classList.toggle('hidden');
   				break;
   			}
   		}else{
