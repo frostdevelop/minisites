@@ -610,7 +610,7 @@
   	};
   	
   	function addCol(){
-  		try{
+  		//try{
   		const divy = 1/(rows.length+1);
   		const rowFrs = cont.style.gridTemplateRows.split(' ');
   		const rowElms = Array.from(cont.children);
@@ -682,7 +682,7 @@
   				}
   				const newdist = Math.max(e.clientY/window.innerHeight,0.05+initSpace);
   				contOver.style.paddingTop = (newdist*100).toString()+'vh';
-  				try{
+  				//try{
   				const fullSize = rowLengths[divInd]+rowLengths[divInd-1];
   				rowLengths[divInd-1] = newdist-initSpace;
   				rowLengths[divInd] = fullSize-(newdist-initSpace);
@@ -691,11 +691,11 @@
   					newStyle += rowLengths[i].toString()+'fr ';
   				}
   				cont.style.gridTemplateRows = newStyle;
-  				}catch(e){alert(e.stack)}
+  				//}catch(e){alert(e.stack)}
   			}
   		});
   		
-  		}catch(e){alert(e.stack)}
+  		//}catch(e){alert(e.stack)}
   	}
   	
   	function remCol(){
@@ -745,6 +745,7 @@
   		2 i16 row 2 column count
   		...
   		*/
+  		commitChange();
   		let totCol = 0;
   		let totTxt = 0;
   		for(let i=0;i<rows.length;i++){
@@ -907,19 +908,19 @@
   	
   	function checkForChange(r=true){
   		if(C_prevState.cont != cont.style.gridTemplateRows || rows.length != C_prevState.val.length){
-  			commitChange();
+  			r || commitChange();
   			r && saveConfig();
   			return;
   		}
   		for(let i=0;i<rows.length;i++){
   			if(rows[i].areas.length != C_prevState.val[i].length){
-  				commitChange();
+  				r || commitChange();
   				r && saveConfig();
   				return;
   			}
   			for(let j=0;j<rows[i].areas.length;j++){
   				if(rows[i].areas[j].value != C_prevState.val[i][j]){
-  					commitChange();
+  					r || commitChange();
   					r && saveConfig();
   					return;
   				}
@@ -936,7 +937,7 @@
   	const prefAutoMin = prefModal.getElementsByClassName('sn-form-min')[0];
   	prefAutoMin.addEventListener('change',()=>{
   		if(prefAutoSave.checked){
-  			clearInterVal(asInterval);
+  			clearInterval(asInterval);
   			asInterval = setInterval(checkForChange,parseFloat(prefAutoMin.value)*60000);
   		}
   	});
@@ -974,27 +975,27 @@
   		if(e.ctrlKey){
   			switch(e.key){
   				case 's':
-  				saveConfig();
   				e.preventDefault();
+  				saveConfig();
   				break;
   				case 'i':
   				loadConfig();
   				break;
   				case 'j':
-  				addCol();
   				e.preventDefault();
+  				addCol();
   				break;
   				case 'k':
-  				remCol();
   				e.preventDefault();
+  				remCol();
   				break;
   				case 'p':
-  				prefModal.classList.toggle('hidden');
   				e.preventDefault();
+  				prefModal.classList.toggle('hidden');
   				break;
   				case '/':
-  				helpModal.classList.toggle('hidden');
   				e.preventDefault();
+  				helpModal.classList.toggle('hidden');
   				break;
   			}
   		}else{
