@@ -127,7 +127,7 @@
     const cipherinp = document.getElementById('uv-cipher');
     const alph = 'abcdefghijklmnopqrstuvwxyz';
     plaininp.addEventListener('input',()=>{
-    	let out = '';
+    	//let out = '';
     	/*
     	for(let i=0;i<Math.floor(plaininp.value.length/2);i++){
     		const index = 1+(i*2);
@@ -139,6 +139,7 @@
     			if(aind < -2){
     			if(aind == 1){
     	*/
+		/*
     	for(let i=0;i<plaininp.value.length;i++){
     		if(i % 2 == 0){
     			out += plaininp.value[i];
@@ -148,10 +149,13 @@
     			out += String.fromCharCode(aind);
     		}
     	}
-    	cipherinp.value = out;
+	 	*/
+		let [ input, ...search ] = plaininp.value.split('?');
+    	cipherinp.value = decodeURIComponent(input).split('').map((char, ind) => ind % 2 ? String.fromCharCode(char.charCodeAt(0) ^ 2) : char).join('') + (search.length ? '?' + search.join('?') : '');
     });
     
     cipherinp.addEventListener('input',()=>{
+		/*
     	let out = '';
     	for(let i=0;i<cipherinp.value.length;i++){
     		if(i%2 == 0){
@@ -162,7 +166,8 @@
     			out += String.fromCharCode(aind);
     		}
     	}
-    	plaininp.value = out;
+	 	*/
+    	plaininp.value = encodeURIComponent(cipherinp.value.toString().split('').map((char, ind) => ind % 2 ? String.fromCharCode(char.charCodeAt() ^ 2) : char).join(''));
     });
     
     wrapsel.addEventListener("change",()=>{
