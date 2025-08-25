@@ -150,8 +150,7 @@
     		}
     	}
 	 	*/
-		let [ input, ...search ] = plaininp.value.split('?');
-    	cipherinp.value = decodeURIComponent(input).split('').map((char, ind) => ind % 2 ? String.fromCharCode(char.charCodeAt(0) ^ 2) : char).join('') + (search.length ? '?' + search.join('?') : '');
+    	cipherinp.value = encodeURIComponent(plaininp.value.toString().split('').map((char, ind) => ind % 2 ? String.fromCharCode(char.charCodeAt() ^ 2) : char).join(''));
     });
     
     cipherinp.addEventListener('input',()=>{
@@ -167,7 +166,8 @@
     		}
     	}
 	 	*/
-    	plaininp.value = encodeURIComponent(cipherinp.value.toString().split('').map((char, ind) => ind % 2 ? String.fromCharCode(char.charCodeAt() ^ 2) : char).join(''));
+		let [ input, ...search ] = plaininp.value.split('?');
+    	plaininp.value = decodeURIComponent(input).split('').map((char, ind) => ind % 2 ? String.fromCharCode(char.charCodeAt(0) ^ 2) : char).join('') + (search.length ? '?' + search.join('?') : '');
     });
     
     wrapsel.addEventListener("change",()=>{
