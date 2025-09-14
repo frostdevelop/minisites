@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Noise Generator</title>
+	<style>
+	body {
+		padding: 0;
+		color: white;
+		font-size: 20px;
+		font-family: Arial, sans-serif;
+		scroll-behavior:smooth;
+		background-color:black;
+		background-image: radial-gradient(circle at 0 100%, #D29FF6 0%, transparent 50%), radial-gradient(circle at 100% 0, #F764E9 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(101,213,247,0.2) 0%, transparent 20%), radial-gradient(circle at 0 0, rgba(255,153,196,0.4) 0%, transparent 20%);
+		width:100vw;
+		height:100vh;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+	}
+	::-webkit-scrollbar {width: 3px;}
+	::-webkit-scrollbar-track {
+		background: #111;
+	}
+	::-webkit-scrollbar-thumb {
+		background: #666;
+		border-radius: 10px;
+	}
+	::-webkit-scrollbar-thumb:hover {background:#777;}
+	::-webkit-scrollbar-thumb:active {box-shadow: 0 0 10px white;}
+	/*begin pacifikyneodark*/
+	:root {
+		--radius: 45px;
+		--height: 6px;
+	}
+	input:focus,select:focus,textarea:focus {outline:none;}
+	.neo-button,input,select {font-family: Arial, sans-serif;}
+	input:active,select:active,input[type="text"]:focus,.neo-button:active {
+		box-shadow: 2px 2px var(--height) rgba(0,0,0,0.6) inset, -2px -2px var(--height) rgba(240,240,240,0.6) inset;
+	}
+	details,input,select,.neo-button,.neo-cont,.neo-slideinp .neo-inp-maincont:before {background: linear-gradient(to top left, rgba(255,255,255,0), rgba(255,255,255,0.2)) !important;border:none;box-shadow: 0 1px 3px rgba(255,255,255,0.4) inset, 0 50px 80px rgba(0,0,0,0.2), 0 6px 10px rgba(255,255,255,0.4) inset, 0 -1px 3px rgba(255,255,255,0.1) inset,2px 2px var(--height) rgba(0,0,0,0.6), -2px -2px var(--height) rgba(240,240,240,0.6);}
+	input,select,.neo-button {
+		transition: box-shadow 500ms ease, border 500ms ease;
+		background: none;
+		color: currentcolor;
+		font-size: 13px;
+		padding: 10px;
+		margin: 5px 0;
+		border-radius: var(--radius);
+		min-width:0px;
+		cursor:pointer;
+	}
+	select {background-color:#222}
+	.neo-block {
+		backdrop-filter: blur(8px);
+		background: linear-gradient(to top right, rgba(255,255,255,0), rgba(255,255,255,0.1));
+		box-shadow: 0 1px 3px rgba(255,255,255,0.4) inset, 0 50px 80px rgba(0,0,0,0.2), 0 6px 10px rgba(255,255,255,0.4) inset, 0 -1px 3px rgba(255,255,255,0.1) inset;
+		border: solid 1px rgba(255,255,255,0.4);
+	}
+	.neo-shine::before {
+		content: '';
+		position:absolute;
+		top:0;
+		left:0;
+		width: 100%;
+		height: 1px;
+		background:linear-gradient(90deg,transparent,rgba(255,255,255,0.8), transparent);
+	}
+	.neo-slideinp {
+		user-select:none;
+	}
+	.neo-slideinp .neo-inp-main {
+		display:none;
+	}
+	.neo-slideinp .neo-inp-maincont {
+		position:relative;
+		padding:0;
+		height:30px;
+		display:flex;
+		align-items:center;
+		margin: 10px 0;
+	}
+	.neo-slideinp .neo-inp-maincont:before {
+		content: "";
+		width: 50px;
+		height: 30px;
+		background: linear-gradient(to top left, rgba(255,255,255,0.1), rgba(255,255,255,0.4)) !important;
+		cursor:pointer;
+		border:none;
+		display:inline-block;
+		border-radius: 15px;
+		margin-right: 10px;
+	}
+	.neo-slideinp .neo-inp-caption:before {
+		height:20px;
+		width:20px;
+		content:"";
+		position:absolute;
+		top:5px;
+		left:5px;
+		background: white;
+		box-shadow: 0 0 10px #ff8a8a inset;
+		border-radius:10px;
+		transition: transform .2s ease, box-shadow .2s linear;
+	}
+	.neo-slideinp .neo-inp-main:checked + .neo-inp-caption:before {
+		transform:translateX(20px);
+		box-shadow: 0 0 10px #00ff55 inset;
+	}
+	/*End PacifikyNeoDark*/
+	h3 {
+		font-weight: normal;
+		font-size: 25px;
+		margin: 5px;
+		text-align:center;
+	}
+	.sn-modal-cont {
+		position: absolute;
+		top:0;
+		left:0;
+		background: rgba(0,0,0,0.7);
+		width:100vw;
+		height:100vh;
+		display: flex;
+		align-items:center;
+		justify-content:center;
+		transition: opacity .3s ease;
+		z-index: 100;
+	}
+	
+	.sn-modal-title {
+		/*font-weight: 600;*/
+		font-size: 30px;
+		color: #EEEEEE;
+	}
+	
+	.sn-modal-div {
+		margin: 10px -50px;
+		opacity: 0.3;
+	}
+	input[type='number']::-webkit-outer-spin-button,
+	input[type='number']::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	.ng-cont {
+		border-radius:50px;
+		overflow: hidden;
+		height: 60vh;
+		width: 50vw;
+		padding: 25px 35px;
+		transition: transform .3s ease;
+		max-width: 500px;
+		display:flex;
+		flex-direction:column;
+	}
+	.ng-title {
+		font-size:50px;
+		margin: 10px 0;
+		text-align:center;
+		font-weight: bold;
+	}
+	#ng-ctr-play {
+		width: 100px;
+		height: 100px;
+		border-radius: 50px;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		margin: 0 auto;
+	}
+	#ng-defs {
+		display:none;
+	}
+	footer {
+		font-size: 10px;
+		margin-top: 20px;
+	}
+	select{
+		background-color:black !important;
+	}
+	#ng-ctr-type{
+		margin: 15px 0;
+	}
+	</style>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+	<div class='ng-cont neo-block neo-shine'>
+		<div class='ng-title'>
+			Noise Generator
+		</div>
+		<hr class='sn-modal-div'/>
+		<button class='neo-button' id='ng-ctr-play' title='Play/Pause button'>
+			<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 50 50" fill="none"><use class='ng-sys-btn-icon' href='#ng-svg-play'></svg>
+		</button>
+		<select id='ng-ctr-type' title='Noise type selection'>
+			<option>White</option>
+			<option>Brown</option>
+		</select>
+		<div class="neo-slideinp" title='Mono toggle'><label class="neo-inp-maincont"><input type="checkbox" class="neo-inp-main" id='ng-ctr-mono'><span class="neo-inp-caption">Mono</span></label></div>
+		<input id='ng-ctr-gain' title='Volume slider' type='range' min='0' max='1' step='0.01' value='0.5'></input>
+		<footer>NG v1.0.0<br/>Copyright 2025 Frost. CC-BY-NC-SA 4.0</footer>
+	</div>
+	<svg id='ng-defs'>
+		<defs>
+			<symbol id='ng-svg-play'>
+				<g xmlns="http://www.w3.org/2000/svg" clip-path="url(#clip0_66_2)"><path d="M39 23.2679C40.3333 24.0377 40.3333 25.9623 39 26.7321L13.5 41.4545C12.1667 42.2243 10.5 41.262 10.5 39.7224L10.5 10.2776C10.5 8.73797 12.1667 7.77572 13.5 8.54552L39 23.2679Z" fill="white"/></g>
+				<defs xmlns="http://www.w3.org/2000/svg"><clipPath id="clip0_66_2"><rect width="50" height="50" fill="white"/></clipPath></defs>
+			</symbol>
+			<symbol id='ng-svg-pause'>
+				<rect xmlns="http://www.w3.org/2000/svg" x="12" y="7" width="8" height="35" fill="white"/>
+				<rect xmlns="http://www.w3.org/2000/svg" x="29" y="7" width="8" height="35" fill="white"/>
+			</symbol>
+		</defs>
+	</svg>
+	<script>
+window.onbeforeunload = ()=>1;
+class noiseSys {
+	constructor(){
+		this.playing = false;
+		this.currentNoise = 0;
+		this.mono = false;
+		this.type = 0;
+		this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+		this.gainNode = this.ctx.createGain();
+		this.gainNode.gain.value = 0;
+		this.noiseGen = [this.ctx.createScriptProcessor(4096,2,2),this.ctx.createScriptProcessor(4096,2,2)];
+		this.noiseGen[0].onaudioprocess = e=>{
+			const ol = e.outputBuffer.getChannelData(0);
+			const or = e.outputBuffer.getChannelData(1);
+			if(this.mono){
+				for (let i=0;i<ol.length;i++) {
+    				or[i] = ol[i] = (Math.random()*2 - 1)*0.2;
+  				}
+			}else{
+				for (let i=0;i<ol.length;i++) {
+    				ol[i] = (Math.random()*2 - 1)*0.2;
+    				or[i] = (Math.random()*2 - 1)*0.2;
+  				}
+			}
+		}
+		this.brownStep = 0.01;
+		this.brownLast = [0,0];
+		this.noiseGen[1].onaudioprocess = e=>{
+			const ol = e.outputBuffer.getChannelData(0);
+			const or = e.outputBuffer.getChannelData(1);
+			if(this.mono){
+				for (let i=0;i<ol.length;i++) {
+    				this.brownLast[0] = (this.brownLast[0]+(Math.random()*2 - 1)*this.brownStep)/(1+this.brownStep);
+					ol[i] = this.brownLast[0]*3.5;
+					or[i] = ol[i];
+  				}
+			}else{
+				for (let i=0;i<ol.length;i++) {
+    				this.brownLast[0] = (this.brownLast[0]+(Math.random()*2 - 1)*this.brownStep)/(1+this.brownStep);
+					ol[i] = this.brownLast[0]*3.5;
+    				this.brownLast[1] = (this.brownLast[1]+(Math.random()*2 - 1)*this.brownStep)/(1+this.brownStep);
+					or[i] = this.brownLast[1]*3.5;
+  				}
+			}
+		}
+	}
+	play(){
+		this.playing = true;
+		this.noiseGen[this.type].connect(this.gainNode).connect(this.ctx.destination);
+	}
+	stop(){
+		this.playing = false;
+		this.noiseGen[this.type].disconnect();
+	}
+	setGain(v){
+		this.gainNode.gain.value = v;
+	}
+	setType(v){
+		if(this.playing){
+			this.noiseGen[this.type].disconnect();
+			this.noiseGen[v].connect(this.gainNode).connect(this.ctx.destination);
+		}
+		this.type = v;
+	}
+}
+const ngSys = new noiseSys();
+const ngBtnPlay = document.getElementById('ng-ctr-play');
+const ngRanGain = document.getElementById('ng-ctr-gain');
+const ngSelType = document.getElementById('ng-ctr-type');
+const ngTogMono = document.getElementById('ng-ctr-mono');
+const ngBtnIcoPlay = ngBtnPlay.getElementsByClassName('ng-sys-btn-icon')[0];
+ngBtnPlay.addEventListener('click',()=>{
+	if(ngSys.playing){
+		ngBtnIcoPlay.setAttribute('href', '#ng-svg-play');
+		ngSys.stop();
+	}else{
+		ngBtnIcoPlay.setAttribute('href', '#ng-svg-pause');
+		ngSys.play();
+	}
+});
+ngTogMono.addEventListener('change',()=>{ngSys.mono = ngTogMono.checked});
+ngRanGain.addEventListener('input',()=>{
+	ngSys.setGain(parseFloat(ngRanGain.value));
+});
+const selColors = ['#FFFFFFA0', '#DE8062A0'];
+function updSelType(){
+	ngSelType.style = 'background-image: radial-gradient(circle at 100% 50%,'+selColors[ngSelType.selectedIndex]+',transparent 50%) !important';
+}
+updSelType();
+ngSelType.addEventListener('change',()=>{
+	ngSys.setType(ngSelType.selectedIndex);
+	updSelType();
+});
+ngSys.setGain(parseFloat(ngRanGain.value));
+	</script>
+</body>
+</html>
