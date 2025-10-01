@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>Screw 0.2 Demo</title>
+  <title>Screw 0.2.1 Demo</title>
   <style>
 	body {
 		margin:0;
@@ -24,14 +24,13 @@
 <body>
   <canvas width='1000' height='1000'></canvas>
   <script>
-//Screw v0.2 demo
+//Screw v0.2.1 demo
 //Programmed by Lucas Lux
 //10/1/25
 
 //adding a parent argument would be kinda useless since addChild is still needed
 class screwElement{
-	constructor(can,ctx=null,x=0,y=0,options={}){
-		this.can = can;
+	constructor(ctx=null,x=0,y=0,options={}){
 		this.ctx = ctx;
 		this.x = x;
 		this.y = y;
@@ -86,8 +85,8 @@ class screwElement{
 	}
 }
 class screwGroup extends screwElement{
-	constructor(can,ctx,x,y,options={}){
-		super(can,ctx,x,y,options);
+	constructor(ctx,x,y,options={}){
+		super(ctx,x,y,options);
 	}
 	intersect(cx,cy){
 		if(this.enabled && this.cena){
@@ -99,8 +98,8 @@ class screwGroup extends screwElement{
 	}
 }
 class screwRectInt extends screwElement{
-	constructor(can,ctx,x,y,w,h,options={}){
-		super(can,ctx,x,y,options);
+	constructor(ctx,x,y,w,h,options={}){
+		super(ctx,x,y,options);
 		this.w = w;
 		this.h = h;
 	}
@@ -118,8 +117,8 @@ class screwRectInt extends screwElement{
 	}
 }
 class screwSqInt extends screwElement{
-	constructor(can,ctx,x,y,l,options={}){
-		super(can,ctx,x,y,options);
+	constructor(ctx,x,y,l,options={}){
+		super(ctx,x,y,options);
 		this.l = l;
 	}
 	intersect(cx,cy){
@@ -136,8 +135,8 @@ class screwSqInt extends screwElement{
 	}
 }
 class screwCircInt extends screwElement{
-	constructor(can,ctx,x,y,r,options={}){
-		super(can,ctx,x,y,options);
+	constructor(ctx,x,y,r,options={}){
+		super(ctx,x,y,options);
 		this.r = r;
 	}
 	intersect(cx,cy){
@@ -154,8 +153,8 @@ class screwCircInt extends screwElement{
 	}
 }
 class screwElliInt extends screwElement{
-	constructor(can,ctx,x,y,hr,vr,options={}){
-		super(can,ctx,x,y,options);
+	constructor(ctx,x,y,hr,vr,options={}){
+		super(ctx,x,y,options);
 		this.hr = hr;
 		this.vr = vr;
 	}
@@ -175,8 +174,8 @@ class screwElliInt extends screwElement{
 	}
 }
 class screwLineInt extends screwElement{
-	constructor(can,ctx,bx,by,ex,ey,options={}){
-		super(can,ctx,bx,by,options);
+	constructor(ctx,bx,by,ex,ey,options={}){
+		super(ctx,bx,by,options);
 		this.ex = ex;
 		this.ey = ey;
 		this.r = options.r || 5;
@@ -247,12 +246,18 @@ class screwLineInt extends screwElement{
 	}
 }
 class screwTexInt extends screwElement{
-	constructor(can,ctx,x,y,t,fnt,options={}){
-		super(can,ctx,x,y,options);
+	constructor(ctx,x,y,t,fnt,options={}){
+		super(ctx,x,y,options);
 		this.t = t;
 		this.fnt = fnt;
 		this.ta = options.ta || 'left';
 		this.tb = options.tb || 'alphabetic';
+		this.ls = options.ls || '0px';
+		this.fvc = options.fvc || 'normal';
+		this.fs = options.fs || 'normal';
+		this.fk = options.fk || 'normal';
+		this.td = options.td || 'ltr';
+		this.ws = options.ws || '0px';
 	}
 	intersect(cx,cy){
 		if(this.enabled){
@@ -261,6 +266,12 @@ class screwTexInt extends screwElement{
 			cy = cy-rc[1];
 			this.ctx.textAlign = this.ta;
 			this.ctx.textBaseline = this.tb;
+			this.ctx.letterSpacing = this.ls;
+			this.ctx.fontVariantCaps = this.fvc;
+			this.ctx.fontStretch = this.fs;
+			this.ctx.fontKerning = this.fk;
+			this.ctx.direction = this.td;
+			this.ctx.wordSpacing = this.ws;
 			this.ctx.font = this.fnt;
 			const m = this.ctx.measureText(this.t);
 			//(this.max ? this.max : m.width)
@@ -276,21 +287,50 @@ class screwTexInt extends screwElement{
 }
 //was originally going to be responsive but has problems with scaling and stuff
 class screwTex extends screwTexInt{
-	constructor(can,ctx,x,y,t,fnt,options={}){
-		super(can,ctx,x,y,t,fnt,options);
+	constructor(ctx,x,y,t,fnt,options={}){
+		super(ctx,x,y,t,fnt,options);
 		this.fvis = options.fvis ?? true;
 		this.svis = options.svis ?? true;
 		this.sty = options.sty;
 		this.ssty = options.ssty;
 		this.slw = options.slw || 1;
 		this.slj = options.slj || 'miter';
+		this.tr = options.tr || 'auto';
+		
+		this.filter = options.filter ?? '';
+		this.alpha = options.alpha || 1;
+		this.blend = options.blend || 'source-over';
+		this.lined = options.lined ?? [];
+		//this.scap = options.cap || 'butt';
+		this.sdoff = options.sdoff ?? 0;
+		this.smlim = options.smlim ?? 10;
+		/*
+		this.shb = options.shb ?? 0;
+		this.shc = options.shc ?? 'transparent';
+		this.shox = options.shox ?? 0;
+		this.shoy = options.shoy ?? 0;
+		this.sshb = options.sshb ?? 0;
+		this.sshc = options.sshc ?? 'transparent';
+		this.sshox = options.sshox ?? 0;
+		this.sshoy = options.sshoy ?? 0;
+		*/
 	}
 	render(x=0,y=0){
 		if(this.visible){
 			const rc = this.getOffset(x,y);
 			this.ctx.font = this.fnt;
+			this.ctx.filter = this.filter;
+			this.ctx.globalAlpha = this.alpha;
+			this.ctx.globalCompositeOperation = this.blend;
 			this.ctx.textAlign = this.ta;
 			this.ctx.textBaseline = this.tb;
+			this.ctx.letterSpacing = this.ls;
+			this.ctx.fontVariantCaps = this.fvc;
+			this.ctx.fontStretch = this.fs;
+			this.ctx.fontKerning = this.fk;
+			this.ctx.direction = this.td;
+			this.ctx.wordSpacing = this.ws;
+			this.ctx.textRendering = this.tr;
 			if(this.fvis && this.sty){
 				this.ctx.fillStyle = this.sty;
 				this.ctx.fillText(this.t,rc[0],rc[1]);
@@ -298,6 +338,9 @@ class screwTex extends screwTexInt{
 			if(this.svis && this.ssty){
 				this.ctx.lineWidth = this.slw;
 				this.ctx.lineJoin = this.slj;
+				this.ctx.setLineDash(this.lined);
+				this.ctx.miterLimit = this.smlim;
+				this.ctx.lineDashOffset = this.sdoff;
 				this.ctx.strokeStyle = this.ssty;
 				this.ctx.strokeText(this.t,rc[0],rc[1]);
 			}
@@ -308,8 +351,8 @@ class screwTex extends screwTexInt{
 	}
 }
 class screwRect extends screwRectInt{
-	constructor(can,ctx,x,y,w,h,options){
-		super(can,ctx,x,y,w,h);
+	constructor(ctx,x,y,w,h,options){
+		super(ctx,x,y,w,h);
 		this.fvis = options.fvis ?? true;
 		this.svis = options.svis ?? true;
 		this.sty = options.sty;
@@ -337,8 +380,8 @@ class screwRect extends screwRectInt{
 	}
 }
 class screwLine extends screwLineInt{
-	constructor(can,ctx,bx,by,ex,ey,options={}){
-		super(can,ctx,bx,by,ex,ey,options);
+	constructor(ctx,bx,by,ex,ey,options={}){
+		super(ctx,bx,by,ex,ey,options);
 		this.sty = options.sty || 'white';
 		this.lw = options.lw || 1;
 		this.lj = options.lj || 'miter';
@@ -360,8 +403,8 @@ class screwLine extends screwLineInt{
 	}
 }
 class screwSq extends screwSqInt{
-	constructor(can,ctx,x,y,l,options={}){
-		super(can,ctx,x,y,l,options);
+	constructor(ctx,x,y,l,options={}){
+		super(ctx,x,y,l,options);
 		this.fvis = options.fvis ?? true;
 		this.svis = options.svis ?? true;
 		this.sty = options.sty;
@@ -389,8 +432,8 @@ class screwSq extends screwSqInt{
 	}
 }
 class screwCirc extends screwCircInt{
-	constructor(can,ctx,x,y,r,options={}){
-		super(can,ctx,x,y,r,options);
+	constructor(ctx,x,y,r,options={}){
+		super(ctx,x,y,r,options);
 		this.fvis = options.fvis ?? true;
 		this.svis = options.svis ?? true;
 		this.sty = options.sty;
@@ -420,8 +463,8 @@ class screwCirc extends screwCircInt{
 	}
 }
 class screwElli extends screwElliInt{
-	constructor(can,ctx,x,y,hr,vr,options={}){
-		super(can,ctx,x,y,hr,vr,options);
+	constructor(ctx,x,y,hr,vr,options={}){
+		super(ctx,x,y,hr,vr,options);
 		this.fvis = options.fvis ?? true;
 		this.svis = options.svis ?? true;
 		this.sty = options.sty;
@@ -451,8 +494,8 @@ class screwElli extends screwElliInt{
 	}
 }
 class screwRoundRect extends screwRectInt{
-	constructor(can,ctx,x,y,w,h,r,options={}){
-		super(can,ctx,x,y,w,h,options);
+	constructor(ctx,x,y,w,h,r,options={}){
+		super(ctx,x,y,w,h,options);
 		this.fvis = options.fvis ?? true;
 		this.svis = options.svis ?? true;
 		this.r = r;
@@ -488,24 +531,24 @@ class screwRoundRect extends screwRectInt{
 }
 const canv = document.getElementsByTagName('canvas')[0];
 const ctx = canv.getContext('2d');
-const rect = new screwRoundRect(canv,ctx,10,10,80,50,0,{sty:'red',ssty:'white',slw:3,svis:false});
-const line = new screwGroup(canv,ctx,300,300);
-const main = new screwGroup(canv,ctx,200,200);
-const circ = new screwCirc(canv,ctx,100,200,25,{sty:'blue',slw:5,ssty:'white',svis:false});
-const elli = new screwElli(canv,ctx,10,300,50,25,{sty:'green',slw:5,ssty:'red',svis:false});
-const txt = new screwTex(canv,ctx,300,300,'Testing...','bold 48px sans-serif',{sty: '#FE854A',ta:'center',tb:'middle',ssty:'lightblue',svis:false});
-const cont1 = new screwCirc(canv,ctx,25,-50,5,{sty:'white',slw:2,visible:false,enabled:false,ssty:'#3EA0FC',svis:false});
-const cont2 = new screwCirc(canv,ctx,-25,50,5,{sty:'white',slw:2,visible:false,enabled:false,ssty:'#3EA0FC',svis:false});
-const rectcont = new screwCirc(canv,ctx,0,0,5,{sty:'green',slw:2,visible:false,enabled:false,ssty:'white',svis:false});
+const rect = new screwRoundRect(ctx,10,10,80,50,0,{sty:'red',ssty:'white',slw:3,svis:false});
+const line = new screwGroup(ctx,300,300);
+const main = new screwGroup(ctx,200,200);
+const circ = new screwCirc(ctx,100,200,25,{sty:'blue',slw:5,ssty:'white',svis:false});
+const elli = new screwElli(ctx,10,300,50,25,{sty:'green',slw:5,ssty:'red',svis:false});
+const txt = new screwTex(ctx,300,300,'Testing...','bold 48px sans-serif',{sty: '#FE854A',ta:'center',tb:'middle',ssty:'lightblue',svis:false});
+const cont1 = new screwCirc(ctx,25,-50,5,{sty:'white',slw:2,visible:false,enabled:false,ssty:'#3EA0FC',svis:false});
+const cont2 = new screwCirc(ctx,-25,50,5,{sty:'white',slw:2,visible:false,enabled:false,ssty:'#3EA0FC',svis:false});
+const rectcont = new screwCirc(ctx,0,0,5,{sty:'green',slw:2,visible:false,enabled:false,ssty:'white',svis:false});
 rect.addChild(rectcont);
 main.addChild(rect);
 main.addChild(line);
 main.addChild(circ);
 main.addChild(elli);
 main.addChild(txt);
-line.addChild(new screwLine(canv,ctx,25,-50,-25,50,10,'white',2));
-line.addChild(new screwLine(canv,ctx,25,-50,50,-50,10,'white',2));
-line.addChild(new screwLine(canv,ctx,-25,50,-50,50,10,'white',2));
+line.addChild(new screwLine(ctx,25,-50,-25,50,10,'white',2));
+line.addChild(new screwLine(ctx,25,-50,50,-50,10,'white',2));
+line.addChild(new screwLine(ctx,-25,50,-50,50,10,'white',2));
 line.addChild(cont1);
 line.addChild(cont2);
 main.render();
