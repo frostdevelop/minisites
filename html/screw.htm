@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Screw</title>
+  <style>
+	body {
+		margin:0;
+		padding:0;
+		background:#AAAAAA;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		width:100vw;
+		height:100vh;
+		overflow-x:hidden;
+	}
+	canvas {
+		background:black;
+	}
+  </style>
+</head>
+<body>
+  <canvas width='1000' height='1000'></canvas>
+  <script>
+//Screw v0.1 demo
+//Programmed by Lucas Lux
+//10/1/25
+class screwElement{
+	constructor(can,ctx,x,y){
+		this.can = can;
+		this.ctx = ctx;
+		this.x = x;
+		this.y = y;
+		this.children = [];
+		this.intersected = false;
+	}
+	addChild(e){
+		this.children.push(e);
+	}
+	removeChild(i){
+		this.children.splice(i,1);
+	}
+	render(x=0,y=0){
+		this.renderChildren(x,y);
+	}
+	renderChildren(x=0,y=0){
+		const rx = this.x+x;
+		const ry = this.y+y;
+		for(let i=0;i<this.children.length;i++){
+			this.children[i].render(rx,ry);
+		}
+	}
+	intersect(x=0,y=0,cx,cy){
+		return false;
+	}
+	intersectChildren(x=0,y=0,cx,cy){
+		const rx = this.x+x;
+		const ry = this.y+y;
+		for(let i=0;i<this.children.length;i++){
+			if(this.children[i].intersect(rx,ry,cx,cy)){
+				return true;
+			}
+		}
+		return false;
+	}
+}
+class screwGroup extends screwElement{
+	constructor(can,ctx,x,y){
+		super(can,ctx,x,y);
+	}
+	intersect(x=0,y=0,cx,cy){
+		this.intersected = this.intersectChildren(x,y,cx,cy)
+		return this.intersected;
+	}
+}
+class screwRectInt extends screwElement{
+	constructor(can,ctx,x,y,w,h){
+		super(can,ctx,x,y);
+		this.w = w;
+		this.h = h;
+	}
+	intersect(x=0,y=0,cx,cy){
+		const rx = this.x+x;
+		const ry = this.y+y;
+		this.intersected = cx >= rx && cx <= rx+this.w && cy >= ry && cy <= ry+this.h;
+		return this.intersected;
+	}
+}
+class screwSqInt extends screwElement{
+	constructor(can,ctx,x,y,l){
+		super(can,ctx,x,y);
+		this.l = l;
+	}
+	intersect(x=0,y=0,cx,cy){
+		const rx = this.x+x;
+		const ry = this.y+y;
+		this.intersected = cx >= rx && cx <= rx+this.l && cy >= ry && cy <= ry+this.l;
+		return this.intersected;
+	}
+}
+class screwCircInt extends screwElement{
+	constructor(can,ctx,x,y,r){
+		super(can,ctx,x,y);
+		this.r = r;
+	}
+	intersect(x=0,y=0,cx,cy){
+		const rx = this.x+x;
+		const ry = this.y+y;
+		this.intersected = Math.hypot(rx-cx,ry-cy) <= this.r;
+		return this.intersected;
+	}
+}
+class screwElliInt extends screwElement{
+	constructor(can,ctx,x,y,hr,vr){
+		super(can,ctx,x,y);
+		this.hr = hr;
+		this.vr = vr;
+	}
+	intersect(x=0,y=0,cx,cy){
+		const rx = this.x+x;
+		const ry = this.y+y;
+		const c1 = (cx-rx);
+		const c2 = (cy-ry);
+		this.intersected = ((c1*c1)/(this.hr*this.hr))+((c2*c2)/(this.vr*this.vr)) <= 1;
+		return this.intersected;
+	}
+}
+class screwLineInt extends screwElement{
+	constructor(can,ctx,bx,by,ex,ey,r){
+		super(can,ctx,bx,by);
+		this.ex = ex;
+		this.ey = ey;
+		this.r = r;
+	}
+	intersect(x=0,y=0,cx,cy){
+		const a = (this.ey-this.y);
+		const b = (this.ex-this.x);
+		if(a == 0){
+			//no rise
+			let	rbx = this.x;
+			let	rex = this.ex;
+			if(rbx > rex){
+				rbx = this.ex;
+				rex = this.x;
+			}
+			rex = cx-(rex+x);
+			rbx = cx-(rbx+x);
+			const d = cy-(y+this.y);
+			if(rex > 0){
+				this.intersected = (rex*rex)+(d*d) <= this.r*this.r;
+				return this.intersected;
+			}else if(rbx < 0){
+				this.intersected = (rbx*rbx)+(d*d) <= this.r*this.r;
+				return this.intersected;
+			}else{
+				this.intersected = Math.abs(d) <= this.r;
+				return this.intersected;
+			}
+		}else if(b == 0){
+			//no run
+			let	rby = this.y;
+			let	rey = this.ey;
+			if(rby > rey){
+				rby = this.ey;
+				rey = this.y;
+			}
+			rey = cy-(rey+y);
+			rby = cy-(rby+y);
+			const d = cx-(x+this.x);
+			if(rey > 0){
+				this.intersected = (rey*rey)+(d*d) <= this.r*this.r;
+				return this.intersected;
+			}else if(rby < 0){
+				this.intersected = (rby*rby)+(d*d) <= this.r*this.r;
+				return this.intersected;
+			}else{
+				this.intersected = Math.abs(d) <= this.r;
+				return this.intersected;
+			}
+		}else{
+			const rx = this.x+x;
+			const ry = this.y+y;
+			let	rbx = rx;
+			let	rex = this.ex+x;
+			if(this.x > this.ex){
+				rbx = rex;
+				rex = rx;
+			}
+			const sl = a/b;
+			const int = Math.min(Math.max((((1/sl)*cx)+cy-ry+(sl*rx))/((1/sl)+sl),rbx),rex);
+			const c1 = cx-int;
+			const c2 = cy-((sl*(int-rx))+ry);
+			this.intersected = (c1*c1)+(c2*c2) <= this.r*this.r;
+			return this.intersected;
+		}
+	}
+}
+class screwTexInt extends screwElement{
+	constructor(can,ctx,x,y,t,fnt,options={}){
+		super(can,ctx,x,y);
+		this.t = t;
+		this.fnt = fnt;
+		this.ta = options.ta || 'left';
+		this.tb = options.tb || 'alphabetic';
+	}
+	intersect(x=0,y=0,cx,cy){
+		cx = cx-x;
+		cy = cy-y;
+		const temp1 = this.ctx.font;
+		const temp2 = this.ctx.textAlign;
+		const temp3 = this.ctx.textBaseline;
+		this.ctx.textAlign = this.ta;
+		this.ctx.textBaseline = this.tb;
+		this.ctx.font = this.fnt;
+		const m = this.ctx.measureText(this.t);
+		this.ctx.font = temp1;
+		this.ctx.textAlign = temp2;
+		this.ctx.textBaseline = temp3;
+		//(this.max ? this.max : m.width)
+		this.intersected = (cx >= this.x-m.actualBoundingBoxLeft && cx <= this.x+m.actualBoundingBoxRight) && (cy <= this.y+m.actualBoundingBoxDescent && cy >= this.y-m.actualBoundingBoxAscent);
+		return this.intersected;
+	}
+}
+//was originally going to be responsive but has problems with scaling and stuff
+class screwTex extends screwTexInt{
+	constructor(can,ctx,x,y,t,fnt,options={}){
+		super(can,ctx,x,y,t,fnt,options);
+		this.sty = options.sty;
+		this.ssty = options.ssty;
+		this.slw = options.slw || 1;
+		this.slj = options.slj || 'miter';
+	}
+	render(x=0,y=0){
+		const temp1 = this.ctx.font;
+		const temp2 = this.ctx.textAlign;
+		const temp3 = this.ctx.textBaseline;
+		this.ctx.font = this.fnt;
+		this.ctx.textAlign = this.ta;
+		this.ctx.textBaseline = this.tb;
+		if(this.sty){
+			const temp4 = this.ctx.fillStyle;
+			this.ctx.fillStyle = this.sty;
+			this.ctx.fillText(this.t,this.x,this.y);
+			this.ctx.fillStyle = temp4;
+		}
+		if(this.ssty){
+			const temp4 = this.ctx.strokeStyle;
+			const temp5 = this.ctx.lineWidth;
+			const temp6 = this.ctx.lineJoin;
+			this.ctx.lineWidth = this.slw;
+			this.ctx.lineJoin = this.slj;
+			this.ctx.strokeStyle = this.ssty;
+			this.ctx.strokeText(this.t,this.x,this.y);
+			this.ctx.strokeStyle = temp4;
+			this.ctx.lineWidth = temp5;
+			this.ctx.lineJoin = temp6;
+		}
+		this.ctx.font = temp1;
+		this.ctx.textAlign = temp2;
+		this.ctx.textBaseline = temp3;
+	}
+}
+class screwRect extends screwRectInt{
+	constructor(can,ctx,x,y,w,h,sty=null,ssty=null,slw=1,slj='miter'){
+		super(can,ctx,x,y,w,h);
+		this.sty = sty;
+		this.ssty = ssty;
+		this.slw = slw;
+		this.slj = slj;
+	}
+	render(x=0,y=0){
+		if(this.sty){
+			const temp = this.ctx.fillStyle;
+			this.ctx.fillStyle = this.sty;
+			this.ctx.fillRect(this.x+x,this.y+y,this.w,this.h);
+			this.ctx.fillStyle = temp;
+		}
+		if(this.ssty){
+			const temp = this.ctx.strokeStyle;
+			const temp1 = this.ctx.lineWidth;
+			const temp2 = this.ctx.lineJoin;
+			this.ctx.lineWidth = this.slw;
+			this.ctx.lineJoin = this.slj;
+			this.ctx.strokeStyle = this.ssty;
+			this.ctx.strokeRect(this.x+x,this.y+y,this.w,this.h);
+			this.ctx.strokeStyle = temp;
+		}
+	}
+}
+class screwLine extends screwLineInt{
+	constructor(can,ctx,bx,by,ex,ey,r,sty,lw=1,lj='miter'){
+		super(can,ctx,bx,by,ex,ey,r);
+		this.sty = sty;
+		this.lw = lw;
+		this.lj = lj;
+	}
+	render(x=0,y=0){
+		const temp = this.ctx.strokeStyle;
+		const temp1 = this.ctx.lineWidth;
+		const temp2 = this.ctx.lineJoin;
+		this.ctx.lineWidth = this.lw;
+		this.ctx.lineJoin = this.lj;
+		this.ctx.strokeStyle = this.sty;
+		this.ctx.beginPath();
+		this.ctx.moveTo(this.x+x,this.y+y);
+		this.ctx.lineTo(this.ex+x,this.ey+y);
+		this.ctx.stroke();
+		this.ctx.strokeStyle = temp;
+		this.ctx.lineWidth = temp1;
+		this.ctx.lineJoin = temp2;
+	}
+}
+class screwSq extends screwSqInt{
+	constructor(can,ctx,x,y,l,sty=null,ssty=null,slw=1,slj='miter'){
+		super(can,ctx,x,y,l);
+		this.sty = sty;
+		this.ssty = ssty;
+		this.slw = slw;
+		this.slj = slj;
+	}
+	render(x=0,y=0){
+		if(this.sty){
+			const temp = this.ctx.fillStyle;
+			this.ctx.fillStyle = this.sty;
+			this.ctx.fillRect(this.x+x,this.y+y,this.l,this.l);
+			this.ctx.fillStyle = temp;
+		}
+		if(this.ssty){
+			const temp = this.ctx.strokeStyle;
+			const temp1 = this.ctx.lineWidth;
+			const temp2 = this.ctx.lineJoin;
+			this.ctx.lineWidth = this.slw;
+			this.ctx.lineJoin = this.slj;
+			this.ctx.strokeStyle = this.ssty;
+			this.ctx.strokeRect(this.x+x,this.y+y,this.l,this.l);
+			this.ctx.strokeStyle = temp;
+			this.ctx.lineWidth = temp1;
+			this.ctx.lineJoin = temp2;
+		}
+	}
+}
+class screwCirc extends screwCircInt{
+	constructor(can,ctx,x,y,r,sty=null,ssty=null,slw=1,slj='miter'){
+		super(can,ctx,x,y,r);
+		this.sty = sty;
+		this.ssty = ssty;
+		this.slw = slw;
+		this.slj = slj;
+	}
+	render(x=0,y=0){
+		const base = new Path2D();
+		base.arc(this.x+x,this.y+y,this.r,0,2*Math.PI);
+		if(this.sty){
+			const temp = this.ctx.fillStyle;
+			this.ctx.fillStyle = this.sty;
+			this.ctx.fill(base);
+			this.ctx.fillStyle = temp;
+		}
+		if(this.ssty){
+			const temp = this.ctx.strokeStyle;
+			const temp1 = this.ctx.lineWidth;
+			const temp2 = this.ctx.lineJoin;
+			this.ctx.lineWidth = this.slw;
+			this.ctx.lineJoin = this.slj;
+			this.ctx.strokeStyle = this.ssty;
+			this.ctx.stroke(base);
+			this.ctx.strokeStyle = temp;
+			this.ctx.lineWidth = temp1;
+			this.ctx.lineJoin = temp2;
+		}
+	}
+}
+class screwElli extends screwElliInt{
+	constructor(can,ctx,x,y,hr,vr,sty=null,ssty=null,slw=1,slj='miter'){
+		super(can,ctx,x,y,hr,vr);
+		this.sty = sty;
+		this.ssty = ssty;
+		this.slw = slw;
+		this.slj = slj;
+	}
+	render(x=0,y=0){
+		const base = new Path2D();
+		base.ellipse(this.x+x,this.y+y,this.hr,this.vr,0,0,2*Math.PI);
+		if(this.sty){
+			const temp = this.ctx.fillStyle;
+			this.ctx.fillStyle = this.sty;
+			this.ctx.fill(base);
+			this.ctx.fillStyle = temp;
+		}
+		if(this.ssty){
+			const temp = this.ctx.strokeStyle;
+			const temp1 = this.ctx.lineWidth;
+			const temp2 = this.ctx.lineJoin;
+			this.ctx.lineWidth = this.slw;
+			this.ctx.lineJoin = this.slj;
+			this.ctx.strokeStyle = this.ssty;
+			this.ctx.stroke(base);
+			this.ctx.strokeStyle = temp;
+			this.ctx.lineWidth = temp1;
+			this.ctx.lineJoin = temp2;
+		}
+	}
+}
+class screwRoundRect extends screwRectInt{
+	constructor(can,ctx,x,y,w,h,r,sty=null,ssty=null,slw=1,slj='miter'){
+		super(can,ctx,x,y,w,h);
+		this.r = r;
+		this.sty = sty;
+		this.ssty = ssty;
+		this.slw = slw;
+		this.slj = slj;
+	}
+	render(x=0,y=0){
+		const base = new Path2D();
+		if(this.r==0){
+			base.rect(this.x+x,this.y+y,this.w,this.h);
+		}else{
+			base.roundRect(this.x+x,this.y+y,this.w,this.h,this.r);
+		}
+		if(this.sty){
+			const temp = this.ctx.fillStyle;
+			this.ctx.fillStyle = this.sty;
+			this.ctx.fill(base);
+			this.ctx.fillStyle = temp;
+		}
+		if(this.ssty){
+			const temp = this.ctx.strokeStyle;
+			const temp1 = this.ctx.lineWidth;
+			const temp2 = this.ctx.lineJoin;
+			this.ctx.lineWidth = this.slw;
+			this.ctx.lineJoin = this.slj;
+			this.ctx.strokeStyle = this.ssty;
+			this.ctx.stroke(base);
+			this.ctx.strokeStyle = temp;
+			this.ctx.lineWidth = temp1;
+			this.ctx.lineJoin = temp2;
+		}
+	}
+}
+const canv = document.getElementsByTagName('canvas')[0];
+const ctx = canv.getContext('2d');
+const rect = new screwRoundRect(canv,ctx,10,10,80,50,0,'red');
+const line = new screwGroup(canv,ctx,300,300);
+const main = new screwGroup(canv,ctx,0,0);
+const circ = new screwCirc(canv,ctx,100,200,25,'blue',null,5);
+const elli = new screwElli(canv,ctx,10,300,50,25,'green',null,5);
+const txt = new screwTex(canv,ctx,300,300,'Testing...','bold 48px sans-serif',{sty: '#FE854A',ta:'center',tb:'middle'});
+main.addChild(rect);
+main.addChild(line);
+main.addChild(circ);
+main.addChild(elli);
+main.addChild(txt);
+line.addChild(new screwLine(canv,ctx,25,-50,-25,50,10,'white',2));
+line.addChild(new screwLine(canv,ctx,25,-50,50,-50,10,'white',2));
+line.addChild(new screwLine(canv,ctx,-25,50,-50,50,10,'white',2));
+main.render();
+canv.addEventListener('mousedown',e=>{
+	if(rect.intersect(0,0,e.offsetX,e.offsetY)){
+		rect.r = 20;
+		ctx.reset();
+		main.render();
+	}else if(line.intersect(0,0,e.offsetX,e.offsetY)){
+		for(let i=0;i<line.children.length;i++){
+			line.children[i].sty = 'green';
+		}
+	}else if(circ.intersect(0,0,e.offsetX,e.offsetY)){
+		circ.ssty = 'white';
+	}else if(elli.intersect(0,0,e.offsetX,e.offsetY)){
+		elli.ssty = 'red';
+	}else if(txt.intersect(0,0,e.offsetX,e.offsetY)){
+		txt.fnt = 'italic 48px serif';
+		txt.ssty = 'lightblue';
+	}
+	ctx.reset();
+	main.render();
+});
+document.addEventListener('mouseup',e=>{
+	rect.intersected = false;
+	line.intersected = false;
+	circ.intersected = false;
+	elli.intersected = false;
+	txt.intersected = false;
+	for(let i=0;i<line.children.length;i++){
+	  line.children[i].sty = 'white';
+	}
+	circ.ssty = null;
+	rect.r = 0;
+	elli.ssty = null;
+	txt.fnt = 'bold 48px sans-serif';
+	txt.ssty = null;
+	ctx.reset();
+	main.render();
+});
+canv.addEventListener('mousemove',e=>{
+  if(rect.intersected){
+    rect.x += e.movementX;
+    rect.y += e.movementY;
+    ctx.reset();
+    main.render();
+  }else if(line.intersected){
+    line.x += e.movementX;
+    line.y += e.movementY;
+    ctx.reset();
+    main.render();
+  }else if(circ.intersected){
+    circ.x += e.movementX;
+    circ.y += e.movementY;
+    ctx.reset();
+    main.render();
+  }else if(elli.intersected){
+    elli.x += e.movementX;
+    elli.y += e.movementY;
+    ctx.reset();
+    main.render();
+  }else if(txt.intersected){
+    txt.x += e.movementX;
+    txt.y += e.movementY;
+    ctx.reset();
+    main.render();
+  }
+});
+  </script>
+</body>
+</html>
