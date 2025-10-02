@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>Screw 0.3 Demo</title>
+  <title>Screw 0.3.1 Demo</title>
   <style>
 	body {
 		margin:0;
@@ -24,12 +24,13 @@
 <body>
   <canvas width='1000' height='1000'></canvas>
   <script>
-//Screw v0.3 demo
+//Screw v0.3.1 demo
 //Programmed by Lucas Lux
 //10/1/25
 
+//needs z-index thingy
 class screwElement{
-	constructor(ctx=null,x=0,y=0,options={}){//,style nahh would be too tedious and stupid with the intersection classes
+	constructor(ctx=null,x=0,y=0,options={}){
 		this.ctx = ctx;
 		this.x = x;
 		this.y = y;
@@ -40,40 +41,36 @@ class screwElement{
 		this.visible = options.visible ?? true;
 		this.cvis = options.cvis ?? true;
 		this.cena = options.cena ?? true;
-		this.style = options.style ?? []; //[map]
-		//this.prevStyle = null; I'M STUPID LOL
+		this.style = options.style ?? [];
+		this.props = options.props ?? new Map();
+		for(let i=0;i<this.style.length;i++){
+			if(this.style[i].constructor.name != 'Map'){
+				this.style[i] = new Map(Object.entries(this.style[i]));
+			}
+		}
+		if(this.props.constructor.name != 'Map'){
+			this.props = new Map(Object.entries(this.props));
+		}
 	}
 	addChild(e){
 		this.children.push(e);
 		e.parent = this;
 	}
-	removeChild(i){
-		this.children[i].parent = null;
+	removeChild(ind){
+		this.children[ind].parent = null;
 		this.children.splice(i,1);
 	}
-	processStyle(ind){//,sav=true
+	changeStyle(ind,v){
+		this.style[ind] = v.constructor.name === 'Map' ? v : new Map(Object.entries(v));
+	}
+	setProp(k,v){
+		return this.props.set(k,v).get(k);
+	}
+	getProp(k){
+		return this.props.get(k);
+	}
+	processStyle(ind){
 		if(this.style[ind]){
-			/*
-			if(sav){
-				this.prevStyle = new Map();
-				for(const [k,v] of this.style[ind]){
-					switch(k){
-						case 'setLineDash':
-						this.prevStyle.set(k,this.ctx.getLineDash());
-						this.ctx.setLineDash(v);
-						break;
-						case 'setTransform':
-						this.prevStyle.set(k,this.ctx.getTransform());
-						this.ctx.setTransform(v);
-						break;
-						default:
-						this.prevStyle.set(k,this.ctx[k]);
-						this.ctx[k] = v;
-					}
-				}
-			}else{
-			}
-			*/
 			for(const [k,v] of this.style[ind]){
 				switch(k){
 					case 'setLineDash':
@@ -88,11 +85,6 @@ class screwElement{
 			}
 		}
 	}
-	/*
-	restoreStyle(){
-		if(this.prevStyle)
-	}
-	*/
 	getOffset(x=0,y=0){
 		let pc = [this.x+x,this.y+y];
 		let p = this.parent;
@@ -312,7 +304,6 @@ class screwTexInt extends screwElement{
 		}
 	}
 }
-//was originally going to be responsive but has problems with scaling and stuff
 class screwTex extends screwTexInt{
 	constructor(ctx,x,y,t,options={}){
 		super(ctx,x,y,t,options);
@@ -328,7 +319,6 @@ class screwTex extends screwTexInt{
 				this.processStyle(0);
 				this.ctx.fillText(this.t,rc[0],rc[1]);
 			}
-			//this.ctx.restore();
 			if(this.svis){
 				this.processStyle(1);
 				this.ctx.strokeText(this.t,rc[0],rc[1]);
@@ -357,7 +347,6 @@ class screwRect extends screwRectInt{
 				this.processStyle(0);
 				this.ctx.fillRect(rc[0],rc[1],this.w,this.h);
 			}
-			//this.ctx.restore();
 			if(this.svis){
 				this.processStyle(1);
 				this.ctx.strokeRect(rc[0],rc[1],this.w,this.h);
@@ -407,7 +396,6 @@ class screwSq extends screwSqInt{
 				this.processStyle(0);
 				this.ctx.fillRect(rc[0],rc[1],this.l,this.l);
 			}
-			//this.ctx.restore();
 			if(this.svis){
 				this.processStyle(1);
 				this.ctx.strokeRect(rc[0],rc[1],this.l,this.l);
@@ -438,7 +426,6 @@ class screwCirc extends screwCircInt{
 				this.processStyle(0);
 				this.ctx.fill(base);
 			}
-			//this.ctx.restore();
 			if(this.svis){
 				this.processStyle(1);
 				this.ctx.stroke(base);
@@ -469,7 +456,6 @@ class screwElli extends screwElliInt{
 				this.processStyle(0);
 				this.ctx.fill(base);
 			}
-			//this.ctx.restore();
 			if(this.svis){
 				this.processStyle(1);
 				this.ctx.stroke(base);
@@ -505,7 +491,6 @@ class screwRoundRect extends screwRectInt{
 				this.processStyle(0);
 				this.ctx.fill(base);
 			}
-			//this.ctx.restore();
 			if(this.svis){
 				this.processStyle(1);
 				this.ctx.stroke(base);
@@ -519,38 +504,15 @@ class screwRoundRect extends screwRectInt{
 }
 const canv = document.getElementsByTagName('canvas')[0];
 const ctx = canv.getContext('2d');
-const rect = new screwRoundRect(ctx,10,10,80,50,0,{svis:false});
-rect.style[0].set('fillStyle','red');
-rect.style[1].set('strokeStyle','white');
-rect.style[1].set('lineWidth',3);
+const rect = new screwRoundRect(ctx,10,10,80,50,0,{svis:false,style:[{fillStyle:'red'},{strokeStyle:'white',lineWidth:3}]});
 const line = new screwGroup(ctx,300,300);
 const main = new screwGroup(ctx,200,200);
-const circ = new screwCirc(ctx,100,200,25,{svis:false});
-circ.style[0].set('fillStyle','blue');
-circ.style[1].set('strokeStyle','white');
-circ.style[1].set('lineWidth',5);
-const elli = new screwElli(ctx,10,300,50,25,{svis:false});
-elli.style[0].set('fillStyle','green');
-elli.style[1].set('strokeStyle','red');
-elli.style[1].set('lineWidth',5);
-const txt = new screwTex(ctx,300,300,'Testing...',{svis:false});
-txt.style[0].set('font','bold 48px sans-serif');
-txt.style[0].set('fillStyle','#FE854A');
-txt.style[0].set('textAlign','center');
-txt.style[0].set('textBaseline','middle');
-txt.style[1].set('strokeStyle','lightblue');
-const cont1 = new screwCirc(ctx,25,-50,5,{visible:false,enabled:false,svis:false});
-cont1.style[0].set('fillStyle','white');
-cont1.style[1].set('lineWidth',2);
-cont1.style[1].set('strokeStyle','#3EA0FC');
-const cont2 = new screwCirc(ctx,-25,50,5,{visible:false,enabled:false,svis:false});
-cont2.style[0].set('fillStyle','white');
-cont2.style[1].set('lineWidth',2);
-cont2.style[1].set('strokeStyle','#3EA0FC');
-const rectcont = new screwCirc(ctx,0,0,5,{visible:false,enabled:false,svis:false});
-rectcont.style[0].set('fillStyle','green');
-rectcont.style[1].set('lineWidth',2);
-rectcont.style[1].set('strokeStyle','white');
+const circ = new screwCirc(ctx,100,200,25,{svis:false,style:[{fillStyle:'blue'},{strokeStyle:'white',lineWidth:5}]});
+const elli = new screwElli(ctx,10,300,50,25,{svis:false,style:[{fillStyle:'green'},{strokeStyle:'red',lineWidth:5}]});
+const txt = new screwTex(ctx,300,300,'Testing...',{svis:false,style:[{font:'bold 48px sans-serif',fillStyle:'#FE854A',textAlign:'center',textBaseline:'middle'},{strokeStyle:'lightblue'}]});
+const cont1 = new screwCirc(ctx,25,-50,5,{visible:false,enabled:false,svis:false,style:[{fillStyle:'white'},{strokeStyle:'#3EA0FC',lineWidth:2}]});
+const cont2 = new screwCirc(ctx,-25,50,5,{visible:false,enabled:false,svis:false,style:[{fillStyle:'white'},{strokeStyle:'#3EA0FC',lineWidth:2}]});
+const rectcont = new screwCirc(ctx,0,0,5,{visible:false,enabled:false,svis:false,style:[{fillStyle:'green'},{strokeStyle:'white',lineWidth:2}]});
 rect.addChild(rectcont);
 main.addChild(rect);
 main.addChild(line);
@@ -567,25 +529,25 @@ line.addChild(cont1);
 line.addChild(cont2);
 main.render();
 canv.addEventListener('mousedown',e=>{
-	if(rectcont.clicked = rectcont.intersect(e.offsetX,e.offsetY)){
+	if(rectcont.setProp('clicked',rectcont.intersect(e.offsetX,e.offsetY))){
 		rectcont.svis = true;
-	}else if(rect.clicked = rect.intersect(e.offsetX,e.offsetY)){
+	}else if(rect.setProp('clicked',rect.intersect(e.offsetX,e.offsetY))){
 		rect.svis = true;
-	}else if(cont1.clicked = cont1.intersect(e.offsetX,e.offsetY)){
+	}else if(cont1.setProp('clicked',cont1.intersect(e.offsetX,e.offsetY))){
 		cont1.svis = true;
-	}else if(cont2.clicked = cont2.intersect(e.offsetX,e.offsetY)){
+	}else if(cont2.setProp('clicked',cont2.intersect(e.offsetX,e.offsetY))){
 		cont2.svis = true;
-	}else if(line.clicked = line.intersect(e.offsetX,e.offsetY)){
+	}else if(line.setProp('clicked',line.intersect(e.offsetX,e.offsetY))){
 		for(let i=0;i<line.children.length;i++){
 			if(line.children[i].constructor.name == 'screwLine'){
 				line.children[i].style[0].set('strokeStyle','green');
 			};
 		}
-	}else if(circ.clicked = circ.intersect(e.offsetX,e.offsetY)){
+	}else if(circ.setProp('clicked',circ.intersect(e.offsetX,e.offsetY))){
 		circ.svis = true;
-	}else if(elli.clicked = elli.intersect(e.offsetX,e.offsetY)){
+	}else if(elli.setProp('clicked',elli.intersect(e.offsetX,e.offsetY))){
 		elli.svis = true;
-	}else if(txt.clicked = txt.intersect(e.offsetX,e.offsetY)){
+	}else if(txt.setProp('clicked',txt.intersect(e.offsetX,e.offsetY))){
 		txt.style[0].set('font','italic 48px serif');
 		txt.svis = true;
 	}
@@ -593,14 +555,14 @@ canv.addEventListener('mousedown',e=>{
 	main.render();
 });
 document.addEventListener('mouseup',e=>{
-	rect.clicked = false;
-	line.clicked = false;
-	circ.clicked = false;
-	elli.clicked = false;
-	txt.clicked = false;
-	cont1.clicked = false;
-	cont2.clicked = false;
-	rectcont.clicked = false;
+	rect.setProp('clicked',false);
+	line.setProp('clicked',false);
+	circ.setProp('clicked',false);
+	elli.setProp('clicked',false);
+	txt.setProp('clicked',false);
+	cont1.setProp('clicked',false);
+	cont2.setProp('clicked',false);
+	rectcont.setProp('clicked',false);
 	for(let i=0;i<line.children.length;i++){
 		if(line.children[i].constructor.name == 'screwLine'){
 			line.children[i].style[0].set('strokeStyle','white');
@@ -618,36 +580,36 @@ document.addEventListener('mouseup',e=>{
 	main.render();
 });
 canv.addEventListener('mousemove',e=>{
-	if(rectcont.clicked){
+	if(rectcont.getProp('clicked')){
 		rectcont.x = Math.min(Math.max(rectcont.x+e.movementX,0),rect.w/2);
 		rect.r = rectcont.x;
-	}else if(rect.clicked){
+	}else if(rect.getProp('clicked')){
 		rect.x += e.movementX;
 		rect.y += e.movementY;
-	}else if(cont1.clicked){
+	}else if(cont1.getProp('clicked')){
 		cont1.x += e.movementX;
 		cont1.y += e.movementY;
 		line.children[0].x = line.children[1].x = cont1.x
 		line.children[0].y = line.children[1].y = cont1.y
 		line.children[1].ex += e.movementX;
 		line.children[1].ey += e.movementY;
-	}else if(cont2.clicked){
+	}else if(cont2.getProp('clicked')){
 		cont2.x += e.movementX;
 		cont2.y += e.movementY;
 		line.children[0].ex = line.children[2].x = cont2.x
 		line.children[0].ey = line.children[2].y = cont2.y
 		line.children[2].ex += e.movementX;
 		line.children[2].ey += e.movementY;
-	}else if(line.clicked){
+	}else if(line.getProp('clicked')){
 		line.x += e.movementX;
 		line.y += e.movementY;
-	}else if(circ.clicked){
+	}else if(circ.getProp('clicked')){
 		circ.x += e.movementX;
 		circ.y += e.movementY;
-	}else if(elli.clicked){
+	}else if(elli.getProp('clicked')){
 		elli.x += e.movementX;
 		elli.y += e.movementY;
-	}else if(txt.clicked){
+	}else if(txt.getProp('clicked')){
 		txt.x += e.movementX;
 		txt.y += e.movementY;
 	}
