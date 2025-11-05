@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sanitized text tester</title>
+  <style>
+    html {
+      color-scheme: dark;
+    }
+    
+    body {
+      padding: 2vh 5vw;
+      color: #EEE;
+      font-family: Courier New, monospace;
+      font-size: 20px;
+      /*font-family: Arial, sans-serif;*/
+      /*color-scheme: dark;*/
+      text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      background: #222;
+      scroll-behavior:smooth;
+    }
+
+    ::-webkit-scrollbar {width: 10px;}
+    ::-webkit-scrollbar-track {
+      background: #111;
+   }
+    ::-webkit-scrollbar-thumb {
+      background: #666;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {background:#777;}
+    ::-webkit-scrollbar-thumb:active {box-shadow: 0 0 10px white;}
+    textarea:focus {outline:none;}
+    textarea{resize:none;width: 100%;height:20vh;font-size:20px;}
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>Sanitized text tester</h1>
+  <textarea></textarea>
+  <h2 id='outinfo'></h2>
+  <footer>Copyright 2025 Frost. CC-BY-SA-NC 4.0</footer>
+  <script>
+  	const area = document.querySelector('textarea');
+  	const outinfo = document.getElementById('outinfo');
+  	area.addEventListener('input',()=>{
+  		const sanitizer = document.createElement('span');
+  		sanitizer.innerText = area.value;
+  		outinfo.innerText = 'VALUE:'+area.value+'\nSAN:'+sanitizer.innerHTML;
+  	})
+  </script>
+</body>
+</html>
