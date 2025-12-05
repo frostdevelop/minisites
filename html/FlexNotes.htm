@@ -155,11 +155,11 @@
     input:focus,select:focus,textarea:focus {outline:none;}
     .button,input,select {font-family: Arial, sans-serif;}
     input:active,select:active,input[type="text"]:focus,.button:active,.sn-slideinp:active .sn-inp-maincont:before {
-      box-shadow: 2px 2px var(--height) rgba(0,0,0,0.6) inset, -2px -2px var(--height) rgba(240,240,240,0.6) inset;
+      box-shadow: 0 -1px 3px rgba(255,255,255,0.4) inset, 0 0 0 rgba(0,0,0,0.2), 0 -6px 10px rgba(255,255,255,0.4) inset, 0 1px 3px rgba(255,255,255,0.1) inset,0 0 0 rgba(0,0,0,0.6), 0 0 0 rgba(240,240,240,0.6), 2px 2px var(--height) rgba(0,0,0,0.6) inset;
     }
     details,input,select,.button,.contsolid,.sn-slideinp .sn-inp-maincont:before {background: linear-gradient(to top left, rgba(255,255,255,0), rgba(255,255,255,0.2)) !important;border:none;box-shadow: 0 1px 3px rgba(255,255,255,0.4) inset, 0 50px 80px rgba(0,0,0,0.2), 0 6px 10px rgba(255,255,255,0.4) inset, 0 -1px 3px rgba(255,255,255,0.1) inset,2px 2px var(--height) rgba(0,0,0,0.6), -2px -2px var(--height) rgba(240,240,240,0.6);}
     input,select,.button {
-      transition: box-shadow 500ms ease, border 500ms ease;
+      transition: box-shadow .15s linear;
       background: none;
       color: currentcolor;
       font-size: 13px;
@@ -259,7 +259,7 @@
     	border: solid 1px rgba(255,255,255,0.4);
     	border-radius:50px;
     	overflow: hidden;
-    	padding: 25px 35px;
+    	padding: 25px 35px 0 35px;
     	transition: transform .3s ease;
     	max-width: 500px;
     	display:flex;
@@ -283,7 +283,7 @@
     }
     
     .sn-modal-div {
-    	margin: 10px -50px;
+    	margin: 10px -50px 0 -50px;
     	opacity: 0.3;
     }
     .sn-numinp {
@@ -343,12 +343,19 @@
     .sn-modal-scroll {
     	overflow-y: auto;
     	margin: 0 -10px;
-    	padding: 0 10px;
+    	padding: 10px 10px;
     	min-height: 82%;
     }
     .sn-modal-foot {
-    	margin-top: 5px;
+    	position:absolute;
     	font-size: 15px;
+    	bottom:0px;
+    	margin-left:-32px;
+    	padding: 30px 0 10px 32px;
+    	width:100%;
+    	background: linear-gradient(to top,rgba(255,255,255,0.2),transparent);
+    	z-index:100;
+    	pointer-events:none;
     }
     .sn-slideinp {
     	user-select:none;
@@ -368,6 +375,7 @@
     	content: "";
     	width: 50px;
     	height: 30px;
+    	transition: box-shadow .15s linear;
     	background: linear-gradient(to top left, rgba(255,255,255,0.1), rgba(255,255,255,0.4)) !important;
     	cursor:pointer;
     	border:none;
@@ -396,6 +404,10 @@
     	transform:translateX(20px);
     	box-shadow: 0 0 10px #00ff55 inset;
     }
+    ::placeholder {
+    	color:white;
+    	opacity:0.3
+    }
   </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
@@ -412,20 +424,23 @@
   	</div>
   	<div id='sn-header-cont'>
   		<div class='sn-header'>
-  			<div class='sn-header-menu' id='sn-file-btn'>
-  				<button class='sn-header-btn'>Save</button>
+  			<div class='sn-header-menu'>
+  				<button class='sn-header-btn' id='sn-file-btn'>Save</button>
   			</div>
-  			<div class='sn-header-menu' id='sn-edit-btn'>
-  				<button class='sn-header-btn'>Load</button>
+  			<div class='sn-header-menu'>
+  				<button class='sn-header-btn' id='sn-edit-btn'>Load</button>
   			</div>
-  			<div class='sn-header-menu' id='sn-pref-btn'>
-  				<button class='sn-header-btn'>Preferences</button>
+  			<div class='sn-header-menu'>
+  				<button class='sn-header-btn' id='sn-tabsave-btn'>Load tabsave</button>
   			</div>
-  			<div class='sn-header-menu' id='sn-help-btn'>
-  				<button class='sn-header-btn'>Help</button>
+  			<div class='sn-header-menu'>
+  				<button class='sn-header-btn' id='sn-pref-btn'>Preferences</button>
+  			</div>
+  			<div class='sn-header-menu'>
+  				<button class='sn-header-btn' id='sn-help-btn'>Help</button>
   			</div>
   			<div class='sn-header-version'>
-  				v0.1.3
+  				v0.1.4 Dev Build
   			</div>
   		</div>
   	</div>
@@ -439,6 +454,12 @@
   			</div> 
   			<hr class='sn-modal-div'/>
   			<div class='sn-modal-scroll'>
+  				<div class='sn-inpinp' title='File name'>
+  					<span class='sn-inp-caption'>File name</span>
+  					<div class='sn-inp-maincont'>
+  						<input class='sn-inp-main sn-form-file' placeholder='export'></input>.fn<br/>
+  					</div>
+  				</div>
   				<div class='sn-numinp' title='Font size'>
   					<span class='sn-inp-caption'>Font Size</span>
   					<div class='sn-inp-maincont'>
@@ -447,6 +468,24 @@
   							<button class='button sn-icobtn'>+</button>
   							<button class='button sn-icobtn'>-</button>
   						</div>
+  					</div>
+  				</div>
+  				<div class='sn-slideinp'>
+  					<label class='sn-inp-maincont'>
+  						<input type='checkbox' class='sn-inp-main sn-form-tabsave'></input>
+  						<span class='sn-inp-caption'>Tabsave</span>
+  					</label>
+  				</div>
+  				<div class='sn-slideinp'>
+  					<label class='sn-inp-maincont'>
+  						<input type='checkbox' class='sn-inp-main sn-form-encrypt' disabled></input>
+  						<span class='sn-inp-caption'>Tabsave Encryption</span>
+  					</label>
+  				</div>
+  				<div class='sn-inpinp' title='Tabsave key'>
+  					<span class='sn-inp-caption'>Tabsave key</span>
+  					<div class='sn-inp-maincont'>
+  						<input class='sn-inp-main sn-form-key' placeholder='frostbyte' disabled></input>
   					</div>
   				</div>
   				<div class='sn-slideinp'>
@@ -522,6 +561,11 @@
   	</div>
   </div>
   <script>
+  	/*
+  	TBD:
+  	Implement CryoCrypt and fsort for Rust wasm 
+  Update file format for unicode support
+  	*/
   	const numbInputs = document.getElementsByClassName('sn-numinp');
   	for(let i=0;i<numbInputs.length;i++){
   		const inp = numbInputs[i].getElementsByClassName('sn-inp-main')[0];
@@ -548,6 +592,25 @@
   		});
   	}
   	
+  	const cont = document.getElementById('sn-main');
+  	const over = document.getElementById('sn-over');
+  	const prefModal = document.getElementById('sn-prefmodal');
+  	const helpModal = document.getElementById('sn-helpmodal');
+  	const prefFile = prefModal.getElementsByClassName('sn-form-file')[0];
+  	const prefTabSave = prefModal.getElementsByClassName('sn-form-tabsave')[0];
+  	let rowLengths = [parseFloat(cont.style.gridTemplateRows.split(' ')[0])];
+  	const baseParams = {alphabet:'base64url',omitPadding:true};
+  	let rows = [];
+  	let dividers = [];
+  	let asInterval = null;
+  	let winSave = null;
+  	let C_prevState = {
+  		val: [['']],
+  		cont: cont.style.gridTemplateRows,
+  	};
+  	function bindToTabSave(a){
+  		a.addEventListener('change',updateTabSave);
+  	}
   	class SNRow {
   		constructor(elm){
   			this.add = this.add.bind(this);
@@ -560,6 +623,7 @@
   			const initArea = document.createElement('textarea');
   			initArea.classList.add('sn-area');
   			this.row.appendChild(initArea);
+  			bindToTabSave(initArea);
   			this.areas = [initArea];
   			const addCont = document.createElement('div');
   			addCont.classList.add('sn-row-add');
@@ -579,6 +643,7 @@
   			const newArea = document.createElement('textarea');
   			newArea.classList.add('sn-area');
   			this.row.appendChild(newArea);
+  			bindToTabSave(newArea);
   			this.areas.push(newArea);
   			this.row.style.gridTemplateColumns = '1fr';
   			for(let i=1;i<this.areas.length;i++){
@@ -596,21 +661,7 @@
   		}
   	}
   	
-  	const cont = document.getElementById('sn-main');
-  	const over = document.getElementById('sn-over');
-  	const prefModal = document.getElementById('sn-prefmodal');
-  	const helpModal = document.getElementById('sn-helpmodal');
-  	const rowLengths = [parseFloat(cont.style.gridTemplateRows.split(' ')[0])];
-  	const rows = [];
-  	const dividers = [];
-  	let asInterval = null;
-  	let C_prevState = {
-  		val: [['']],
-  		cont: cont.style.gridTemplateRows,
-  	};
-  	
   	function addCol(){
-  		//try{
   		const divy = 1/(rows.length+1);
   		const rowFrs = cont.style.gridTemplateRows.split(' ');
   		const rowElms = Array.from(cont.children);
@@ -653,49 +704,9 @@
   			downDist += rowLengths[i];
   			dividers[i].style.paddingTop = (downDist*100).toString()+'vh';
   		}
+  		downDist += rowLengths[dividers.length];
   		const divInd = rowLengths.length-1;
-  		const contOver = document.createElement('div');
-  		contOver.classList.add('sn-spacer');
-  		downDist += rowLengths[dividers.length]
-  		contOver.style.paddingTop = (downDist*100).toString()+'vh';
-  		const divCont = document.createElement('div');
-  		divCont.classList.add('sn-divider-cont')
-  		const divider = document.createElement('div');
-  		divider.classList.add('sn-divider')
-  		divCont.appendChild(divider);
-  		contOver.appendChild(divCont);
-  		document.body.appendChild(contOver);
-  		dividers.push(contOver);
-  		
-  		let divDwn = false;
-  		divCont.addEventListener('mousedown',()=>{
-  			divDwn = true;
-  		});
-  		document.body.addEventListener('mouseup',()=>{
-  			divDwn = false;
-  		});
-  		document.body.addEventListener('mousemove',e=>{
-  			if(divDwn){
-  				let initSpace = 0;
-  				for(let i=0;i<divInd-1;i++){
-  					initSpace += rowLengths[i];
-  				}
-  				const newdist = Math.max(e.clientY/window.innerHeight,0.05+initSpace);
-  				contOver.style.paddingTop = (newdist*100).toString()+'vh';
-  				//try{
-  				const fullSize = rowLengths[divInd]+rowLengths[divInd-1];
-  				rowLengths[divInd-1] = newdist-initSpace;
-  				rowLengths[divInd] = fullSize-(newdist-initSpace);
-  				let newStyle = '';
-  				for(let i=0;i<rowLengths.length;i++){
-  					newStyle += rowLengths[i].toString()+'fr ';
-  				}
-  				cont.style.gridTemplateRows = newStyle;
-  				//}catch(e){alert(e.stack)}
-  			}
-  		});
-  		
-  		//}catch(e){alert(e.stack)}
+  		addDiv(downDist,divInd);
   	}
   	
   	function remCol(){
@@ -730,6 +741,41 @@
   		//}catch(e){alert(e.stack)}
   	}
   	
+  	function addDiv(prevLen,row){
+  		const contOver = document.createElement('div');
+  		contOver.classList.add('sn-spacer');
+  		contOver.style.paddingTop = (prevLen*100).toString()+'vh';
+  		const divCont = document.createElement('div');
+  		divCont.classList.add('sn-divider-cont')
+  		const divider = document.createElement('div');
+  		divider.classList.add('sn-divider')
+  		divCont.appendChild(divider);
+  		contOver.appendChild(divCont);
+  		document.body.appendChild(contOver);
+  		dividers.push(contOver);
+  		let divDwn = false;
+  		divCont.addEventListener('mousedown',()=>divDwn=true);
+  		document.body.addEventListener('mouseup',()=>divDwn=false);
+  		document.body.addEventListener('mousemove',e=>{
+  			if(divDwn){
+  				let initSpace = 0;
+  				for(let i=0;i<row-1;i++){
+  					initSpace += rowLengths[i];
+  				}
+  				const newdist = Math.max(e.clientY/window.innerHeight,0.05+initSpace);
+  				contOver.style.paddingTop = (newdist*100).toString()+'vh';
+  				const fullSize = rowLengths[row]+rowLengths[row-1];
+  				rowLengths[row-1] = newdist-initSpace;
+  				rowLengths[row] = fullSize-(newdist-initSpace);
+  				let newStyle = '';
+  				for(let i=0;i<rowLengths.length;i++){
+  					newStyle += rowLengths[i].toString()+'fr ';
+  				}
+  				cont.style.gridTemplateRows = newStyle;
+  			}
+  		});
+  	}
+  	
   	function saveConfig(){
   		/*
   		8 0xe588984046521a57 Magic number
@@ -759,8 +805,8 @@
   		const file = new ArrayBuffer(12+(6*rows.length)+(4*totCol)+totTxt); //8+2+2+(4*rows)+(2*rows)+(4*columns)+letters
   		const fileView = new DataView(file);
   		const fileArr = new Uint8Array(file);
-  		fileView.setBigUint64(0,BigInt("16539637033343261271"));
-  		fileView.setUint16(8,0);
+  		fileView.setBigUint64(0,16539637033343261271n);
+  		fileView.setUint16(8,1);
   		fileView.setUint16(10,rows.length);
   		let ind = 12;
   		const rowFrs = cont.style.gridTemplateRows.split(' ');
@@ -780,7 +826,7 @@
   			}
   		}
   		const dwnAnch = document.createElement('a');
-  		dwnAnch.download = 'export.fn';
+  		dwnAnch.download = (prefFile.value||'export')+'.fn';
   		dwnAnch.href = URL.createObjectURL(new Blob([file]));
   		dwnAnch.click();
   		URL.revokeObjectURL(dwnArch.href);
@@ -798,12 +844,13 @@
 				alert('Please upload some files');
 				return;
 			}
+			prefFile.value = fileInp.files[0].name.substr(0,fileInp.files[0].name.length-3);
 			const fR = new FileReader();
 			fR.onload = ()=>{
 				const file = fR.result;
 				const fileView = new DataView(file);
-				if(fileView.getBigUint64(0) != BigInt("16539637033343261271")){alert('Invalid File!');return;};
-				if(fileView.getUint16(8) > 0){alert('Invalid File!');return;}
+				if(fileView.getBigUint64(0) != 16539637033343261271n){alert('Invalid File!');return;};
+				if(fileView.getUint16(8) > 1){alert('Invalid File!');return;}
 				const rowCount = fileView.getUint16(10);
 				let ind = 12;
 				
@@ -816,8 +863,6 @@
 				rowLengths.length = 0;
 				rows.length = 0;
 				dividers.length = 0;
-				cont.style.gridTemplateRows = '';
-				
 				let newStyle = '';
 				let prevLen = 0;
 				for(let i=0;i<rowCount;i++){
@@ -829,45 +874,7 @@
   					cont.appendChild(newCol);
   					rows.push(new SNRow(newCol));
   					
-  					if(i>0){
-  						const contOver = document.createElement('div');
-  						contOver.classList.add('sn-spacer');
-  						contOver.style.paddingTop = (prevLen*100).toString()+'vh';
-  						const divCont = document.createElement('div');
-  						divCont.classList.add('sn-divider-cont')
-  						const divider = document.createElement('div');
-  						divider.classList.add('sn-divider')
-  						divCont.appendChild(divider);
-  						contOver.appendChild(divCont);
-  						document.body.appendChild(contOver);
-  						dividers.push(contOver);
-  						
-  						let divDwn = false;
-  						divCont.addEventListener('mousedown',()=>{
-  							divDwn = true;
-  						});
-  						document.body.addEventListener('mouseup',()=>{
-  							divDwn = false;
-  						});
-  						document.body.addEventListener('mousemove',e=>{
-  							if(divDwn){
-  								let initSpace = 0;
-  								for(let j=0;j<i-1;j++){
-  									initSpace += rowLengths[j];
-  								}
-  								const newdist = Math.max(e.clientY/window.innerHeight,0.05+initSpace);
-  								contOver.style.paddingTop = (newdist*100).toString()+'vh';
-  								const fullSize = rowLengths[i]+rowLengths[i-1];
-  								rowLengths[i-1] = newdist-initSpace;
-  								rowLengths[i] = fullSize-(newdist-initSpace);
-  								let newStyle = '';
-  								for(let j=0;j<rowLengths.length;j++){
-  									newStyle += rowLengths[j].toString()+'fr ';
-  								}
-  								cont.style.gridTemplateRows = newStyle;
-  							}
-  						});
-  					}
+  					if(i>0) addDiv(prevLen,i);
   					
 					ind += 4;
 					prevLen += rowLengths[rowLengths.length-1];
@@ -879,6 +886,7 @@
 					const colCount = fileView.getUint16(ind);
 					ind += 2;
 					for(let j=0;j<colCount;j++){
+						//mar:problem This doesn't account for unicode!!
 						const newText = new Uint8Array(new ArrayBuffer(fileView.getUint32(ind)));
 						ind+=4;
 						for(let i=0;i<newText.buffer.byteLength;i++){
@@ -928,6 +936,129 @@
   		}
   	}
   	
+  	function updateTabSave(){
+  		//try{
+  		if(!winSave) return;
+  		if(winSave.closed) winSave=open();
+  		let out = '';
+  		const fileName = encodeURIComponent(prefFile.value || 'export');
+  		out+=fileName.length.toString(16).padStart(2,'0')+fileName;
+  		let totCol = 0;
+  		for(let i=0;i<rows.length;i++){
+  			totCol+=rows[i].areas.length;
+  		}
+  		let fullText = '';
+  		for(let i=0;i<rows.length;i++){
+  			for(let j=0;j<rows[i].areas.length;j++){
+  				fullText+=rows[i].areas[j].value;
+  			}
+  		}
+  		fullText = (new TextEncoder()).encode(fullText);
+  		/*
+  		i16 version
+  		i8 flags
+  		i16 row count
+  		f32 row size
+  		i16 r1 column count
+  		i32*columns length
+  		f32 row size
+  		i16 r2 column count
+  		i32*columns length
+  		*/
+  		const file = new Uint8Array(5+rows.length*6+totCol*4+fullText.length);
+  		const fileView = new DataView(file.buffer);
+  		//File version already set to 0
+  		file[2] = 1;
+  		fileView.setUint16(3,rows.length);
+  		let ind=5;
+  		for(let i=0;i<rows.length;i++){
+  			fileView.setFloat32(ind,rowLengths[i]);
+  			ind+=4;
+  			fileView.setUint16(ind,rows[i].areas.length);
+  			ind+=2;
+  			for(let j=0;j<rows[i].areas.length;j++){
+  				fileView.setUint32(ind,rows[i].areas[j].value.length);
+  				ind+=4;
+  			}
+  		}
+  		//although encodeURIComponent is the raw string, it can 3x text in worst case and the more spaces, the worse.
+  		//base64 is always 1.33, way better than the 2.-x of spaces and special characters of the string
+  		file.set(fullText,ind);
+  		const fileBase = file.toBase64(baseParams);
+  		//Wait I don't need this lol (end) 
+  		//out+=(new Uint8Array((new Uint32Array([fileBase.length])).buffer)).toBase64(baseParams);
+  		out+=fileBase;
+  		winSave.location.href = 'http://fn/'+out;
+  		//}catch(e){console.error(e.stack)}
+  	}
+  	
+  	function loadTabSave(){
+  		const fullUrl = prompt('Enter Tabsave Url:');
+  		if(fullUrl){
+  			let fullUrlUrl=null;
+  			try{
+  				fullUrlUrl = new URL(fullUrl);
+  			}catch(e){
+  				alert('That\'s not a url!');
+  				return;
+  			}
+  			if(fullUrlUrl.hostname!='fn'){alert('This is not a tabsave URL!');return}
+  			const fileNameLength = parseInt(fullUrlUrl.pathname.substr(1,2),16);
+  			try{
+    		prefFile.value=decodeURIComponent(fullUrlUrl.pathname.substr(3,fileNameLength));
+  			//const fileLength = (new Uint32Array(Uint8Array.fromBase64(fullUrlUrl.pathname.substr(3+fileNameLength,6)).buffer))[0];
+  			const file = Uint8Array.fromBase64(fullUrlUrl.pathname.substr(3+fileNameLength),baseParams);
+  			const fileView = new DataView(file.buffer);
+  			if(fileView.getUint16(0)>0){alert('Invalid version!');return}
+  			//ignore flags until you add encryption!
+  			const rowCount = fileView.getUint16(3);
+  			for(let i=0;i<rows.length;i++){
+				rows[i].cont.remove();
+			}
+			for(let i=0;i<dividers.length;i++){
+				dividers[i].remove();
+			}
+			rowLengths = new Array(rowCount);
+			rows = new Array(rowCount);
+			dividers.length = 0;
+			let newStyle = '';
+			let ind = 5;
+			let prevLen = 0;
+			const colLengths = new Array(rowCount);
+			for(let i=0;i<rowCount;i++){
+				colLengths[i] = [];
+				rowLengths[i] = fileView.getFloat32(ind);
+				newStyle += rowLengths[i].toString()+'fr ';
+				ind+=4;
+				const columnCount = fileView.getUint16(ind);
+				ind+=2;
+				
+				const newCol = document.createElement('div');
+  				newCol.classList.add('sn-row-cont');
+  				rows[i] = new SNRow(newCol);
+				for(let j=0;j<columnCount;j++){
+					j>0 && rows[i].add();
+					colLengths[i].push(fileView.getUint32(ind));
+					ind+=4;
+				}
+  				cont.appendChild(newCol);
+  				
+  				if(i>0) addDiv(prevLen,i);
+				prevLen += rowLengths[i];
+			}
+			cont.style.gridTemplateRows = newStyle;
+			const extractedText = (new TextDecoder()).decode(file.subarray(ind));
+			ind = 0;
+			for(let i=0;i<rowCount;i++){
+				for(let j=0;j<rows[i].areas.length;j++){
+					rows[i].areas[j].value = extractedText.substr(ind,colLengths[i][j]);
+					ind+=colLengths[i][j];
+				}
+			}
+  			}catch(e){alert(e.stack)}
+  		}
+  	}
+  	
   	const prefFont = prefModal.getElementsByClassName('sn-form-font')[0];
   	prefFont.addEventListener('change',()=>{
   		const cVal = Math.max(1,parseInt(prefFont.value)) || 1;
@@ -950,22 +1081,31 @@
   			clearInterval(asInterval);
   		}
   	});
+  	prefTabSave.addEventListener('change',()=>{
+  		if(prefTabSave.checked){
+  			winSave = open();
+  			updateTabSave();
+  		}else if(winSave){
+  			!winSave.closed && winSave.close()
+  			winSave = null;
+  		}
+  	});
+  	const prefEncrypt = prefModal.getElementsByClassName('sn-form-encrypt')[0];
+  	const prefKey = prefModal.getElementsByClassName('sn-form-key')[0];
   	const colAddBtn = document.getElementsByClassName('sn-add')[0];
   	colAddBtn.addEventListener('click',addCol);
   	const colRemBtn = document.getElementsByClassName('sn-add-red')[0];
   	colRemBtn.addEventListener('click',remCol);
-  	const fileBtn = document.getElementById('sn-file-btn').getElementsByClassName('sn-header-btn')[0];
+  	const fileBtn = document.getElementById('sn-file-btn');
   	fileBtn.addEventListener('click',saveConfig);
-  	const editBtn = document.getElementById('sn-edit-btn').getElementsByClassName('sn-header-btn')[0];
+  	const editBtn = document.getElementById('sn-edit-btn');
   	editBtn.addEventListener('click',loadConfig);
-  	const prefBtn = document.getElementById('sn-pref-btn').getElementsByClassName('sn-header-btn')[0];
-  	const helpBtn = document.getElementById('sn-help-btn').getElementsByClassName('sn-header-btn')[0];
-  	prefBtn.addEventListener('click',()=>{
-  		prefModal.classList.remove('hidden');
-  	});
-  	helpBtn.addEventListener('click',()=>{
-  		helpModal.classList.remove('hidden');
-  	});
+  	const prefBtn = document.getElementById('sn-pref-btn');
+  	const helpBtn = document.getElementById('sn-help-btn');
+  	prefBtn.addEventListener('click',()=>prefModal.classList.remove('hidden'));
+  	helpBtn.addEventListener('click',()=>helpModal.classList.remove('hidden'));
+  	const tabSaveBtn = document.getElementById('sn-tabsave-btn');
+  	tabSaveBtn.addEventListener('click',loadTabSave);
   	const i_rows = document.getElementsByClassName('sn-row-cont');
   	for(let i=0;i<i_rows.length;i++){
   		rows.push(new SNRow(i_rows[i]))
