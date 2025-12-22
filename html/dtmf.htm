@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>DTMF Generator</title>
+  <style>
+    body {font-family:system-ui,sans-serif;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;height:100vh;user-select:none;background:black;padding:10vmax;box-sizing:border-box;}
+		div {display:flex;font-size:5vmin;align-items:center;justify-content:center;background:#1F1D7C;box-sizing:border-box;cursor:pointer;border-radius:60px;margin:10px;color:white;}
+		div:active,div.active {background:#A5CCEC;}
+		.frost-foot {
+			position:fixed;
+			bottom:10px;
+			right:10px;
+			font-size:15px;
+			text-align:right;
+			width:100%;
+			color:white;
+			opacity:0.4;
+			pointer-events:none;
+		}
+  </style>
+</head>
+<body>
+	<footer class='frost-foot'>DTMF Generator v1.0<br>© Frostbyte 2025. aGPLv3.0</footer>
+<script>
+	const ctx = new (window.AudioContext || window.webkitAudioContext)();
+	const master = ctx.createGain();
+	master.gain.value = 0.25;
+	master.connect(ctx.destination);
+	const row = [1209,1336,1477,1633];
+	const col = [697,770,852,941];
+	const keys = ['1','2','3','a','4','5','6','b','7','8','9','c','*','0','#','d'];
+	const keyOsc = new Array(keys.length);
+	const keyElm = new Array(keys.length);
+	const osc = [];
+	for(let i=0;i<keys.length;i++){
+		const key = document.createElement('div');
+		key.textContent = keys[i].toUpperCase();
+		document.body.appendChild(key);
+		key.addEventListener('mousedown',()=>{
+			const osc1 = ctx.createOscillator();
+			osc1.type = 'sine';
+			osc1.frequency.value = col[Math.floor(i/4)];
+			osc1.connect(master);
+			osc1.start();
+			const osc2 = ctx.createOscillator();
+			osc2.type = 'sine';
+			osc2.frequency.value = row[i%4];
+			osc2.connect(master);
+			osc2.start();
+			osc.push(osc1);
+			osc.push(osc2);
+		});
+		keyElm[i] = key;
+	}
+	document.body.addEventListener('mouseup',()=>{for(let i=osc.length-1;i>=0;i--){osc.pop().stop()}});
+	document.body.addEventListener('keyup',e=>{
+		const ind = keys.indexOf(e.key);
+		if(ind>=0 && keyOsc[ind]){
+			keyElm[ind].classList.remove('active');
+			keyOsc[ind][0].stop();
+			keyOsc[ind][1].stop();
+			keyOsc[ind] = null;
+		}
+	});
+	document.body.addEventListener('keydown',e=>{
+		const ind = keys.indexOf(e.key);
+		if(ind>=0 && !keyOsc[ind]){
+			const osc1 = ctx.createOscillator();
+			osc1.type = 'sine';
+			osc1.frequency.value = col[Math.floor(ind/4)];
+			osc1.connect(master);
+			osc1.start();
+			const osc2 = ctx.createOscillator();
+			osc2.type = 'sine';
+			osc2.frequency.value = row[ind%4];
+			osc2.connect(master);
+			osc2.start();
+			keyOsc[ind] = [osc1,osc2];
+			keyElm[ind].classList.add('active');
+		}else if(e.key == 'v' && e.ctrlKey){
+			master.gain.value = parseFloat(prompt('Enter a new volume!')) || 0.25;
+		}
+	})
+</script>
+</body>
+</html>
