@@ -93,60 +93,80 @@
   </div>
   <footer>Copyright 2024 Pacifiky. All rights reserved.</footer>
   <script>
-    class canvasInteract {
-      constructor(canv,interactables,beforeRender,actMouseDown,actMouseUp,actMouseMove){
+    class frostInteract {
+      constructor(canv,interactables,beforeRender,props={}){
         this.canv = canv;
-        this.ctx = canv.getContext("2d");
+        this.ctx = canv.getContext('2d');
         this.active = null;
         this.md = false;
         this.interactables = interactables;
         this.beforeRender = beforeRender;
-        this.actMouseDown = actMouseDown.bind(this);
-        this.actMouseMove = actMouseMove.bind(this);
-        this.actMouseUp = actMouseUp.bind(this);
+				this.beforeInteract = props.beforeInteract;
+				this.afterInteract = props.afterInteract;
+        this.actMouseDown = this.actMouseDown.bind(this);
+        this.actMouseMove = this.actMouseMove.bind(this);
+        this.actMouseUp = this.actMouseUp.bind(this);
         this.canv.addEventListener("mousedown",this.actMouseDown);
         this.canv.addEventListener("mouseup",this.actMouseUp);
-        this.canv.addEventListener("mousemove",this.actMouseMove)
+        this.canv.addEventListener("mousemove",this.actMouseMove);
+				this.radius = props.radius ?? 5;
       }
       renderInteract() {
+        this.ctx.clearRect(0,0,this.canv.width,this.canv.height);
         this.beforeRender();
-        this.ctx.fillStyle = "blue";
         for(let i=0;i<this.interactables.length;i++){
           this.ctx.beginPath();
-          this.ctx.arc(this.interactables[i][0],this.interactables[i][1],5,0,Math.PI*2);
+          this.ctx.arc(this.interactables[i][0],this.interactables[i][1],this.radius,0,Math.PI*2);
           this.ctx.fill();
+					this.ctx.stroke();
         }
       }
+			actMouseDown(e){
+        this.md=true;
+        for(let i=0;i<this.interactables.length;i++){
+          if(Math.sqrt((this.interactables[i][0]-e.offsetX)**2 + (this.interactables[i][1]-e.offsetY)**2) <= this.radius){this.beforeInteract && this.beforeInteract(e);this.active = i;break;};
+        }
+			}
+			actMouseUp(e){
+        this.active=null;
+        this.md=false;
+				this.afterInteract && this.afterInteract(e);
+			}
+			actMouseMove(e){
+        if(this.active != null && this.md){
+          this.interactables[this.active][0]=e.offsetX;
+          this.interactables[this.active][1]=e.offsetY;
+					this.renderInteract();
+        }
+			}
     }
     const controls = document.getElementById("controls").children;
     //try{
-    const maincanv = new canvasInteract(document.getElementsByClassName("maincanvas")[0],[[50,50],[150,50],[150,150],[250,150]],
+		const canv = document.getElementsByClassName("maincanvas")[0]
+    const maincanv = new frostInteract(canv,[[20,50],[50,20]],
       function(){
-        this.ctx.clearRect(0,0,this.canv.width,this.canv.height);
+				this.ctx.strokeStyle = '#ff697d';
+				this.ctx.fillStyle = '#49506f'
+				this.ctx.lineWidth = 2;
+				this.ctx.shadowColor = '#ff697d';
+				this.ctx.shadowBlur = 10;
+				this.ctx.beginPath();
+        this.ctx.moveTo(0,this.canv.height);
+				this.ctx.lineTo(this.interactables[0][0],this.interactables[0][1]);
+				this.ctx.stroke();
+				this.ctx.beginPath();
+        this.ctx.moveTo(this.canv.width,0);
+				this.ctx.lineTo(this.interactables[1][0],this.interactables[1][1]);
+				this.ctx.stroke();
         this.ctx.beginPath();
-        this.ctx.moveTo(this.interactables[0][0], this.interactables[0][1]);
-        this.ctx.bezierCurveTo(this.interactables[1][0], this.interactables[1][1], this.interactables[2][0], this.interactables[2][1], this.interactables[3][0], this.interactables[3][1]);
+        this.ctx.moveTo(0,this.canv.height);
+        this.ctx.bezierCurveTo(this.interactables[0][0], this.interactables[0][1], this.interactables[1][0], this.interactables[1][1], this.canv.width,0);
         this.ctx.stroke();
       },
-      function(e){
-        this.md=true;
-        for(let i=0;i<this.interactables.length;i++){
-          if(Math.sqrt((this.interactables[i][0]-e.offsetX)**2 + (this.interactables[i][1]-e.offsetY)**2) <= 5){
-            this.active = i
-          }
-        }
-      },
-      function(e){
-        this.active=null;
-        this.md=false
-      },
-      function(e){
-        if(this.active != null && this.md){
-          this.interactables[this.active][0]=e.offsetX;
-          this.interactables[this.active][1]=e.offsetY
-        };
-        this.renderInteract();
-      }
+			{afterInteract:
+			 function(){
+			 }
+			}
     );
     //}catch(e){alert(e)}
     maincanv.canv.width = controls[4].value = (document.body.offsetWidth/100)*90;
