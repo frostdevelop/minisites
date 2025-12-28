@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tonny</title>
+  <style>
+	:root {
+		--bg-1: #0d0a14;
+		--bg-2: #161122;
+		--bg-3: #1f1833;
+		--bg-10: #2a2047; 
+		--bg-11: #3a2d63;
+		--fg-4: #6c4bbf;
+		--fg-3: #8a6ee8;
+		--fg-2: #b9a4ff;
+		--fg-1: #e6ddff;
+		--ac-1: #d14cff;
+		--ac-2: #caa8ff;
+		--txt-1: #f2eaff;
+		--txt-2: #c7b8e6;
+		--txt-mut: #9a8bbd;
+	}
+	body {
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		font-size: 20px;
+		font-family: Arial, sans-serif;
+		color-scheme: dark;
+		text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+		background:var(--bg-1);
+		color:var(--txt-1);
+		accent-color:var(--ac-1);
+		width:100vw;
+		height:100vh;
+		margin:0;
+		padding:0;
+		flex-direction:column;
+		overflow:hidden;
+    }
+	.ice-close {
+		transition: transform .15s ease-out;
+		background:none;
+		font-size:15px;
+		border:none;
+	}
+	.ice-close:hover {
+		transform:rotate(90deg);
+		font-weight:bold;
+	}
+	.ice-close:active {
+		transform:rotate(90deg) scale(0.8);
+	}
+	#tns-tones {
+		border-radius:10px;
+		width:75vw;
+		height:80vh;
+		border: 1px solid var(--bg-11);
+		background: var(--bg-2);
+		display:flex;
+		flex-direction:column;
+		overflow-y:auto;
+		overflow-x:hidden;
+		box-shadow: 0 10px 30px var(--bg-11);
+	}
+	.tns-tone {
+		position:relative;
+		display:flex;
+		padding:10px;
+		width:100%;
+		border-bottom:var(--bg-11) solid 1px;
+		box-sizing:border-box;
+		padding-right: 30px;
+	}
+	.tns-tone .ice-close {
+		position:absolute;
+		top:5px;
+		right:5px;
+	}
+	.tns-tone input{
+		width:100%;
+		margin: 0 5px;
+	}
+	.tns-check-cont {
+		width:20%;
+	}
+	.clay-inp {
+		background: var(--bg-11);
+		border: 1px solid var(--fg-4);
+		border-radius:10px;
+		font-size: 15px;
+		padding: 5px;
+		transition: background .15s linear, transform .15s ease-out;
+		box-shadow: 0 10px 10px rgba(0,0,0,0.4), inset 1px 1px 7px rgba(255, 255, 255, 0.5), inset -2px -2px 10px rgba(0, 0, 0, 1);
+	}
+	.clay-inp:focus {
+		outline:none;
+	}
+	.clay-inp:active {
+		background: var(--fg-4) !important;
+		transform: scale(0.8);
+	}
+	.clay-inp:hover {
+		background: var(--bg-3);
+	}
+	#tns-add {
+		aspect-ratio:1;
+		font-size:30px;
+		border-radius:30px;
+		display: flex;
+		height: 100%;
+		justify-content: center;
+		align-items: center;
+		padding: 10px;
+	}
+	.clay-toggle {
+	    border-radius: 50px;
+	    width: fit-content;
+	    aspect-ratio: 2;
+	    padding: 3px 5px;
+	    height: 80%;
+	    box-sizing: content-box;
+	    display: flex;
+	    justify-content: center;
+	    flex-direction: column;
+	}
+	.clay-toggle input {
+	    background: var(--fg-3);
+	    height: 100%;
+	    width: fit-content;
+	    aspect-ratio: 1;
+	    border-radius: 100%;
+	    transition: transform .1s ease;
+	    margin: 0;
+	    appearance: none;
+	    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4), inset 1px 1px 5px rgba(255, 255, 255, 0.5), inset -2px -2px 5px rgba(0, 0, 0, 1);
+	}
+	.clay-toggle input:checked {
+	    transform: translate(100%, 0);
+	}
+	.clay-toggle:hover {
+		background: var(--bg-3);
+	}
+	header {
+		font-family: roboto,system-ui,helvetica, Arial, sans-serif;
+		font-size: 40px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 10px;
+	}
+	.frost-foot {
+		position:fixed;
+		bottom:10px;
+		right:10px;
+		font-size:15px;
+		text-align:right;
+		width:100%;
+		color:white;
+		opacity:0.4;
+		pointer-events:none;
+	}
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+<body lang="en">
+	<main>
+	<header>
+		Tonny
+		<button id="tns-add" class="clay-inp">+</button>
+	</header>
+	<div id="tns-tones"></div>
+	</main>
+	<footer class='frost-foot'>Tonney v1.0<br>© Frostbyte 2025. aGPLv3.0</footer>
+	<template id="tns-temp-tone">
+		<div class="tns-tone">
+			<label class="tns-check-cont clay-inp clay-toggle"><input type="checkbox" class="tns-tone-enable" checked></label>
+			<input type="range" value="440" min="20" max="10000" class="tns-tone-frequency clay-inp" title="Frequency">
+			<input type="number" value="440" min="1" class="tns-tone-frequency clay-inp" title="Frequency">
+			<input type="range" min="0" max="1" value="0.25" step="0.01" class="tns-tone-volume clay-inp" title="Volume">
+			<input type="range" min="-1" max="1" value="0" step="0.01" class="tns-tone-pan clay-inp" title="Pan">
+			<select class="tns-tone-wave clay-inp" title="Instrument">
+				<option>Sine</option>
+				<option>Square</option>
+				<option>Sawtooth</option>
+				<option>Triangle</option>
+			</select>
+			<button class="ice-close">✕</button>
+		</div>
+	</template>
+	<script>
+		const actx = new (window.AudioContext || window.webkitAudioContext)();
+		const toneCont = document.getElementById("tns-tones");
+		const addBtn = document.getElementById("tns-add");
+		const toneTemplate = document.getElementById("tns-temp-tone");
+		addBtn.addEventListener("click",()=>{
+			const toneOsc = actx.createOscillator();
+			const toneGain = actx.createGain();
+			const tonePan = actx.createStereoPanner();
+			toneOsc.connect(toneGain);
+			toneGain.connect(tonePan);
+			tonePan.connect(actx.destination);
+			const frag = toneTemplate.content.cloneNode("true");
+			const toneElm = frag.firstElementChild;
+			const toneClose = toneElm.getElementsByClassName("ice-close")[0];
+			const toneFreqInp = Array.from(toneElm.getElementsByClassName("tns-tone-frequency"));
+			const toneEnableChk = toneElm.getElementsByClassName("tns-tone-enable")[0];
+			const toneWaveCtrl = toneElm.getElementsByClassName("tns-tone-wave")[0];
+			const toneVolCtrl = toneElm.getElementsByClassName("tns-tone-volume")[0];
+			const tonePanCtrl = toneElm.getElementsByClassName("tns-tone-pan")[0];
+			toneOsc.type = toneWaveCtrl.value.toLowerCase();
+			toneOsc.frequency.value = parseInt(toneFreqInp[0].value);
+			toneOsc.start();
+			toneGain.gain.value = parseFloat(toneVolCtrl.value);
+			toneClose.addEventListener("click",()=>{
+				toneElm.remove();
+				tonePan.disconnect();
+				toneOsc.disconnect();
+				toneGain.disconnect();
+			});
+			toneEnableChk.addEventListener("change",()=>{
+				if(toneEnableChk.checked){
+					toneOsc.connect(toneGain);
+				}else{
+					toneOsc.disconnect();
+				}
+			});
+			tonePanCtrl.addEventListener("input",()=>tonePan.pan.value=parseFloat(tonePanCtrl.value));
+			for(const freqInput of toneFreqInp){
+				freqInput.addEventListener("input",()=>{
+					toneOsc.frequency.value = parseInt(freqInput.value);
+					for(freqInp of toneFreqInp) freqInp.value = freqInput.value;
+				});
+			}
+			toneWaveCtrl.addEventListener("change",()=>toneOsc.type=toneWaveCtrl.value.toLowerCase());
+			toneVolCtrl.addEventListener("input",()=>toneGain.gain.value=parseFloat(toneVolCtrl.value));
+			toneCont.appendChild(frag);
+		});
+	</script>
+</body>
+</html>
