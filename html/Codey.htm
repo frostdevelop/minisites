@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Codey</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/lib/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/addon/display/fullscreen.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/theme/material.min.css">
+    <style>
+body{
+	padding:0;
+	margin:0;
+	color-scheme:dark;
+}
+    </style>
+</head>
+<body>
+<textarea class='main-editor'>console.log("Frostbyte is so cool")</textarea>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/lib/codemirror.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/mode/javascript/javascript.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.13/addon/display/fullscreen.min.js"></script>
+<script>
+var editor = CodeMirror.fromTextArea(document.getElementsByClassName("main-editor")[0], {lineNumbers: true,theme: "material"});
+editor.setOption('fullScreen',true);
+</script>
+</body>
+</html>
