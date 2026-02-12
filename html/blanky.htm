@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blanky</title>
+  <style>
+    body {
+      padding: 2vh 5vw;
+      color: #EEE;
+      font-size: 20px;
+      font-family: Arial, sans-serif;
+      text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      background: #222;
+      scroll-behavior:smooth;
+    }
+    textarea {
+       height: 60vh;
+       width: 80vw;
+       box-shadow: none;
+       border-radius: 0;
+       resize: none;
+       border:none;
+       padding: 5px;
+    }
+    .flexhor {
+    	display: flex;
+    }
+    .vd {
+    	padding: 0;
+    	margin: 0;
+    	border-color: white;
+    	border-style: dashed;
+    }
+    ::-webkit-scrollbar {width: 10px;}
+    ::-webkit-scrollbar-track {
+      background: #111;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #666;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {background:#777;}
+    ::-webkit-scrollbar-thumb:active {box-shadow: 0 0 10px white;}
+    :root {
+      --hover: #4f4f4f;
+      --border: 2px;
+      --radius: 45px;
+      --height: 6px;
+    }
+    input:focus,select:focus,textarea:focus {outline:none;}
+    input:active,select:active,input[type="text"]:focus,.button:active {background-image: linear-gradient(to left top, #292929, #121212)};
+    .button,input,select {font-family: Tahoma, Arial, sans-serif;}
+    input:active,select:active,input[type="text"]:focus,.button:active {
+      box-shadow: 0 0 0 rgba(0,0,0,0.7), 0 0 0 rgba(240,240,240,0.3), 2px 2px var(--height) rgba(0,0,0,0.7) inset, -2px -2px var(--height) rgba(240,240,240,0.3) inset;
+      border-color: rgba(0,0,0,0);
+    }
+    details,input,select,.button,.contsolid {border: var(--border) #292929 solid;box-shadow: 2px 2px var(--height) rgba(0,0,0,0.7), -2px -2px var(--height) rgba(240,240,240,0.3);}
+    input,select {
+      transition: box-shadow .15s ease, border .15s ease;
+      background-image: linear-gradient(to left top, #121212, #292929);
+      color: currentcolor;
+      font-size: 13px;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: var(--radius);
+      min-width:0px;
+    }
+    select {background-color:#222}
+    input:hover,select:hover,.button:hover {border-color: var(--hover);}
+    .smallinput {width:10em}
+    .button {
+      display: inline-flex;
+      flex-direction: row;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+      cursor: pointer;
+      background-image: linear-gradient(to left top, #121212, #292929);
+      color: currentColor;
+      transition: box-shadow 500ms ease, border 500ms ease;
+      font-size: 13px;
+      padding: 8px;
+      margin: 4px;
+      border-radius: var(--radius);
+      min-width: 100px;
+    }
+    h2 {
+      font-size: 17px;
+      font-weight: 600;
+    }
+    footer {
+      margin: 10px;
+      font-size: 10px;
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body lang="en">
+  <h1>Blanky</h1>
+  <h2>Turn text into javascript literals!</h2>
+  <div id="controls">
+  <button class="button" id='c-run'>Run</button>
+  <select id="c-wrapsel" title="Wrapping">
+    <option value="nw">None</option>
+    <option value="bw">Break</option>
+    <option value="ww">Word</option>
+    <option value="ab">Break All</option>
+  </select>
+  <select id="bk-after" title="What happens after">
+    <option value=";history.back()">Previous page</option>
+    <option value=";location.href='https://google.com'">Google.com</option>
+    <option value="">Nothing</option>
+  </select>
+  <hr/>
+  <div class='flexhor'>
+  <textarea placeholder='The HTML you want to turn into a blank URL!' title='The HTML you want to turn into a blank URL!' id='c-in' style="white-space: nowrap;"></textarea>
+  <hr class='vd'/>
+  <textarea placeholder='This is where your blank URL goes!' title='This is where your blank URL goes!' id='c-out' style="white-space: nowrap;"></textarea>
+  </div>
+  </div>
+  <footer>Copyright 2026 Frostbyte. AGPLv3.0</footer>
+  <script>
+  	const ru = document.getElementById('c-run');
+  	const cinp = document.getElementById('c-in');
+  	const cout = document.getElementById('c-out');
+    const wrapsel = document.getElementById("c-wrapsel");
+    const aftersel = document.getElementById('bk-after');
+    function trig0f(e){
+    	cout.value='data:text/html;charset=utf-8,%0A'+encodeURIComponent('<script>w=open();w.document.write('+JSON.stringify(cinp.value).replaceAll('<\/script>','<\\/script>')+')'+aftersel.value+'<\/script>');
+    	return;
+    }
+    ru.addEventListener("click", trig0f);
+    wrapsel.addEventListener("change",()=>{
+      switch(wrapsel.value){
+         case "ww":
+           cinp.style="word-wrap:normal;";
+           cout.style="word-wrap:normal;";
+           break;
+         case "bw":
+           cinp.style="word-wrap:break-word;";
+           cout.style="word-wrap:break-word;";
+           break;
+         case "ab":
+           cinp.style="word-break: break-all;";
+           cout.style="word-break: break-all;";
+           break;
+         default:
+           cinp.style="white-space: nowrap;";
+           cout.style="white-space: nowrap;";
+           break;
+         }
+     });
+  </script>
+</body>
+</html>
