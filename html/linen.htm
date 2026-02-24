@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Linen Editor</title>
+        <style>
+            body{
+              color-scheme:light;
+              --bg-1: #FBFBF7;
+              --fg-1: #2D2926;
+              --bg-2: #FFF;
+              --fg-m: #706A63;
+              --a: #a3B18A;
+              --b: #ebe7e0;
+            }
+            body.fr-dark{
+              color-scheme:dark;
+              --bg-1: #1c1a17;
+              --fg-1: #ebe7e0;
+              --bg-2: #262320;
+              --fg-m: #a19b91;
+              --a: #8b9677;
+              --b: #322e2a;
+            }
+            body{
+                padding:5% 10%;
+                width:100vw;
+                min-height:100vh;
+                margin:0;
+                box-sizing:border-box;
+                display:grid;
+                font-family:Georgia;
+                background-color:var(--bg-1);
+                color:var(--fg-1);
+                background-image: radial-gradient(transparent 90%,rgba(0,0,0,0.1));
+                transition: background-color .3s ease, color .3s ease;
+                overflow-x:hidden;
+            }
+            :focus{outline:none}
+            #fn-noise{
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              pointer-events: none;
+              opacity: 0.15;
+              mix-blend-mode: multiply;
+              z-index: 999;
+              background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            }
+            .frost-foot {
+              font-family: Roboto, Arial, sans-serif;
+        			position:fixed;
+        			bottom:10px;
+        			right:10px;
+        			font-size:15px;
+        			text-align:right;
+        			width:100%;
+        			color:black;
+        			opacity:0.4;
+        			pointer-events:none;
+        		}
+            .fgl-modal-cont.fgl-hidden {
+        			pointer-events:none;
+        			opacity:0;
+        		}
+        		.fgl-modal-cont {
+        			position: absolute;
+        			top:0;
+        			left:0;
+        			background: rgba(0,0,0,0.7);
+        			width:100vw;
+        			height:100vh;
+        			display: flex;
+        			align-items:center;
+        			justify-content:center;
+        			transition: opacity .3s ease;
+        			z-index: 100;
+        			color:white;
+              font-family: Roboto, Arial, sans-serif;
+        		}
+        		.fgl-modal-cont.fgl-hidden .fgl-modal {
+        			transform: scale(0.5);
+        		}
+        		.fgl-modal-cont .fgl-modal {
+        			height: 60vh;
+        			width: 50vw;
+        			backdrop-filter: blur(8px);
+        			background: linear-gradient(to top right, rgba(255,255,255,0), rgba(255,255,255,0.1));
+        			box-shadow: 0 1px 3px rgba(255,255,255,0.4) inset, 0 50px 80px rgba(0,0,0,0.2), 0 6px 10px rgba(255,255,255,0.4) inset, 0 -1px 3px rgba(255,255,255,0.1) inset;
+        			border: solid 1px rgba(255,255,255,0.4);
+        			border-radius:50px;
+        			overflow: hidden;
+        			padding: 25px 35px 0 35px;
+        			transition: transform .3s ease;
+        			max-width: 500px;
+        			display:flex;
+        			flex-direction:column;
+        		}
+        		.fgl-modal-cont .fgl-modal::before {
+        			content: '';
+        			position:absolute;
+        			top:0;
+        			left:0;
+        			width: 100%;
+        			height: 1px;
+        			background:linear-gradient(90deg,transparent,rgba(255,255,255,0.8), transparent);
+        		}
+        		.fgl-modal h3 {
+        			font-weight: normal;
+        			font-size: 25px;
+        			margin: 5px;
+        			text-align:center;
+        		}
+        		.fgl-modal-title {
+        			font-size: 30px;
+        			color: #EEEEEE;
+        		}
+        		.fgl-modal-div {
+        			margin: 10px -50px 0 -50px;
+        			opacity: 0.3;
+        		}
+        		.fgl-modal-scroll {
+        			overflow-y: auto;
+        			margin: 0 -10px;
+        			padding: 10px 10px;
+        			min-height: 82%;
+        		}
+        		table.fgl-table {
+        			border-collapse: collapse;
+        			border-spacing: 0;
+        			margin-left: auto;
+        			margin-right: auto;
+        		}
+        		table.fgl-table th {border: 3px solid rgba(255,255,255,0.5);padding:5px;}
+        		table.fgl-table td {border: 3px solid rgba(255,255,255,0.2);padding:5px;}
+            #ln-ctrl {
+              position:fixed;
+              left:0;
+              top:10px;
+              display:flex;
+              width:100%;
+              align-items:center;
+              justify-content:center;
+            }
+            #ln-ctrl button {
+              color:var(--fg-1);
+              background:var(--bg-2);
+              border: 1px solid var(--a);
+              border-radius:5px;
+              cursor:pointer;
+              font-size:20px;
+              font-family:inherit;
+              margin: 0 10px;
+              padding:10px;
+              box-shadow:0 10px 10px rgba(0,0,0,0.1);
+              transition:transform .2s ease;
+            }
+            #ln-ctrl button:hover {
+              color:var(--fg-m);
+              background:var(--bg-1);
+            }
+            #ln-ctrl button:active {
+              transform:translateY(5px);
+            }
+        </style>
+    </head>
+    <body>
+        <div class='fgl-modal-cont fgl-hidden' id='fgl-modal-help'>
+      	<div class='fgl-modal'>
+      		<div class='fgl-modal-title'>
+      			Help
+      		</div> 
+      		<hr class='fgl-modal-div'/>
+      		<div class='fgl-modal-scroll'>
+      		<h3>Shortcuts</h3>
+      		<table class='fgl-table'>
+      			<thead>
+      				<tr>
+      				<th>Shortcut</th>
+      				<th>Result</th>
+      				</tr>
+      			</thead>
+      			<tbody>
+      				<tr>
+      					<td>Ctrl+?</td>
+      					<td>Open help</td>
+      				</tr>
+      				<tr>
+      					<td>Ctrl+;</td>
+      					<td>Toggle TabSave</td>
+      				</tr>
+      				<tr>
+      					<td>Ctrl+E</td>
+      					<td>Load TabSave</td>
+      				</tr>
+              <tr>
+      					<td>Ctrl+O</td>
+      					<td>Load file</td>
+      				</tr>
+              <tr>
+      					<td>Ctrl+S</td>
+      					<td>Save file</td>
+      				</tr>
+      				<tr>
+      					<td>Ctrl+M</td>
+      					<td>Change margin</td>
+      				</tr>
+      				<tr>
+      					<td>Ctrl+L</td>
+      					<td>Change tracking</td>
+      				</tr>
+      				<tr>
+      					<td>Ctrl+J</td>
+      					<td>Change leading</td>
+      				</tr>
+      				<tr>
+      					<td>Ctrl+K</td>
+      					<td>Change font</td>
+      				</tr>
+      				<tr>
+      					<td>Ctrl+D</td>
+      					<td>Toggle theme</td>
+      				</tr>
+      				<tr>
+      					<td>Ctrl+B</td>
+      					<td>Bold</td>
+      				</tr>
+      				<tr>
+      					<td>Ctrl+I</td>
+      					<td>Italics</td>
+      				</tr>
+      				<tr>
+      					<td>Ctrl+U</td>
+      					<td>Underline</td>
+      				</tr>
+      			</tbody>
+      		</table>
+      		</div>
+      	</div>
+      	</div>
+        <div id='fn-noise'></div>
+        <div id='ln-ctrl'>
+          <button title='formatBlock' value="h1">H1</button>
+          <button title='formatBlock' value="h2">H2</button>
+          <button title='formatBlock' value="h3">H3</button>
+          <button title='formatBlock' value="p">P</button>
+          <button title='insertHorizontalRule'>-</button>
+          <button title='insertUnorderedList'>•</button>
+          <button title='insertOrderedList'>1.</button>
+          <button title='italic'><em>X</em></button>
+          <button title='bold'><strong>X</strong></button>
+          <button title='underline'><u>X</u></button>
+          <button title='strikeThrough'><del>X</del></button>
+          <button title='superscript'>ˣ</button>
+          <button title='subscript'>ₓ</button>
+        </div>
+        <div id='ln-main' contenteditable><h1>Welcome to Linen!</h1>Press Ctrl+? for help.</div>
+        <footer class='frost-foot'>Linen v1.0<br>© Frostbyte 2025. aGPLv3.0</footer>
+    </body>
+    <script>
+        const mainArea = document.getElementById('ln-main');
+        class TabSave{
+    			constructor(host="ts",query=""){
+    				this.host=host;
+    				this.query=query;
+    				this.enabled=false;
+    				this.tab=null;
+    			}
+    			toggle(){
+    				if(this.enabled){
+    					if(!this.tab.closed) this.tab.close();
+    					this.tab=null;
+    				}else this.tab=open();
+    				this.enabled=!this.enabled;
+    			}
+    			save(d){
+    				const u="http://"+this.host+(this.query ? "?"+this.query+"="+d.toBase64({alphabet:"base64url",omitPadding:true}) : "/"+d.toBase64({alphabet:"base64url",omitPadding:true}));
+    				if(this.tab.closed) this.tab=open(u);
+    				else this.tab.location.href=u;
+    			}
+    			load(s){
+    				const u=new URL(s);
+    				if(u.hostname!=this.host) throw new Error(u.hostname+" is not a TabSave host!");
+    				if(this.query){
+    					const p=u.searchParams.get(this.query);
+    					if(!p) throw new Error("No query parameter present.");
+    					return Uint8Array.fromBase64(p,{alphabet:"base64url"});
+    				}else{
+    					return Uint8Array.fromBase64(u.pathname.substr(1),{alphabet:"base64url"});
+    				}
+    			}
+    		}
+        class LinenSys{
+  				static te = new TextEncoder;
+  				static td = new TextDecoder;
+          constructor(area){
+            this.area=area;
+            this.ts=new TabSave('lin');
+            this.lastInputTime=0;
+            this.saveTS=this.saveTS.bind(this);
+            this.checkForSave=this.checkForSave.bind(this);
+            area.addEventListener('focusout',this.saveTS);
+            area.addEventListener('input',this.checkForSave);
+          }
+          checkForSave(e){
+            switch(e.inputType){
+              case 'insertParagraph':
+              case 'insertFromPaste':
+              case 'insertReplacementText':
+              case 'insertLineBreak':
+              case 'insertFromPaste':
+              case 'insertFromDrop':
+              case 'insertFromPasteAsQuotation':
+              case 'deleteByCut':
+              this.saveTS();
+              break;
+              //case 'insertText':
+              default:
+              if(Date.now()-this.lastInputTime > 2000){
+                this.saveTS()
+              }
+            }
+            this.lastInputTime = Date.now();
+          }
+          createData(){
+				    //Magic number 0xE588984653504467
+            //Magic Number + version = 12
+            const textData = LinenSys.te.encode(this.area.innerHTML);
+            const d = new Uint8Array(12+textData.length);
+    				const dv = new DataView(d.buffer);
+    				dv.setBigUint64(0,16539637033342880078n);
+            dv.setUint16(8,0);
+            d.set(textData,12);
+            return d;
+          }
+          loadData(d){
+    				const dv = new DataView(d.buffer);
+    				if(dv.getBigUint64(0) != 16539637033342880078n) throw new Error('Invalid Linen data!');
+    				if(dv.getUint16(8) != 0) throw new Error('File is too new! Please use a higher version of Linen!');
+            this.area.innerHTML = LinenSys.td.decode(d.subarray(12));
+    			}
+          openFile(){
+    				const fileInp = document.createElement('input');
+    				fileInp.type = 'file';
+    				fileInp.accept = '.lin';
+    				fileInp.addEventListener('change',()=>{
+    					fileInp.remove();
+    					if(fileInp.files.length == 0){
+    						alert('Please upload some files!');
+    						return;
+    					}
+    					const fr = new FileReader();
+    					fr.onload = ()=>this.loadData(new Uint8Array(fr.result));
+    					fr.readAsArrayBuffer(fileInp.files[0]);
+    				});
+    				fileInp.click();
+    			}
+    			saveFile(){
+    				const d=document.createElement('a');
+    				d.download = 'export.lin';
+    				d.href = URL.createObjectURL(new Blob([this.createData()]));
+    				d.click();
+    				URL.revokeObjectURL(d.href);
+    			}
+          loadTS(){
+            this.loadData(this.ts.load(prompt('Enter your TabSave URL!')));
+          }
+          saveTS(){
+            this.ts.save(this.createData());
+          }
+          toggleTS(){
+            this.ts.toggle();
+          }
+        }
+        const system = new LinenSys(mainArea);
+        const helpModal = document.getElementById('fgl-modal-help');
+        const richControls = document.getElementById('ln-ctrl');
+        richControls.addEventListener('click',e=>{
+          document.execCommand(e.target.title,false,e.target.value);
+        });
+        addEventListener('keydown',e=>{
+            if(e.ctrlKey){
+                switch(e.key){
+                    case 'm':
+                    const marginSize = parseInt(prompt('Enter margin size (%)'));
+                    if(marginSize)document.body.style.padding='5% '+marginSize.toString()+'%';
+                    break;
+                    case 'j':
+                    const heightSize = parseInt(prompt('Enter line height (x)'));
+                    if(heightSize)document.body.style.lineHeight=heightSize;
+                    break;
+                    case 'l':
+                    const letterSpacing = parseInt(prompt('Enter spacing size (%)'));
+                    if(letterSpacing)document.body.style.letterSpacing=letterSpacing.toString()+'px';
+                    break;
+                    case 'k':
+                    e.preventDefault();	
+                    document.body.style.fontFamily=prompt('Enter a font name')??'Georgia';
+                    break;
+                    case 'd':
+                    //themes
+                    e.preventDefault();	
+                    document.body.classList.toggle('fr-dark');
+                    break;
+                    case 's':
+                    e.preventDefault();	
+                    system.saveFile();
+                    break;
+                    case 'o':
+                    e.preventDefault();	
+                    system.openFile();
+                    break;
+                    case ';':
+                    system.toggleTS();
+                    system.saveTS();
+                    break;
+                    case 'e':
+                    system.loadTS();
+                    break;
+                    case '/':
+                    helpModal.classList.toggle('fgl-hidden');
+                }
+            }
+        })
+        onbeforeunload=()=>1;
+    </script>
+</html>
