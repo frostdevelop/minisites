@@ -35,7 +35,7 @@ startBtn.addEventListener('click',()=>{
 startBtn.remove();
 try{
 const testNum = Math.random()*100;
-addField('Relative Linking',scriptSupport);
+addField('Relative Linking',window.scriptSupport ?? false);
 async function testCookieStore(){try{await cookieStore.set('cookiestore','test');if(await cookieStore.get('cookiestore')!='test')throw new Error('Avalon: cookiestore set and retrieval fail');addField('cookieStore',true)}catch(e){addField('cookieStore',false,e)}}
 testCookieStore();
 async function testClipboard(){
