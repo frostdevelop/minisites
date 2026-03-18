@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>AvalonTest</title>
+	<script src='script.js'></script>
+	<style>body{font-family:Helvetica,Verdana,Arial,sans-serif;text-align:center;}#at-list{font-size:20px;margin:0 auto;border:2px solid black;border-collapse: collapse;border-spacing: 0;}#at-list td{border:1px solid black;}#at-list th{border:1px solid green}#at-css{font-size:0}#at-css:before{content:"✔️";font-size:20px;}</style>
+</head>
+<body>
+	<h1>AvalonTest</h1>
+	<button id='at-start'>Start</button>
+	<table id='at-list'>
+		<tr>
+			<th>Item</th>
+			<th>Support</th>
+		</tr>
+		<tr>
+			<td>Javascript</td>
+			<td id='at-js'>❌</td>
+		</tr>
+		<tr>
+			<td>CSS</td>
+			<td id='at-css'>❌</td>
+		</tr>
+	</table>
+	<script>
+document.getElementById('at-js').textContent = '✔️';
+const supportList = document.getElementById('at-list');
+function addField(t,s,c=''){const r=document.createElement('tr');const d=document.createElement('td');const p=document.createElement('td');d.textContent=t;p.textContent=s?'✔️':'❌';p.title=c;r.appendChild(d);r.appendChild(p);supportList.appendChild(r)}
+
+const startBtn = document.getElementById('at-start');
+startBtn.addEventListener('click',()=>{
+
+startBtn.remove();
+const testNum = Math.random()*100;
+addField('Relative Linking',scriptSupport);
+async function testCookieStore(){try{await cookieStore.set('cookiestore','test');if(await cookieStore.get('cookiestore')!='test')throw new Error('Avalon: cookiestore set and retrieval fail');addField('cookieStore',true)}catch(e){addField('cookieStore',false,e)}}
+testCookieStore();
+async function testClipboard(){
+	try{
+		await navigator.clipboard.writeText('Avalon');
+		if(await navigator.clipboard.readText() == 'Avalon'){addField('clipboard',false,'Avalon: clipboard Text set and retrieval fail');return}
+		await navigator.clipboard.write([new ClipboardItem({'application/octet-stream':new Blob([new Uint8Array([0xe5,0x88,0x98,0x40,0x46,0x52,67,0b01010010,0o67])],'application/octet-stream')})]);
+		const clipboardItems=await navigator.read();
+		console.log(clipboardItems);
+		addField('clipboard',true);
+	}catch(e){
+		addField('clipboard',false,e);
+	}
+}
+testClipboard();
+async function testService(){
+	try{
+		await navigator.serviceWorker.register(URL.createObjectURL(new Blob([`
+			self.addEventListener('install',e=>{self.skipWaiting()});
+			self.addEventListener('fetch',e=>{e.respondWith(new Response(new Blob(["Avalon"]),{status:200}))});
+		`], { type: 'text/javascript' })));
+		if(await (await fetch('avalon')).text() != 'Avalon'){addField('Service Worker',false,'Avalon: Fetch verification fail.');return;}
+		navigator.serviceWorker.getRegistrations().then(regs=>{
+			for(const reg of regs)reg.unregister();
+		});
+		addField('Service Worker',true);
+	}catch(e){
+		addField('Service Worker',false,e);
+	}
+}
+testService();
+async function testCrypto(){
+	try{
+		const k=await crypto.subtle.generateKey({
+				name:'AES-GCM',
+				length:256
+			},
+			false,
+			['encrypt','decrypt']
+		);
+		const iv=crypto.getRandomValues(new Uint8Array(12));
+		if((new TextDecoder).decode(await crypto.subtle.decrypt({name:'AES-GCM',iv},k,await crypto.subtle.encrypt({name:'AES-GCM',iv},k,(new TextEncoder).encode('Avalon')))) != 'Avalon'){
+			addField('Crypto',false,'Avalon: Failed encrypt/decrypt');
+			return;
+		}
+		addField('Crypto',true);
+	}catch(e){
+		addField('Crypto',false,e);
+	}
+}
+testCrypto();
+async function testCache(){
+	try{
+		await caches.open('v1')
+		addField('Cache',true);
+	}catch(e){
+		addField('Cache',false,e);
+	}
+}
+testCache();
+async function testIdleDetector(){
+	try{
+		if((await IdleDetector.requestPermission()) !== "granted"){
+			console.error("Idle detection permission denied.");
+			addField('IdleDetector',false,'Avalon: Permission denied');
+			return;
+		}
+		addField('IdleDetector',true);
+	}catch(e){
+		addField('IdleDetector',false,e);
+	}
+}
+testIdleDetector();
+async function testUSBDevice(){
+	if(navigator.usb){
+		try{
+			await navigator.usb.getDevices();
+			addField('USB',true);
+		}catch(e){
+			addField('USB',false,e);
+		}
+	}else{
+		addField('USB',false,'Avalon: No USB API Found.');
+	}
+}
+testUSBDevice();
+async function testHID(){
+	if(navigator.hid){
+		try{
+			await navigator.hid.getDevices();
+			addField('HID',true);
+		}catch(e){
+			addField('HID',false,e);
+		}
+	}else{
+		addField('HID',false,'Avalon: No HID API Found.');
+	}
+}
+testHID();
+async function testStorageRequest(){
+	try{
+		await document.requestStorageAccess({all:true})
+		addField('IdleDetector',true);
+	}catch(e){
+		addField('IdleDetector',false,e);
+	}
+}
+testStorageRequest();
+async function testUserMedia(){
+	try{
+		//await navigator.mediaDevices.getUserMedia({audio:true,video:true});
+		await navigator.mediaDevices.enumerateDevices();
+		addField('UserMedia',true);
+	}catch(e){
+		addField('UserMedia',false,e);
+	}
+}
+testUserMedia();
+async function testDisplayMedia(){
+	try{
+		await navigator.mediaDevices.getDisplayMedia();
+		addField('DisplayMedia',true);
+	}catch(e){
+		addField('DisplayMedia',false,e);
+	}
+}
+testDisplayMedia();
+async function testAudioWorklet(){
+	try{
+		const actx = new AudioContext();
+		await actx.resume();
+		await actx.audioWorklet.addModule(URL.createObjectURL(new Blob([`class AvalonProc etends AudioWorkletProcessor {
+		  constructor(){super()}
+		  process(i,o,p){return true;}
+		}
+		registerProcessor("AvalonTest", AvalonProc)`]),{type:'application/javascript'}));
+		addField('DisplayMedia',true);
+	}catch(e){
+		addField('DisplayMedia',false,e);
+	}
+}
+testAudioWorklet();
+async function testFontQuery(){
+	try{
+		await queryLocalFonts();
+		addField('FontQuery',true);
+	}catch(e){
+		addField('FontQuery',false,e);
+	}
+}
+testFontQuery();
+async function testScreenDetails(){
+	try{
+		await getScreenDetails();
+		addField('getScreenDetails()',true);
+	}catch(e){
+		addField('getScreenDetails()',false,e);
+	}
+}
+testScreenDetails();
+async function testBluetooth(){
+	try{
+		const btPermission = await navigator.permissions.query({ name: "bluetooth" });
+		if (btPermission.state !== "denied") {
+			addField('Bluetooth',true);
+		}else{
+			addField('Bluetooth',false,'Avalon: Bluetooth permission denied');
+		}
+	}catch(e){
+		addField('Bluetooth',false,e);
+	}
+}
+testBluetooth();
+async function testWebGPU(){
+	const adapter = await navigator.gpu?.requestAdapter();
+	const device = await adapter?.requestDevice();
+	if (!device) {
+		addField('WebGPU',false,'Avalon: No GPU Found.');
+	}else{
+		try{
+			const canvas = document.createElement('canvas');
+			const context = canvas.getContext('webgpu');
+			addField('WebGPU',true);
+		}catch(e){
+			addField('WebGPU',false,e);
+		}
+	}
+}
+testWebGPU();
+try{
+	eval('evalSupport=true');	
+	addField('eval()',evalSupport);
+}catch(e){
+	addField('eval()',false,e);
+}
+try{localStorage.setItem('avalon','test');if(localStorage.getItem('avalon')!='test')throw new Error('Avalon: getItem fail');localStorage.removeItem('avalon');addField('localStorage',true);}catch(e){addField('localStorage',false,e)}
+try{sessionStorage.setItem('avalon','test');if(sessionStorage.getItem('avalon')!='test')throw new Error('Avalon: getItem fail');sessionStorage.removeItem('avalon');addField('sessionStorage',true);}catch(e){addField('sessionStorage',false,e)}
+try{document.cookie='avalon=test;path=/';if(document.cookie.split(';').indexOf('avalon=test')<0)throw new Error('Avalon: cookie set and retrieval fail');addField('Cookies',true)}catch(e){addField('Cookies',false,e)}
+if("virtualKeyboard" in navigator){
+	addField('Virtual Keyboard',false);
+}else{
+	addField('Virtual Keyboard',true);
+}
+navigator.geolocation.getCurrentPosition(()=>addField('Geolocation',true),e=>addField('Geolocation',false,e));
+if(Worker){
+	try{
+		const testWorker = new Worker(URL.createObjectURL(new Blob([`self.onmessage=e=>{self.postMessage(e.data*5)}`])));
+		testWorker.postMessage(testNum);
+		const timeoutTimeout = setTimeout(()=>{testWorker.terminate();addField('Web Worker',false,'Avalon: Response timeout reached');},5000);
+		testWorker.onmessage=e=>{testWorker.terminate();clearTimeout(timeoutTimeout);if(e.data===testNum*5){addField('Web Worker',true)}else{addField('Web Worker',false,'Avalon: Calculation result mismatch')}}
+	}catch(e){
+		addField('Web Worker',false,e);
+	}
+}else{
+	addField('Web Worker',false,'Avalon: Worker api unavailable.');
+}
+if(indexedDB){
+	try{
+		const BaseReq = indexedDB.open('AvalonTestDatabase', 1);
+		let BaseReqSetup = false;
+		const BaseReqTimeout = setTimeout(()=>{addField('indexedDB',false,'Avalon: Response timeout reached');},10000);
+		BaseReq.onupgradeneeded=e=>{
+			clearTimeout(BaseReqTimeout);
+			const AvalonDB = e.target.result;
+			const testStore1Create = AvalonDB.createObjectStore('testStore1',{keyPath: "id",autoIncrement: true});
+			const testStore2Create = AvalonDB.createObjectStore('testStore2');
+			testStore1Create.createIndex('by_index','index');
+			testStore1Create.createIndex('by_name','name',{unique:false});
+			BaseReqSetup = true;
+		};
+		BaseReq.onsuccess=e=>{
+			clearTimeout(BaseReqTimeout);
+			if(BaseReqSetup){
+				try{
+					const AvalonDB = e.target.result;
+					const rwTransaction = AvalonDB.transaction(['testStore1','testStore2'],'readwrite');
+					const testStore1 = rwTransaction.objectStore('testStore1');
+					const testStore2 = rwTransaction.objectStore('testStore2');
+					testStore1.add({data:'testEntry1',name:'test',index:123});
+					testStore1.add({data:'testEntry2',name:'test',index:67});
+					try{
+						testStore1.add('testEntry3');
+						addField('indexedDB',false,'Avalon: Failed primary key error test');
+						AvalonDB.close();
+						indexedDB.deleteDatabase('AvalonTestDatabase');
+						return;
+					}catch{
+						console.log('Avalon: Successful indexeddb primary key test');
+					}
+					try{
+						testStore2.add({data:'testEntry2'});
+						addField('indexedDB',false,'Avalon: Failed no key error test');
+						AvalonDB.close();
+						indexedDB.deleteDatabase('AvalonTestDatabase');
+						return;
+					}catch{
+						console.log('Avalon: Successful indexeddb key test');
+					}
+					const finalBaseRequest = testStore2.add('testEntry1',67);
+					finalBaseRequest.onsuccess=()=>{
+						const roTransaction = AvalonDB.transaction(['testStore1','testStore2'],'readonly');
+						const testStore1 = roTransaction.objectStore('testStore1');
+						const testStore2 = roTransaction.objectStore('testStore2');
+						const testRequest1 = testStore2.get(67);
+						testRequest1.onsuccess=()=>{
+							if(testRequest1.result=='testEntry1'){
+								const testRequestIndex = testStore1.index('by_name').getAll('test');
+								testRequestIndex.onsuccess=()=>{
+									if(testRequestIndex.result.length == 2){
+										for(let i=0;i<testRequestIndex.result.length;i++){
+											const entry = testRequestIndex.result[i];
+											switch(entry.data){
+												case 'testEntry1':
+												case 'testEntry2':
+													if(!('name' in entry && 'index' in entry && 'id' in entry)){
+														addField('indexedDB',false,'Avalon: Failed read request index not unique');
+														AvalonDB.close();
+														indexedDB.deleteDatabase('AvalonTestDatabase');
+														return;
+													}
+													break;
+												default:
+													addField('indexedDB',false,'Avalon: Failed read request index not unique');
+													AvalonDB.close();
+													indexedDB.deleteDatabase('AvalonTestDatabase');
+													return;
+											}
+										}
+									}else{
+										addField('indexedDB',false,'Avalon: Failed read request index not unique');
+										AvalonDB.close();
+										indexedDB.deleteDatabase('AvalonTestDatabase');
+										return;
+									}
+									const testRequestIndex2 = testStore1.index('by_index').getAll(67);
+									testRequestIndex2.onsuccess=()=>{
+										addField('indexedDB',true);
+										AvalonDB.close();
+										indexedDB.deleteDatabase('AvalonTestDatabase');
+									}
+									testRequestIndex2.onerror=()=>{
+										addField('indexedDB',false,'Avalon: Failed read request index unique - '+testRequestIndex2.error.message);
+										AvalonDB.close();
+										indexedDB.deleteDatabase('AvalonTestDatabase');
+									}
+								}
+								testRequestIndex.onerror=()=>{
+									addField('indexedDB',false,'Avalon: Failed read request index not unique - '+testRequestIndex.error.message);
+									AvalonDB.close();
+									indexedDB.deleteDatabase('AvalonTestDatabase');
+								}
+							}else{
+								addField('indexedDB',false,'Avalon: Value mismatch between read and write');
+								AvalonDB.close();
+								indexedDB.deleteDatabase('AvalonTestDatabase');
+							}
+						}
+						testRequest1.onerror=()=>{
+							addField('indexedDB',false,'Avalon: Failed read request get - '+testRequest1.error.message);
+							AvalonDB.close();
+							indexedDB.deleteDatabase('AvalonTestDatabase');
+						}
+					}
+					finalBaseRequest.onerror=e=>{
+						addField('indexedDB',false,'Avalon: Failed add request - '+finalBaseRequest.error.message);
+						AvalonDB.close();
+						indexedDB.deleteDatabase('AvalonTestDatabase');
+					}
+				}catch(e){
+					addField('indexedDB',false,e);
+					AvalonDB.close();
+					indexedDB.deleteDatabase('AvalonTestDatabase');
+				}
+			}else{
+				addField('indexedDB',false,'Avalon: Database already exists.');
+				e.target.result.close();
+				indexedDB.deleteDatabase('AvalonTestDatabase');
+			}
+		};
+		BaseReq.onerror=e=>{
+			clearTimeout(BaseReqTimeout);
+			addField('indexedDB',false,'Avalon: Database request error - '+e.target.errorCode.toString());
+		}
+		function getTasks() {
+			const transaction = db.transaction(["tasks"], "readonly");
+			const store = transaction.objectStore("tasks");
+			const cursorRequest = store.openCursor();
+
+			cursorRequest.onsuccess = (event) => {
+				const cursor = event.target.result;
+				if (cursor) {
+					const li = document.createElement('li');
+					li.textContent = `${cursor.value.title} - [${cursor.value.status}]`;
+					listElement.appendChild(li);
+					cursor.continue(); // Move to the next item
+				}
+			};
+		}
+	}catch(e){
+		addField('indexedDB',false,e);
+	}
+}else{
+	addField('indexedDB',false,'Avalon: indexedDB api unavailable.');
+}
+
+});
+	</script>
+</body>
+</html>

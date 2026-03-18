@@ -1,0 +1,1 @@
+scriptSupport=true
