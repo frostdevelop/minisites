@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Focus Counter</title>
+	<style>
+		body {
+			padding:0;
+			margin:0;
+			font-family: Roboto, Arial, sans-serif;
+			text-align:center;
+			display:flex;
+			align-items:center;
+			flex-direction:column;
+			justify-content:center;
+			height:100vh;
+			user-select:none;
+		}
+		.frost-foot {
+			position:fixed;
+			bottom:10px;
+			right:10px;
+			font-size:15px;
+			text-align:right;
+			width:100%;
+			color:black;
+			
+			opacity:0.4;
+			pointer-events:none;
+		}
+		.isl-label {
+			color:grey;
+			font-weight:200;
+			letter-spacing:5px;
+			margin:0;
+		}
+		.isl-label.isl-small {font-size:15px;}
+		.isl-main.isl-small {
+			font-size:40px;
+			margin-bottom: 20px;
+		}
+		.isl-main {
+			font-size:100px;
+			margin:0;
+			font-weight:100;
+			margin-bottom:40px;
+		}
+		.isl-button {
+			padding:20px 30px;
+			font-size: 20px;
+			border-radius:10px;
+			font-family:inherit;
+			background:white;
+			color:darkblue;
+			border:darkblue solid 2px;
+			transition:background .1s ease,color .1s ease,transform .1s ease;
+			font-weight:300;
+		}
+		.isl-button.isl-large {
+			padding:30px 50px;
+			font-size: 30px;
+			border-radius:10px;
+		}
+		.isl-button:active {
+			color:white;
+			background:darkblue;
+			transform:scale(0.95);
+		}
+		.isl-button:focus {
+			outline:none;
+		}
+		.isl-h {
+			display:flex;
+		}
+		.isl-counter {
+			margin: 0 10px;
+		}
+	</style>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width'>
+</head>
+
+<body lang='en'>
+	<div class='isl-h'>
+		<div class='isl-counter'>
+		<h2 class='isl-label isl-small'>Focus</h2>
+		<h1 class='isl-main isl-small' id='fc-focus'>0</h1>
+		</div>
+		<div class='isl-counter'>
+		<h2 class='isl-label isl-small'>Visibility</h2>
+		<h1 class='isl-main isl-small' id='fc-visi'>0</h1>
+		</div>
+	</div>
+	<h2 class='isl-label'>Blur</h2>
+	<h1 class='isl-main' id='fc-blur'>0</h1>
+	<button class='isl-button' id='fc-reset' autofocus>Reset</button>
+	<footer class='frost-foot'>Focus Counter v1.0<br>© Frostbyte 2025. aGPLv3.0</footer>
+	<script>
+const focusCounter = document.getElementById('fc-focus');
+const blurCounter = document.getElementById('fc-blur');
+const visiCounter = document.getElementById('fc-visi');
+let focusCount = 0;
+let blurCount = 0;
+let visiCount = 0;
+window.addEventListener('blur',()=>blurCounter.textContent=++blurCount);
+window.addEventListener('focus',()=>focusCounter.textContent=++focusCount);
+document.addEventListener('visibilitychange',()=>visiCounter.textContent=++visiCount);
+document.getElementById('fc-reset').addEventListener('click',()=>focusCounter.textContent=blurCounter.textContent=visiCounter.textContent=blurCount=focusCount=visiCount=0);
+window.onbeforeunload=()=>1;
+	</script>
+</body>
+</html>
