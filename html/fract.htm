@@ -422,6 +422,83 @@
   </div>
   <footer>Copyright 2026 FrostByte. aGPL 3.0</footer>
   <script src="https://cdn.ably.com/lib/ably.min-2.js"></script>
-  <script>const fractStatus=document.getElementById("fract-status"),userName=prompt("Enter your username.");fractStatus.textContent="Connecting...";const client=new Ably.Realtime({key:"(please provide)",clientId:userName}),martinp=document.getElementsByClassName("mart-inp")[0],martmsgs=document.getElementById("mart-msgs"),martsbtn=martinp.parentElement.getElementsByClassName("mart-sendbtn")[0];class msgSys{constructor(e,t,s,n){this.msginp=e,this.msgcont=t.getElementsByClassName("scrollarea")[0],this.msgsen=s,this.username=n,this.sendMsgWrap=this.sendMsgWrap.bind(this),this.msginp.addEventListener("keydown",e=>{"Enter"!==e.key||e.shiftKey||(e.preventDefault(),this.sendMsgWrap())}),this.msgsen.addEventListener("click",this.sendMsgWrap),this.msginp.addEventListener("input",e=>{switch(e.inputType){case"insertLineBreak":case"insertFromPaste":case"insertFromDrop":case"historyUndo":case"deleteByCut":case"deleteContentBackward":this.msginp.rows=Math.min(this.msginp.value.split(/\r*\n/).length,5)}}),this.channel=null}sendMsgWrap(){this.msginp.value.length>0&&(this.channel?(this.channel.publish("msg",this.msginp.value),this.msginp.value="",this.msginp.rows=1):alert("You are not connected."))}sendMsg(e,t,s){if(""!=s){let n=document.createElement("div");n.className="mart-msg";let a=document.createElement("img");a.className="mart-pfp",a.src=t;let i=document.createElement("div");i.className="text";let l=document.createElement("span"),c=new Date(Date.now()).toString().split(" ");c.length=5,l.innerText=e+" • "+c.splice(1).join(" "),l.className="name";let m=document.createElement("span");m.innerText=s,m.className="content",i.appendChild(l),i.appendChild(document.createElement("br")),i.appendChild(m),n.appendChild(a),n.appendChild(i),this.msgcont.appendChild(n),n.scrollIntoView()}else console.warn("No message in sendMsg")}async setupChannel(e){this.channel=e,e.subscribe(e=>{this.sendMsg(e.clientId+" : "+e.connectionId,"https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",e.data)})}}const messages=new msgSys(martinp,martmsgs,martsbtn,userName);client.connection.once("connected").then(()=>{fractStatus.textContent="Successfully Connected.";let e=client.channels.get("book-main");messages.setupChannel(e)}).catch(e=>{fractStatus.textContent="Unsuccessful Connection.\n"+e});window.onbeforeunload=()=>1</script>
+  <script>
+	const fractStatus = document.getElementById("fract-status")
+	fractStatus.textContent = "Loaded...";
+	const userName = prompt("Enter your username.") || "Guest";
+	const client = new Ably.Realtime({
+		key: "(please provide)",
+		clientId: userName,
+		closeOnUnload: false
+	})
+	const martinp = document.getElementsByClassName("mart-inp")[0];
+	const martmsgs = document.getElementById("mart-msgs");
+	const martsbtn = martinp.parentElement.getElementsByClassName("mart-sendbtn")[0];
+	class msgSys {
+		constructor(e, t, s, n) {
+			this.msginp = e
+			this.msgcont = t.getElementsByClassName("scrollarea")[0]
+			this.msgsen = s
+			this.username = n
+			this.sendMsgWrap = this.sendMsgWrap.bind(this)
+			this.msginp.addEventListener("keydown", e => {
+				"Enter" !== e.key || e.shiftKey || (e.preventDefault(), this.sendMsgWrap())
+			})
+			this.msgsen.addEventListener("click", this.sendMsgWrap)
+			this.msginp.addEventListener("input", e => {
+				switch (e.inputType) {
+					case "insertLineBreak":
+					case "insertFromPaste":
+					case "insertFromDrop":
+					case "historyUndo":
+					case "deleteByCut":
+					case "deleteContentBackward":
+						this.msginp.rows = Math.min(this.msginp.value.split(/\r*\n/).length, 5)
+				}
+			})
+			this.channel = null
+		}
+		sendMsgWrap() {
+			this.msginp.value.length > 0 && (this.channel ? (this.channel.publish("msg", this.msginp.value), this.msginp.value = "", this.msginp.rows = 1) : alert("You are not connected."))
+		}
+		sendMsg(username, picture, message) {
+			if ("" != message) {
+				let n = document.createElement("div");
+				n.className = "mart-msg";
+				let a = document.createElement("img");
+				a.className = "mart-pfp", a.src = picture;
+				let i = document.createElement("div");
+				i.className = "text";
+				let l = document.createElement("span"),
+					c = new Date(Date.now()).toString().split(" ");
+				c.length = 5, l.innerText = username + " • " + c.splice(1).join(" "), l.className = "name";
+				let m = document.createElement("span");
+				m.innerText = message
+				m.className = "content"
+				i.appendChild(l)
+				i.appendChild(document.createElement("br"))
+				i.appendChild(m)
+				n.appendChild(a)
+				n.appendChild(i)
+				this.msgcont.appendChild(n)
+				n.scrollIntoView()
+			} else console.warn("No message in sendMsg")
+		}
+		async setupChannel(channel) {
+			this.channel = channel;
+			channel.subscribe(msg => {
+				this.sendMsg(msg.clientId + "#" + msg.connectionId, "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg", msg.data)
+				//if(msg.connectionId != client.connection.id){location.href=''};
+			})
+		}
+	}
+	const messages = new msgSys(martinp, martmsgs, martsbtn, userName);
+	client.connection.on("connected",() => {
+		fractStatus.textContent = "Successfully Connected as: "+userName+'#'+client.connection.id;
+		messages.sendMsg('System','https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg',fractStatus.textContent);
+		messages.setupChannel(client.channels.get("book-main"))
+	})
+	client.connection.on('failed',()=>{fractStatus.textContent="Error, Please reload."});client.connection.on('suspended',()=>{fractStatus.textContent="Offline. Press Ctrl+Q to connect."});client.connection.on('closed',()=>{fractStatus.textContent="Disconnected. Press Ctrl+Q to connect."});client.connection.on('disconnected',()=>{fractStatus.textContent="Disconnected. Press Ctrl+Q to connect."});client.connection.on('connecting',()=>{fractStatus.textContent="Connecting..."});onkeydown=e=>{if(e.ctrlKey){switch(e.key){case q:client.connect();}}};onbeforeunload=()=>1</script>
+</script>
 </body>
 </html>
