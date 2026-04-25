@@ -461,7 +461,7 @@
 		sendMsgWrap() {
 			this.msginp.value.length > 0 && (this.channel ? (this.channel.publish("msg", this.msginp.value), this.msginp.value = "", this.msginp.rows = 1) : alert("You are not connected."))
 		}
-		sendMsg(username, picture, message) {
+		sendMsg(username, picture, message, time) {
 			if ("" != message) {
 				let n = document.createElement("div");
 				n.className = "mart-msg";
@@ -470,7 +470,7 @@
 				let i = document.createElement("div");
 				i.className = "text";
 				let l = document.createElement("span"),
-					c = new Date(Date.now()).toString().split(" ");
+					c = new Date(time||Date.now()).toString().split(" ");
 				c.length = 5, l.innerText = username + " • " + c.splice(1).join(" "), l.className = "name";
 				let m = document.createElement("span");
 				m.innerText = message
@@ -485,20 +485,33 @@
 			} else console.warn("No message in sendMsg")
 		}
 		async setupChannel(channel) {
+			if(channel.name != this.channel?.name){
+				while(this.msgcont.firstChild){this.msgcont.removeChild(this.msgcont.firstChild)}
+				const histMsgs = await channel.history({direction:'backwards'});
+				for(let i=0;i<histMsgs.items.length;i++){const msg=histMsgs.items[i];this.sendMsg(msg.clientId+"#"+msg.connectionId,"https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",msg.data,msg.timestamp)}
+			}
 			this.channel = channel;
 			channel.subscribe(msg => {
 				this.sendMsg(msg.clientId + "#" + msg.connectionId, "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg", msg.data)
 				//if(msg.connectionId != client.connection.id){location.href=''};
 			})
+			channel.presence.subscribe('enter',m=>{this.sendMsg('System','https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg',m.clientId+'#'+m.connectionId+' joined')});
+			channel.presence.subscribe('leave',m=>{this.sendMsg('System','https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg',m.clientId+'#'+m.connectionId+' left')});
+			await channel.presence.enter();
+			const channelConns = await channel.presence.get();
+			let connsMsg = "Who's in here:";
+			for(let i=0;i<channelConns.length;i++){
+				connsMsg+='\n'+channelConns[i].clientId + "#" + channelConns[i].connectionId;
+			}
+			this.sendMsg('Local System', "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg", connsMsg);
 		}
 	}
 	const messages = new msgSys(martinp, martmsgs, martsbtn, userName);
-	client.connection.on("connected",() => {
+	client.connection.on("connected",async () => {
 		fractStatus.textContent = "Successfully Connected as: "+userName+'#'+client.connection.id;
-		messages.sendMsg('System','https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg',fractStatus.textContent);
-		messages.setupChannel(client.channels.get("book-main"))
+		await messages.setupChannel(client.channels.get("book-main"));
 	})
-	client.connection.on('failed',()=>{fractStatus.textContent="Error, Please reload."});client.connection.on('suspended',()=>{fractStatus.textContent="Offline. Press Ctrl+Q to connect."});client.connection.on('closed',()=>{fractStatus.textContent="Disconnected. Press Ctrl+Q to connect."});client.connection.on('disconnected',()=>{fractStatus.textContent="Disconnected. Press Ctrl+Q to connect."});client.connection.on('connecting',()=>{fractStatus.textContent="Connecting..."});onkeydown=e=>{if(e.ctrlKey){switch(e.key){case q:client.connect();}}};onbeforeunload=()=>1</script>
+	client.connection.on('failed',()=>{fractStatus.textContent="Error, Please reload."});client.connection.on('suspended',()=>{fractStatus.textContent="Offline. Press Ctrl+Q to connect."});client.connection.on('closed',()=>{fractStatus.textContent="Disconnected. Press Ctrl+Q to connect."});client.connection.on('disconnected',()=>{fractStatus.textContent="Disconnected. Press Ctrl+Q to connect."});client.connection.on('connecting',()=>{fractStatus.textContent="Connecting..."});onkeydown=e=>{if(e.ctrlKey){switch(e.key){case q:client.connect();}}};onbeforeunload=()=>1
 </script>
 </body>
 </html>
