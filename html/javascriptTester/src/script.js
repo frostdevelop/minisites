@@ -4,12 +4,12 @@ function consoleCapture(o){
 	return function(...args){
 		uiConsole.log(args.map(m=>{
 			if(typeof m === "object"){ // && !Array.isArray(ret)
-				let consoleOut="";
+				let consoleOut=m+"";
 				const props = Object.getOwnPropertyNames(m);
 				for(let i=0;i<props.length;i++){consoleOut+=props[i]+": "+m[props[i]]+"\n"}
 				return consoleOut;
 			}else{
-				return m.toString();
+				return String(m);
 			}
 		}).join(' '),o)
 	}
