@@ -472,9 +472,10 @@
 				let l = document.createElement("span"),
 					c = new Date(time||Date.now()).toString().split(" ");
 				c.length = 5, l.innerText = username + " • " + c.splice(1).join(" "), l.className = "name";
-				let m = document.createElement("span");
-				m.innerText = message
+				let m = document.createElement("textarea");
+				m.value = message
 				m.className = "content"
+				m.onclick=()=>{m.selectionStart=0,m.selectionEnd=m.value.length}
 				i.appendChild(l)
 				i.appendChild(document.createElement("br"))
 				i.appendChild(m)
