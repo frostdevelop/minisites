@@ -9,6 +9,8 @@ Try at http://mini.frostco.org/
 | Ctrl+o | Open file |
 | Ctrl+s | Save text file |
 ## FrostPlayground
-### DEVELOPMENT MOVED TO https://github.com/frostdevelop/frostplayground
+### Moved to: https://github.com/frostdevelop/frostplayground
 ## FrostPaint
-### DEVELOPMENT MOVED TO https://github.com/frostdevelop/frostpaint
+### Moved to: https://github.com/frostdevelop/frostpaint
+## FlexNote
+### Moved to: https://github.com/frostdevelop/FlexNote
