@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minisites - Home</title>
+	<style>
+/*Begin FrostNocturneDark*/
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+
+:root {
+	--ac-1: #fff5c0;
+	--ac-0: #d4af37;
+	--ac--1: #8c7322;
+	--bg-1: #0a0a0a;
+	--bg-2: #101010;
+	--txt-0: #c2bba8;
+	--txt--1: #6a6455;
+}
+
+::selection {
+	background: var(--ac--1);
+	color: var(--bg-1);
+}
+
+@keyframes fadeLoop {
+	0% {
+		opacity: 0.5;
+		filter: brightness(0.75);
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes revealIn {
+	0% {
+		opacity: 0;
+		transform: translateY(20px);
+		filter: blur(5px);
+	}
+
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+		filter: blur(0);
+	}
+}
+
+body {
+	background-color: var(--bg-1);
+	color: var(--txt-0);
+	font-family: 'Playfair Display', serif;
+	margin: 0;
+	min-height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	padding: 10vh 5vw;
+	background-image: radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.15) 0%, transparent 60%), linear-gradient(to bottom, var(--bg-2) 0%, var(--bg-1) 100%);
+	overflow-x: hidden;
+	font-size: 28px;
+}
+
+body::before,
+body::after {
+	content: '';
+	position: fixed;
+	width: 40vmin;
+	height: 40vmin;
+	border: 1px solid rgba(212, 175, 55, 0.5);
+	border-radius: 50%;
+	box-shadow: inset 0 20px 50px rgba(212, 175, 55, 0.05);
+	pointer-events: none;
+	z-index: -1;
+	animation: fadeLoop 8s infinite alternate ease-in-out;
+}
+
+body::before {
+	left: 10vw;
+	bottom: 10vh;
+}
+
+body::after {
+	right: 10vw;
+	top: 10vh;
+}
+
+.directory-tree {
+	position: relative;
+	width: 100%;
+	max-width: 900px;
+	background: rgba(10, 10, 10, 0.3);
+	backdrop-filter: blur(8px);
+	padding: 60px 80px;
+	border-image: linear-gradient(to right, transparent, var(--ac-0), var(--ac-1), var(--ac-0), transparent) 1;
+	border-top: 2px solid;
+	border-bottom: 2px solid;
+	box-shadow: 0 30px 100px rgba(0, 0, 0, 0.9), inset 0 0 100px rgba(212, 175, 55, 0.05);
+}
+
+.directory-tree::before,
+.directory-tree::after {
+	content: '⚜';
+	position: absolute;
+	color: var(--ac--1);
+	top: 20px;
+	text-shadow: 0 0 15px var(--ac-0);
+}
+
+.directory-tree::before {
+	left: 30px;
+}
+
+.directory-tree::after {
+	right: 30px;
+}
+
+.root-folder h2 {
+	font-family: 'Cinzel', serif;
+	text-align: center;
+	font-size: 5rem;
+	font-weight: 800;
+	margin: 0 10px;
+	text-transform: uppercase;
+	letter-spacing: 0.2rem;
+	background: linear-gradient(to bottom, var(--ac-1), var(--ac-0), var(--ac--1));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+	border-image: linear-gradient(to right, transparent 20%, var(--ac-0), transparent 80%) 1;
+	border-bottom: 1px solid;
+}
+
+.dir-list {
+	list-style-type: none;
+	margin: 0;
+	position: relative;
+}
+
+.dir-list::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 5px;
+	width: 1px;
+	background: linear-gradient(to bottom, transparent, var(--ac--1), var(--ac-0), var(--ac--1), transparent);
+	opacity: 0.3;
+}
+
+.file-item,
+.dir-item {
+	margin: 40px 0;
+	opacity: 0;
+	animation: revealIn 1s forwards ease-out;
+	animation-delay: 0.6s;
+	display: flex;
+	align-items: center;
+}
+
+.file-item:nth-child(1),
+.dir-item:nth-child(1) {
+	animation-delay: 0s;
+}
+
+.file-item:nth-child(2),
+.dir-item:nth-child(2) {
+	animation-delay: 0.15s;
+}
+
+.file-item:nth-child(3),
+.dir-item:nth-child(3) {
+	animation-delay: 0.3s;
+}
+
+.file-item:nth-child(4),
+.dir-item:nth-child(4) {
+	animation-delay: 0.45s;
+}
+
+.file-item a {
+	color: currentcolor;
+	text-decoration: none;
+	font-size: 1.25rem;
+	letter-spacing: 0.1rem;
+	transition: all 0.4s ease;
+	position: relative;
+	width: 100%;
+}
+
+.file-item::before {
+	content: '✦';
+	position: absolute;
+	left: -40px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: var(--ac--1);
+	font-size: 1rem;
+	transition: all 0.4s ease;
+}
+
+.file-item:hover::before {
+	color: var(--ac-1);
+	transform: translateY(-50%) scale(1.5) rotate(180deg);
+}
+
+.file-item a:hover {
+	color: var(--ac-1);
+	transform: translateX(15px);
+	text-shadow: 0 0 20px var(--ac-0);
+}
+
+.html-title {
+	font-style: italic;
+	color: var(--txt--1);
+	font-size: 0.85em;
+	opacity: 0.7;
+	transition: all 0.4s ease;
+}
+
+.file-item a:hover .html-title {
+	opacity: 1;
+	color: var(--ac--1);
+}
+
+.folder-name {
+	cursor: pointer;
+	font-family: 'Cinzel', serif;
+	font-size: 1.6rem;
+	color: var(--ac-0);
+	letter-spacing: 0.2rem;
+	outline: none;
+	position: relative;
+	list-style: none;
+	transition: all 0.4s ease;
+}
+
+.folder-name::marker,
+.folder-name::-webkit-details-marker {
+	display: none;
+}
+
+.folder-name::before {
+	content: '❧';
+	position: absolute;
+	left: -40px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 1rem;
+	color: var(--ac--1);
+	transition: all 0.4s ease;
+}
+
+.folder-name:hover {
+	color: var(--ac-1);
+	text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+	transform: translateX(5px);
+}
+
+details[open]>.folder-name::before {
+	transform: translateY(-50%) rotate(90deg);
+	color: var(--ac-1);
+}
+
+details[open]>.folder-name {
+	border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+	padding-bottom: 15px;
+}
+	</style>
+</head>
+<body>
+<div class="directory-tree">
+<div class="root-folder"><h2>html</h2></div>
+<ul class="dir-list">
+<li class="file-item"><a href="asciiconv.html">asciiconv.html <span class="html-title"> - &quot;AsciiConv&quot;</span></a></li>
+<li class="file-item"><a href="asciitext.html">asciitext.html <span class="html-title"> - &quot;AsciiText&quot;</span></a></li>
+<li class="dir-item">
+<details>
+<summary class="folder-name">AvalonTest</summary>
+<ul class="dir-list">
+<li class="file-item"><a href="AvalonTest/blank.txt">blank.txt</a></li>
+<li class="file-item"><a href="AvalonTest/index.html">index.html <span class="html-title"> - &quot;AvalonTest&quot;</span></a></li>
+<li class="file-item"><a href="AvalonTest/script.js">script.js</a></li>
+<li class="file-item"><a href="AvalonTest/src.html">src.html <span class="html-title"> - &quot;AvalonTest&quot;</span></a></li>
+</ul>
+</details>
+</li>
+<li class="file-item"><a href="baseconv.html">baseconv.html <span class="html-title"> - &quot;Base converter!&quot;</span></a></li>
+<li class="file-item"><a href="beziertool.html">beziertool.html <span class="html-title"> - &quot;BezierTool&quot;</span></a></li>
+<li class="file-item"><a href="blanky.htm">blanky.htm <span class="html-title"> - &quot;Blanky&quot;</span></a></li>
+<li class="file-item"><a href="block.htm">block.htm <span class="html-title"> - &quot;BLOCK&quot;</span></a></li>
+<li class="file-item"><a href="canvasplayground.html">canvasplayground.html <span class="html-title"> - &quot;CanvasPlayground&quot;</span></a></li>
+<li class="file-item"><a href="checksummy.htm">checksummy.htm <span class="html-title"> - &quot;Checksummy&quot;</span></a></li>
+<li class="file-item"><a href="Codey.htm">Codey.htm <span class="html-title"> - &quot;Codey&quot;</span></a></li>
+<li class="file-item"><a href="Codey.min.htm">Codey.min.htm <span class="html-title"> - &quot;Codey&quot;</span></a></li>
+<li class="file-item"><a href="colorpick.html">colorpick.html <span class="html-title"> - &quot;Color Picker&quot;</span></a></li>
+<li class="file-item"><a href="csvrot.htm">csvrot.htm <span class="html-title"> - &quot;CSV Rotator&quot;</span></a></li>
+<li class="file-item"><a href="ctc.htm">ctc.htm <span class="html-title"> - &quot;Columnar Transposition Cipher&quot;</span></a></li>
+<li class="file-item"><a href="ctcl.htm">ctcl.htm <span class="html-title"> - &quot;Columnar Transposition Cipher (Length)&quot;</span></a></li>
+<li class="file-item"><a href="dtmf.htm">dtmf.htm <span class="html-title"> - &quot;DTMF Generator&quot;</span></a></li>
+<li class="file-item"><a href="easyframe.html">easyframe.html <span class="html-title"> - &quot;EasyFrame&quot;</span></a></li>
+<li class="file-item"><a href="emeraldTXT.htm">emeraldTXT.htm <span class="html-title"> - &quot;EmeraldText&quot;</span></a></li>
+<li class="file-item"><a href="eval.html">eval.html <span class="html-title"> - &quot;Eval&quot;</span></a></li>
+<li class="file-item"><a href="filedataviewer.htm">filedataviewer.htm <span class="html-title"> - &quot;File Data Viewer&quot;</span></a></li>
+<li class="file-item"><a href="flappy.htm">flappy.htm <span class="html-title"> - &quot;Flappy&quot;</span></a></li>
+<li class="file-item"><a href="FocusCount.htm">FocusCount.htm <span class="html-title"> - &quot;Focus Counter&quot;</span></a></li>
+<li class="dir-item">
+<details>
+<summary class="folder-name">fract</summary>
+<ul class="dir-list">
+<li class="file-item"><a href="fract/fract-easycopy.htm">fract-easycopy.htm <span class="html-title"> - &quot;Fract&quot;</span></a></li>
+<li class="file-item"><a href="fract/fract.htm">fract.htm <span class="html-title"> - &quot;Fract&quot;</span></a></li>
+<li class="file-item"><a href="fract/fractmin-noscroll.htm">fractmin-noscroll.htm <span class="html-title"> - &quot;Fract&quot;</span></a></li>
+<li class="file-item"><a href="fract/fractmin.htm">fractmin.htm <span class="html-title"> - &quot;Fract&quot;</span></a></li>
+</ul>
+</details>
+</li>
+<li class="file-item"><a href="frt.html">frt.html <span class="html-title"> - &quot;Frost Rich Text&quot;</span></a></li>
+<li class="file-item"><a href="hampereag.htm">hampereag.htm <span class="html-title"> - &quot;KM/H to Hamburgers per Eagle&quot;</span></a></li>
+<li class="file-item"><a href="htmltourl.html">htmltourl.html <span class="html-title"> - &quot;Html to URL&quot;</span></a></li>
+<li class="file-item"><a href="hwinberg.htm">hwinberg.htm <span class="html-title"> - &quot;$test&quot;</span></a></li>
+<li class="file-item"><a href="ImgView.html">ImgView.html <span class="html-title"> - &quot;Simple Image Viewer&quot;</span></a></li>
+<li class="file-item"><a href="JackFont.htm">JackFont.htm <span class="html-title"> - &quot;Jack Font Creator&quot;</span></a></li>
+<li class="dir-item">
+<details>
+<summary class="folder-name">javascriptTester</summary>
+<ul class="dir-list">
+<li class="file-item"><a href="javascriptTester/javascriptTester-min.html">javascriptTester-min.html <span class="html-title"> - &quot;Javascript Tester&quot;</span></a></li>
+<li class="file-item"><a href="javascriptTester/javascriptTester.html">javascriptTester.html <span class="html-title"> - &quot;Javascript Tester&quot;</span></a></li>
+<li class="file-item"><a href="javascriptTester/javascriptTester.svg">javascriptTester.svg</a></li>
+<li class="dir-item">
+<details>
+<summary class="folder-name">src</summary>
+<ul class="dir-list">
+<li class="file-item"><a href="javascriptTester/src/index.html">index.html <span class="html-title"> - &quot;Javascript Tester&quot;</span></a></li>
+<li class="file-item"><a href="javascriptTester/src/script.js">script.js</a></li>
+<li class="file-item"><a href="javascriptTester/src/style.css">style.css</a></li>
+<li class="file-item"><a href="javascriptTester/src/swirl.css">swirl.css</a></li>
+<li class="file-item"><a href="javascriptTester/src/swirl.js">swirl.js</a></li>
+</ul>
+</details>
+</li>
+</ul>
+</details>
+</li>
+<li class="file-item"><a href="Keycodes.html">Keycodes.html <span class="html-title"> - &quot;JavaScript Key Tool&quot;</span></a></li>
+<li class="file-item"><a href="lassotool.html">lassotool.html <span class="html-title"> - &quot;LassoTool&quot;</span></a></li>
+<li class="dir-item">
+<details>
+<summary class="folder-name">linen</summary>
+<ul class="dir-list">
+<li class="file-item"><a href="linen/linen-blank.txt">linen-blank.txt</a></li>
+<li class="file-item"><a href="linen/linen-min.htm">linen-min.htm <span class="html-title"> - &quot;Linen Editor&quot;</span></a></li>
+<li class="file-item"><a href="linen/linen.htm">linen.htm <span class="html-title"> - &quot;Linen Editor&quot;</span></a></li>
+</ul>
+</details>
+</li>
+<li class="file-item"><a href="literally.htm">literally.htm <span class="html-title"> - &quot;Literally&quot;</span></a></li>
+<li class="file-item"><a href="minirgxtst.htm">minirgxtst.htm <span class="html-title"> - &quot;RegexTester&quot;</span></a></li>
+<li class="dir-item">
+<details>
+<summary class="folder-name">NoiseGenerator</summary>
+<ul class="dir-list">
+<li class="file-item"><a href="NoiseGenerator/NoiseGen_A.htm">NoiseGen_A.htm <span class="html-title"> - &quot;Noise Generator&quot;</span></a></li>
+<li class="file-item"><a href="NoiseGenerator/NoiseGen_A_Min.htm">NoiseGen_A_Min.htm <span class="html-title"> - &quot;Noise Generator&quot;</span></a></li>
+<li class="file-item"><a href="NoiseGenerator/NoiseGen_B.htm">NoiseGen_B.htm <span class="html-title"> - &quot;Noise Generator&quot;</span></a></li>
+<li class="file-item"><a href="NoiseGenerator/NoiseGen_B_Min-blank.htm">NoiseGen_B_Min-blank.htm <span class="html-title"> - &quot;Noise Generator&quot;</span></a></li>
+<li class="file-item"><a href="NoiseGenerator/NoiseGen_B_Min.htm">NoiseGen_B_Min.htm <span class="html-title"> - &quot;Noise Generator&quot;</span></a></li>
+<li class="file-item"><a href="NoiseGenerator/NoiseGen_S.htm">NoiseGen_S.htm <span class="html-title"> - &quot;Noise Generator&quot;</span></a></li>
+<li class="file-item"><a href="NoiseGenerator/NoiseGen_S_Min.htm">NoiseGen_S_Min.htm <span class="html-title"> - &quot;Noise Generator&quot;</span></a></li>
+<li class="dir-item">
+<details>
+<summary class="folder-name">svg</summary>
+<ul class="dir-list">
+<li class="file-item"><a href="NoiseGenerator/svg/NoiseGen_B_Min.svg">NoiseGen_B_Min.svg</a></li>
+</ul>
+</details>
+</li>
+<li class="dir-item">
+<details>
+<summary class="folder-name">url</summary>
+<ul class="dir-list">
+<li class="file-item"><a href="NoiseGenerator/url/NoiseGen_B_Min-blank.txt">NoiseGen_B_Min-blank.txt</a></li>
+<li class="file-item"><a href="NoiseGenerator/url/NoiseGen_B_Min.txt">NoiseGen_B_Min.txt</a></li>
+</ul>
+</details>
+</li>
+</ul>
+</details>
+</li>
+<li class="file-item"><a href="NumList.htm">NumList.htm <span class="html-title"> - &quot;Number List Tool&quot;</span></a></li>
+<li class="file-item"><a href="p2d.htm">p2d.htm <span class="html-title"> - &quot;P2D&quot;</span></a></li>
+<li class="file-item"><a href="popnote.htm">popnote.htm</a></li>
+<li class="file-item"><a href="qbs.htm">qbs.htm <span class="html-title"> - &quot;Quadratic Bezier Sampling&quot;</span></a></li>
+<li class="file-item"><a href="QuadTool.html">QuadTool.html <span class="html-title"> - &quot;QuadTool&quot;</span></a></li>
+<li class="file-item"><a href="rainbow.html">rainbow.html <span class="html-title"> - &quot;My favorite color is ~THE RAINBOW~&quot;</span></a></li>
+<li class="file-item"><a href="regexp.html">regexp.html <span class="html-title"> - &quot;JS Regexp&quot;</span></a></li>
+<li class="file-item"><a href="reverse.html">reverse.html <span class="html-title"> - &quot;Text reverser&quot;</span></a></li>
+<li class="file-item"><a href="rgxtst.htm">rgxtst.htm <span class="html-title"> - &quot;RegexTester&quot;</span></a></li>
+<li class="file-item"><a href="rnatrans.htm">rnatrans.htm <span class="html-title"> - &quot;RNA Transcript Generator&quot;</span></a></li>
+<li class="file-item"><a href="robloxtransposition.html">robloxtransposition.html <span class="html-title"> - &quot;Roblox Transposition&quot;</span></a></li>
+<li class="file-item"><a href="rotationplanes.html">rotationplanes.html <span class="html-title"> - &quot;Rotation Planes Calculator&quot;</span></a></li>
+<li class="file-item"><a href="SanTst.htm">SanTst.htm <span class="html-title"> - &quot;Sanitized text tester&quot;</span></a></li>
+<li class="file-item"><a href="screw.htm">screw.htm <span class="html-title"> - &quot;Screw 0.3.1 Demo&quot;</span></a></li>
+<li class="file-item"><a href="sedit.htm">sedit.htm</a></li>
+<li class="file-item"><a href="simpedit.htm">simpedit.htm</a></li>
+<li class="dir-item">
+<details>
+<summary class="folder-name">Spacey</summary>
+<ul class="dir-list">
+<li class="file-item"><a href="Spacey/Spacey-blank-url.txt">Spacey-blank-url.txt</a></li>
+<li class="file-item"><a href="Spacey/Spacey-blank.htm">Spacey-blank.htm <span class="html-title"> - &quot;Spacey&quot;</span></a></li>
+<li class="file-item"><a href="Spacey/Spacey-min.htm">Spacey-min.htm <span class="html-title"> - &quot;Spacey&quot;</span></a></li>
+<li class="file-item"><a href="Spacey/Spacey.htm">Spacey.htm <span class="html-title"> - &quot;Spacey&quot;</span></a></li>
+<li class="file-item"><a href="Spacey/spacey.svg">spacey.svg</a></li>
+</ul>
+</details>
+</li>
+<li class="file-item"><a href="splitnotes.html">splitnotes.html <span class="html-title"> - &quot;SplitNotes&quot;</span></a></li>
+<li class="file-item"><a href="stringarray.html">stringarray.html <span class="html-title"> - &quot;String Array Maker&quot;</span></a></li>
+<li class="file-item"><a href="stringtolit.html">stringtolit.html <span class="html-title"> - &quot;String to Literal&quot;</span></a></li>
+<li class="file-item"><a href="templater.html">templater.html <span class="html-title"> - &quot;Templater&quot;</span></a></li>
+<li class="file-item"><a href="TestFrame.html">TestFrame.html <span class="html-title"> - &quot;TestFrame&quot;</span></a></li>
+<li class="file-item"><a href="Teststats.html">Teststats.html <span class="html-title"> - &quot;Textstats&quot;</span></a></li>
+<li class="file-item"><a href="textcomp.html">textcomp.html <span class="html-title"> - &quot;TextComparer&quot;</span></a></li>
+<li class="file-item"><a href="textpad.html">textpad.html <span class="html-title"> - &quot;TextPadv1.2&quot;</span></a></li>
+<li class="file-item"><a href="TextPadv1.html">TextPadv1.html <span class="html-title"> - &quot;TextPadv1&quot;</span></a></li>
+<li class="file-item"><a href="textsplit.html">textsplit.html <span class="html-title"> - &quot;TextSplitter&quot;</span></a></li>
+<li class="file-item"><a href="time.html">time.html <span class="html-title"> - &quot;Timer&quot;</span></a></li>
+<li class="file-item"><a href="timer.html">timer.html <span class="html-title"> - &quot;Timer&quot;</span></a></li>
+<li class="file-item"><a href="Tonney.htm">Tonney.htm <span class="html-title"> - &quot;Tonny&quot;</span></a></li>
+<li class="file-item"><a href="URLMESSAGE.html">URLMESSAGE.html <span class="html-title"> - &quot;URL Messager&quot;</span></a></li>
+<li class="file-item"><a href="urltest.html">urltest.html <span class="html-title"> - &quot;Site URL Test&quot;</span></a></li>
+<li class="file-item"><a href="UUIDGEN.htm">UUIDGEN.htm <span class="html-title"> - &quot;UUID Generator&quot;</span></a></li>
+<li class="file-item"><a href="uvcipher.htm">uvcipher.htm <span class="html-title"> - &quot;UV Cipher&quot;</span></a></li>
+<li class="file-item"><a href="webhooktool-min.html">webhooktool-min.html <span class="html-title"> - &quot;WebhookTool&quot;</span></a></li>
+<li class="file-item"><a href="webhooktool.html">webhooktool.html <span class="html-title"> - &quot;WebhookTool&quot;</span></a></li>
+<li class="file-item"><a href="windows11update.html">windows11update.html</a></li>
+</ul>
+</div>
+</body>
+</html>

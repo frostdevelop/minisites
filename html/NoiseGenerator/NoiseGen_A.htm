@@ -4,6 +4,7 @@
 	<title>Noise Generator</title>
 	<style>
 	body {
+		margin: 0;
 		padding: 0;
 		color: white;
 		font-size: 20px;
@@ -37,7 +38,7 @@
 	input:active,select:active,input[type="text"]:focus,.neo-button:active {
 		box-shadow: 2px 2px var(--height) rgba(0,0,0,0.6) inset, -2px -2px var(--height) rgba(240,240,240,0.6) inset;
 	}
-	details,input,select,.neo-button,.neo-cont,.neo-slideinp .neo-inp-maincont:before {background: linear-gradient(to top left, rgba(255,255,255,0), rgba(255,255,255,0.2)) !important;border:none;box-shadow: 0 1px 3px rgba(255,255,255,0.4) inset, 0 50px 80px rgba(0,0,0,0.2), 0 6px 10px rgba(255,255,255,0.4) inset, 0 -1px 3px rgba(255,255,255,0.1) inset,2px 2px var(--height) rgba(0,0,0,0.6), -2px -2px var(--height) rgba(240,240,240,0.6);}
+	details,input,select,.neo-button,.neo-cont {background: linear-gradient(to top left, rgba(255,255,255,0), rgba(255,255,255,0.2)) !important;border:none;box-shadow: 0 1px 3px rgba(255,255,255,0.4) inset, 0 50px 80px rgba(0,0,0,0.2), 0 6px 10px rgba(255,255,255,0.4) inset, 0 -1px 3px rgba(255,255,255,0.1) inset,2px 2px var(--height) rgba(0,0,0,0.6), -2px -2px var(--height) rgba(240,240,240,0.6);}
 	input,select,.neo-button {
 		transition: box-shadow 500ms ease, border 500ms ease;
 		background: none;
@@ -47,7 +48,6 @@
 		margin: 5px 0;
 		border-radius: var(--radius);
 		min-width:0px;
-		cursor:pointer;
 	}
 	select {background-color:#222}
 	.neo-block {
@@ -64,47 +64,6 @@
 		width: 100%;
 		height: 1px;
 		background:linear-gradient(90deg,transparent,rgba(255,255,255,0.8), transparent);
-	}
-	.neo-slideinp {
-		user-select:none;
-	}
-	.neo-slideinp .neo-inp-main {
-		display:none;
-	}
-	.neo-slideinp .neo-inp-maincont {
-		position:relative;
-		padding:0;
-		height:30px;
-		display:flex;
-		align-items:center;
-		margin: 10px 0;
-	}
-	.neo-slideinp .neo-inp-maincont:before {
-		content: "";
-		width: 50px;
-		height: 30px;
-		background: linear-gradient(to top left, rgba(255,255,255,0.1), rgba(255,255,255,0.4)) !important;
-		cursor:pointer;
-		border:none;
-		display:inline-block;
-		border-radius: 15px;
-		margin-right: 10px;
-	}
-	.neo-slideinp .neo-inp-caption:before {
-		height:20px;
-		width:20px;
-		content:"";
-		position:absolute;
-		top:5px;
-		left:5px;
-		background: white;
-		box-shadow: 0 0 10px #ff8a8a inset;
-		border-radius:10px;
-		transition: transform .2s ease, box-shadow .2s linear;
-	}
-	.neo-slideinp .neo-inp-main:checked + .neo-inp-caption:before {
-		transform:translateX(20px);
-		box-shadow: 0 0 10px #00ff55 inset;
 	}
 	/*End PacifikyNeoDark*/
 	h3 {
@@ -141,6 +100,47 @@
 	input[type='number']::-webkit-inner-spin-button {
 		-webkit-appearance: none;
 		margin: 0;
+	}
+	.sn-slideinp {
+		user-select:none;
+	}
+	.sn-slideinp .sn-inp-main {
+		display:none;
+	}
+	.sn-slideinp .sn-inp-maincont {
+		position:relative;
+		padding:0;
+		height:30px;
+		display:flex;
+		align-items:center;
+		margin: 10px 0;
+	}
+	.sn-slideinp .sn-inp-maincont:before {
+		content: "";
+		width: 50px;
+		height: 30px;
+		background: linear-gradient(to top left, rgba(255,255,255,0.1), rgba(255,255,255,0.4)) !important;
+		cursor:pointer;
+		border:none;
+		display:inline-block;
+		border-radius: 15px;
+		margin-right: 10px;
+	}
+	.sn-slideinp .sn-inp-caption:before {
+		height:20px;
+		width:20px;
+		content:"";
+		position:absolute;
+		top:5px;
+		left:5px;
+		background: white;
+		box-shadow: 0 0 10px #ff8a8a inset;
+		border-radius:10px;
+		transition: transform .2s ease, box-shadow .2s linear;
+	}
+	.sn-slideinp .sn-inp-main:checked + .sn-inp-caption:before {
+		transform:translateX(20px);
+		box-shadow: 0 0 10px #00ff55 inset;
 	}
 	.ng-cont {
 		border-radius:50px;
@@ -192,16 +192,15 @@
 			Noise Generator
 		</div>
 		<hr class='sn-modal-div'/>
-		<button class='neo-button' id='ng-ctr-play' title='Play/Pause button'>
+		<button class='neo-button' id='ng-ctr-play'>
 			<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 50 50" fill="none"><use class='ng-sys-btn-icon' href='#ng-svg-play'></svg>
 		</button>
-		<select id='ng-ctr-type' title='Noise type selection'>
+		<select id='ng-ctr-type'>
 			<option>White</option>
 			<option>Brown</option>
 		</select>
-		<div class="neo-slideinp" title='Mono toggle'><label class="neo-inp-maincont"><input type="checkbox" class="neo-inp-main" id='ng-ctr-mono'><span class="neo-inp-caption">Mono</span></label></div>
-		<input id='ng-ctr-gain' title='Volume slider' type='range' min='0' max='1' step='0.01' value='0.5'></input>
-		<footer>NG v1.0.0<br/>Copyright 2025 Frost. CC-BY-NC-SA 4.0</footer>
+		<input id='ng-ctr-gain' type='range' min='0' max='1' step='0.01' value='0.5'></input>
+		<footer>NG-A v1.0.0<br/>© 2026 Frostbyte | aGPLv3.0</footer>
 	</div>
 	<svg id='ng-defs'>
 		<defs>
@@ -216,51 +215,52 @@
 		</defs>
 	</svg>
 	<script>
-window.onbeforeunload = ()=>1;
+const noiseProcessorJS = `
+class white extends AudioWorkletProcessor {
+	process(i,o,p){
+		for(let j=0;j<o[0].length;j++){
+			for(let i=0;i<o[0][j].length;i++){
+				o[0][j][i] = (Math.random()*2 - 1)*0.2;
+			}
+		}
+		return true;
+	}
+}
+registerProcessor("noiseWhite", white);
+class red extends AudioWorkletProcessor {
+	constructor(options){
+		super();
+		this.last = [];
+		for(let i=0;i<options.outputChannelCount[0];i++){
+			this.last.push(0);
+		}
+		this.step = 0.01;
+	}
+	process(i,o,p){
+		for(let j=0;j<o[0].length;j++){
+			for(let i=0;i<o[0][j].length;i++){
+				this.last[j] = (this.last[j]+(Math.random()*2 - 1)*this.step)/(1+this.step);
+				o[0][j][i] = this.last[j]*3.5;
+			}
+		}
+		return true;
+	}
+}
+registerProcessor("noiseRed", red);
+`;
+const noiseProcessorURL = URL.createObjectURL(new Blob([noiseProcessorJS],{type:'application/javascript'}));
 class noiseSys {
-	constructor(){
+	constructor(nP){
 		this.playing = false;
 		this.currentNoise = 0;
 		this.mono = false;
 		this.type = 0;
 		this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+		this.ctx.audioWorklet.addModule(nP).then(()=>{
+			this.noiseGen = [new AudioWorkletNode(this.ctx,'noiseWhite',{outputChannelCount: [2]}),new AudioWorkletNode(this.ctx,'noiseRed',{outputChannelCount: [2]})];
+		});
 		this.gainNode = this.ctx.createGain();
 		this.gainNode.gain.value = 0;
-		this.noiseGen = [this.ctx.createScriptProcessor(4096,2,2),this.ctx.createScriptProcessor(4096,2,2)];
-		this.noiseGen[0].onaudioprocess = e=>{
-			const ol = e.outputBuffer.getChannelData(0);
-			const or = e.outputBuffer.getChannelData(1);
-			if(this.mono){
-				for (let i=0;i<ol.length;i++) {
-    				or[i] = ol[i] = (Math.random()*2 - 1)*0.2;
-  				}
-			}else{
-				for (let i=0;i<ol.length;i++) {
-    				ol[i] = (Math.random()*2 - 1)*0.2;
-    				or[i] = (Math.random()*2 - 1)*0.2;
-  				}
-			}
-		}
-		this.brownStep = 0.01;
-		this.brownLast = [0,0];
-		this.noiseGen[1].onaudioprocess = e=>{
-			const ol = e.outputBuffer.getChannelData(0);
-			const or = e.outputBuffer.getChannelData(1);
-			if(this.mono){
-				for (let i=0;i<ol.length;i++) {
-    				this.brownLast[0] = (this.brownLast[0]+(Math.random()*2 - 1)*this.brownStep)/(1+this.brownStep);
-					ol[i] = this.brownLast[0]*3.5;
-					or[i] = ol[i];
-  				}
-			}else{
-				for (let i=0;i<ol.length;i++) {
-    				this.brownLast[0] = (this.brownLast[0]+(Math.random()*2 - 1)*this.brownStep)/(1+this.brownStep);
-					ol[i] = this.brownLast[0]*3.5;
-    				this.brownLast[1] = (this.brownLast[1]+(Math.random()*2 - 1)*this.brownStep)/(1+this.brownStep);
-					or[i] = this.brownLast[1]*3.5;
-  				}
-			}
-		}
 	}
 	play(){
 		this.playing = true;
@@ -281,11 +281,10 @@ class noiseSys {
 		this.type = v;
 	}
 }
-const ngSys = new noiseSys();
+const ngSys = new noiseSys(noiseProcessorURL);
 const ngBtnPlay = document.getElementById('ng-ctr-play');
 const ngRanGain = document.getElementById('ng-ctr-gain');
 const ngSelType = document.getElementById('ng-ctr-type');
-const ngTogMono = document.getElementById('ng-ctr-mono');
 const ngBtnIcoPlay = ngBtnPlay.getElementsByClassName('ng-sys-btn-icon')[0];
 ngBtnPlay.addEventListener('click',()=>{
 	if(ngSys.playing){
@@ -296,7 +295,6 @@ ngBtnPlay.addEventListener('click',()=>{
 		ngSys.play();
 	}
 });
-ngTogMono.addEventListener('change',()=>{ngSys.mono = ngTogMono.checked});
 ngRanGain.addEventListener('input',()=>{
 	ngSys.setGain(parseFloat(ngRanGain.value));
 });
