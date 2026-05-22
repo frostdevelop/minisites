@@ -8,6 +8,7 @@ Try at http://mini.frostco.org/
 | Ctrl+. | Decrease font size |
 | Ctrl+o | Open file |
 | Ctrl+s | Save text file |
+| Ctrl+b | Rename active file |
 ## FrostPlayground
 ### Moved to: https://github.com/frostdevelop/frostplayground
 ## FrostPaint
