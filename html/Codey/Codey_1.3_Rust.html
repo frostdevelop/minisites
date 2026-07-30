@@ -60,7 +60,9 @@
     import { duotoneLight } from "https://esm.sh/@uiw/codemirror-theme-duotone";
 	
     const view = new EditorView({
-      doc: 'console.log("Frostbyte is so cool")',
+      doc: `fn main() {
+    println!("Frostbyte is so cool");
+}`,
       extensions: [
         basicSetup,
         rust(),
