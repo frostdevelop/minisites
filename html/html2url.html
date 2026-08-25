@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Html2URL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Momo+Trust+Display&family=Stack+Sans+Notch:wght@200..700&display=swap" rel="stylesheet">
+<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		:root {
+			--main-font: 'Stack Sans Notch',system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+			--bold-font: 'Momo Trust Display', sans-serif;
+			--main-color: rgba(255, 255, 255, 0.95);
+			--mute-color: rgba(255, 255, 255, 0.6);
+			--pkt-bg: rgba(255, 255, 255, 0.025);
+			--pkt-border: rgba(255, 255, 255, 0.1);
+			--pkt-shadow: 
+				0 20px 50px rgba(0, 0, 0, 0.4),
+				inset 0 1px 0 rgba(255, 255, 255, 0.25),
+				inset 0 10px 20px rgba(255, 255, 255, 0.05),
+				inset 0 -15px 30px rgba(0, 0, 0, 0.25);
+			--pkt-filter: blur(2px) saturate(140%);
+		}
+
+		@keyframes drift-slow {
+			0% {
+				transform: translate(0, 0) scale(1) rotate(0deg);
+			}
+			50% {
+				transform: translate(8%, 12%) scale(1.1) rotate(60deg);
+			}
+			100% {
+				transform: translate(-5%, -5%) scale(0.9) rotate(-30deg);
+			}
+		}
+
+		@keyframes drift-medium {
+			0% {
+				transform: translate(0, 0) scale(1.05) rotate(0deg);
+			}
+			50% {
+				transform: translate(-10%, 8%) scale(0.9) rotate(-90deg);
+			}
+			100% {
+				transform: translate(12%, -10%) scale(1.15) rotate(45deg);
+			}
+		}
+
+		html {
+			font-family: var(--main-font);
+			background-color: black;
+			color: var(--main-color);
+			overflow: hidden;
+			height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			text-rendering: optimizeSpeed;
+			color-scheme:dark;
+		}
+
+		html::before {
+			content: "";
+			position: absolute;
+			top: -20%;
+			right: -10%;
+			width: 60vw;
+			height: 60vw;
+			border-radius: 50%;
+			background: radial-gradient(circle, rgba(234, 0, 255, 0.6) 0%, rgba(138, 43, 226, 0) 100%);
+			filter: blur(80px);
+			z-index: -2;
+			animation: drift-slow 15s infinite alternate ease-in-out;
+		}
+
+		html::after {
+			content: "";
+			position: absolute;
+			bottom: -15%;
+			left: -10%;
+			width: 55vw;
+			height: 55vw;
+			border-radius: 50%;
+			background: radial-gradient(circle, rgba(0, 206, 209, 0.6) 0%, rgba(0, 206, 209, 0) 100%);
+			filter: blur(80px);
+			z-index: -1;
+			animation: drift-medium 25s infinite alternate ease-in-out;
+		}
+
+		body {
+			width: 100%;
+			height: 100vh;
+			display: flex;
+			overflow:hidden;	
+			padding:100px;
+	    background-size: 24px 24px;
+			background-image: radial-gradient(circle, rgba(255, 255, 255, 0.13) 1px, transparent 1px);
+		}
+
+		body::before {
+			content: "";
+			position: absolute;
+			bottom: 20%;
+			right: 15%;
+			width: 40vw;
+			height: 40vw;
+			border-radius: 50%;
+			background: radial-gradient(circle, rgba(255, 76, 172, 0.6) 0%, rgba(255, 20, 147, 0) 100%);
+			filter: blur(80px);
+			z-index: -2;
+			animation: drift-medium 20s infinite alternate ease-in-out;
+		}
+
+		body::after {
+			content: "";
+			position: absolute;
+			top: 5%;
+			left: 10%;
+			width: 45vw;
+			height: 45vw;
+			border-radius: 50%;
+			background: radial-gradient(circle, rgba(30, 144, 255, 0.6) 0%, rgba(30, 144, 255, 0) 100%);
+			filter: blur(80px);
+			z-index: -2;
+			animation: drift-slow 30s infinite alternate ease-in-out;
+		}
+
+		main {
+			width: 100%;
+			height: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap:50px;
+		}
+
+		header {
+			font-family: var(--main-font);
+			font-weight:900;
+			font-size:18vmin;
+			position:absolute;
+			top:50%;
+			left:50%;
+			transform:translate(-50%,-50%);
+		  color: rgba(255,255,255,0.1);
+			user-select:none;
+			mix-blend-mode: overlay;
+		}
+
+		form.terry-form {
+			background: var(--pkt-bg);
+			border: 1px solid var(--pkt-border);
+			backdrop-filter: var(--pkt-filter);
+			-webkit-backdrop-filter: var(--pkt-filter);
+			box-shadow: var(--pkt-shadow);
+			border-radius: 8px;
+			padding: 48px;
+			width: 100%;
+			height:100%;
+			max-width: 550px;
+			display: flex;
+			flex-direction: column;
+			gap: 28px;
+			transition: box-shadow 0.5s ease, border-color 0.5s ease;
+			overflow:auto;
+			position:absolute;
+			transition: all .5s ease;
+		}
+
+		form.terry-form:hover, #terry-display:hover{
+			border-color: rgba(255, 255, 255, 0.18);
+			box-shadow: 
+				0 25px 60px rgba(0, 0, 0, 0.45),
+				inset 0 1px 0 rgba(255, 255, 255, 0.35),
+				inset 0 12px 24px rgba(255, 255, 255, 0.08),
+				inset 0 -15px 30px rgba(0, 0, 0, 0.25);
+		}
+		
+		form.terry-form.hidden {
+			opacity:0;
+			filter:blur(20px);
+			transform:perspective(700px) rotateY(50deg) scale(0.8);
+			pointer-events:none;
+		}
+
+		.terry-tab_container {
+			position:relative;
+			height:100%;
+		}
+    
+		h1 {
+			font-family: var(--bold-font);
+			font-size: 2.2rem;
+			font-weight: 900;
+			letter-spacing: -0.05em;
+			background: linear-gradient(135deg, #ffffff 30%, rgba(255, 255, 255, 0.7) 100%);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			margin-bottom: -15px;
+			/*
+			text-transform:uppercase;
+			*/
+		}
+
+		p {
+			font-size: 0.95rem;
+			line-height: 1.6;
+			color: var(--mute-color);
+		}
+
+		label {
+			font-size: 0.8rem;
+			font-weight: 700;
+			letter-spacing: 0.12em;
+			color: rgba(255, 255, 255, 0.85);
+			margin-bottom: -16px;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+
+		input[type="text"],
+		input[type="number"],
+		input[type="email"],
+		input[type="password"],
+		select,
+		textarea {
+			width: 100%;
+			background: var(--pkt-bg);
+			border: 1px solid var(--pkt-border);
+			border-radius: 14px;
+			padding: 16px 20px;
+			font-size: 1rem;
+			color: var(--main-color);
+			font-family: var(--main-font);
+			outline: none;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), inset 0 -4px 10px rgba(0, 0, 0, 0.1);
+		}
+		
+		textarea {
+			height:100%;
+		}
+
+		input:focus,
+		select:focus,
+		textarea:focus {
+			background: rgba(255, 255, 255, 0.08);
+			border-color: rgba(255, 255, 255, 0.4);
+			box-shadow: 
+				0 0 20px rgba(255, 255, 255, 0.05),
+				inset 0 1px 2px rgba(255, 255, 255, 0.05);
+		}
+    
+		::placeholder {
+			color: rgba(255, 255, 255, 0.3);
+			font-size: 0.95rem;
+		}
+
+		button {
+			cursor: pointer;
+			font-family: var(--main-font);
+			font-weight: 700;
+			font-size: 1rem;
+			letter-spacing: 0.02em;
+			color:white;
+			background:radial-gradient(circle,transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+			border: 1px solid #ffffff;
+			border-radius: 14px;
+			padding: 18px;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			text-shadow: 0 0px 5px rgba(255, 255, 255, 0.5);
+			box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15), inset 0 0px 10px rgba(255, 255, 255, 0.3);
+		}
+
+		button:hover {
+			color: #ffffff;
+			box-shadow: 
+				0 15px 30px rgba(255, 255, 255, 0.1),
+				inset 0 0 8px rgba(255, 255, 255, 0.5);
+			transform: translateY(-2px);
+		}
+
+		button:active {
+			transform: translateY(1px);
+			box-shadow: 0 5px 15px rgba(255, 255, 255, 0.05);
+		}
+
+		img,
+		video {
+			width: 100%;
+			height: auto;
+			border-radius: 18px;
+			border: 1px solid rgba(255, 255, 255, 0.15);
+			background: rgba(0, 0, 0, 0.2);
+			box-shadow: 
+				0 10px 30px rgba(0, 0, 0, 0.3),
+				inset 0 1px 2px rgba(255, 255, 255, 0.1);
+			object-fit: cover;
+		}
+
+		video {
+			aspect-ratio: 16 / 9;
+		}
+
+		audio {
+			width: 100%;
+			border-radius: 50px;
+			background: rgba(255, 255, 255, 0.05);
+			border: 1px solid var(--pkt-border);
+			padding: 4px;
+			outline: none;
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+		}
+		
+		.terry-section {
+			border-radius: 8px;
+			background: var(--pkt-bg);
+			border: 1px solid var(--pkt-border);
+			backdrop-filter: var(--pkt-filter);
+			-webkit-backdrop-filter: var(--pkt-filter);
+			box-shadow: var(--pkt-shadow);
+			padding: 40px;
+			height:100%;
+			width:100%;
+			display: flex;
+			flex-direction: column;
+			gap: 28px;
+			transition: box-shadow 0.5s ease, border-color 0.5s ease;
+			overflow-y:auto;
+			overflow-x:hidden;
+		}
+    
+		#terry-area {
+			outline: none;
+			height:100%;
+			width:100%;
+			font-size:12px;
+		}
+
+		.terry-radio {
+			display:flex;
+			flex-direction:row;
+			gap:20px;
+		}
+
+		.terry-radio input{
+			opacity:0;
+			appearance:none;
+		}
+
+		.terry-radio label span{
+			transition: all .1s ease;
+			background: var(--pkt-bg);
+			border: 1px solid var(--pkt-border);
+			backdrop-filter: var(--pkt-filter);
+			-webkit-backdrop-filter: var(--pkt-filter);
+			box-shadow: var(--pkt-shadow);
+			padding:10px;
+			border-radius:15px 15px 10px 10px;
+			cursor:pointer;
+			transform: perspective(200px) rotateX(-45deg);
+			opacity:0.75;
+		}
+
+		.terry-radio label input:checked + span {
+			transform:translateY(-5px);
+			opacity:1;
+			filter:unset;
+		}
+		#main-section {
+			max-width:600px;
+		}
+		.terry-tab {
+			display:contents;
+		}
+		.terry-value {
+			height:100%;
+		}
+		.frost-foot {
+			position:absolute;
+			bottom:10px;
+			right:10px;
+			font-size:15px;
+			text-align:right;
+			width:100%;
+			color:grey;
+		}
+	</style>
+</head>
+<body>
+	<header>&lt;html2url&gt;</header>
+	<main>
+		<section class="terry-section" id="main-section">
+			<h1>HTML2URL</h1>
+			<p>Get a URL from your HTML!</p>
+			<div class="terry-tab">
+				<form class="terry-radio terry-tab_form">
+					<label>
+						<input type='radio' name='tab' value='0' checked/>
+						<span>Smallest</span>
+					</label>
+					<label>
+						<input type='radio' name='tab' value='1'/>
+						<span>URI Component</span>
+					</label>
+					<label>
+						<input type='radio' name='tab' value='2'/>
+						<span>Base64</span>
+					</label>
+				</form>
+				<div class="terry-tab_container">
+					<form class="terry-form">
+						<h1>Smallest</h1>
+						<button type="submit">Run</button>
+						<label>
+							HTML
+							<textarea name="html" required></textarea>
+						</label>
+					</form>
+					<form class="terry-form hidden">
+						<h1>URI Component</h1>
+						<button type="submit">Run</button>
+						<label>
+							HTML
+							<textarea name="html" required></textarea>
+						</label>
+					</form>
+					<form class="terry-form hidden">
+						<h1>Base64</h1>
+						<button type="submit">Run</button>
+						<label>
+							HTML
+							<textarea name="html" required></textarea>
+						</label>
+					</form>
+				</div>
+			</div>
+		</section>
+		<section class="terry-section" id="terry-display"></section>
+	</main>
+	<footer class='frost-foot'>Html2URL v2.0<br>© Frostbyte 2026 | AGPL-3.0</footer>
+	<script>
+		const terryTabs = document.getElementsByClassName("terry-tab");
+		for(terryTab of terryTabs){
+			const tabForm = terryTab.getElementsByClassName("terry-tab_form")[0];
+			const tabContainer = terryTab.getElementsByClassName("terry-tab_container")[0];
+			tabForm.addEventListener("change",e=>{
+				const selectedTab = parseInt(e.target.value);
+				for(let i=0;i<tabContainer.children.length;i++){
+					if(i===selectedTab){
+						tabContainer.children[i].classList.remove('hidden');
+					}else{
+						tabContainer.children[i].classList.add('hidden');
+					}
+				}
+			});
+		}
+		class terrySystem {
+			constructor(container){
+				this.container = container;
+			}
+			clear(){
+				while(this.container.lastChild){this.container.removeChild(this.container.lastChild)}
+			}
+			display(value,name="Unnamed"){
+				const displayCont = document.createElement("div");
+				const displayValue = document.createElement("h1");
+				displayCont.appendChild(document.createTextNode(name));
+				displayCont.classList.add("terry-value");
+				displayValue.innerText = value;
+				displayCont.appendChild(displayValue);
+				this.container.appendChild(displayCont);
+			}
+			displayArea(value,name="Unnamed"){
+				const displayCont = document.createElement("div");
+				const displayValue = document.createElement("textarea");
+				displayCont.classList.add("terry-value");
+				displayCont.appendChild(document.createTextNode(name));
+				displayValue.value = value;
+				displayCont.appendChild(displayValue);
+				this.container.appendChild(displayCont);
+			}
+		}
+		const terry = new terrySystem(document.getElementById("terry-display"));
+		const terryForms = document.getElementsByClassName("terry-form");
+		
+		terryForms[0].addEventListener("submit",e=>{
+			e.preventDefault();
+			const fields = new FormData(e.target);
+			terry.clear();
+			let htmlInput;
+			for(const [key, value] of fields.entries()){
+				switch(key){
+					case 'html':
+						htmlInput=value.replace("<!DOCTYPE html>","");
+						break;
+				}
+			}
+			const componentText = "data:text/html," + encodeURIComponent(htmlInput);
+			const baseText = "data:text/html;base64," + btoa(htmlInput);
+			terry.displayArea(baseText.length > componentText.length ? componentText : baseText, "Smallest");
+		});
+		terryForms[1].addEventListener("submit",e=>{
+			e.preventDefault();
+			const fields = new FormData(e.target);
+			terry.clear();
+			let htmlInput;
+			for(const [key, value] of fields.entries()){
+				switch(key){
+					case 'html':
+						htmlInput=value.replace("<!DOCTYPE html>","");
+						break;
+				}
+			}
+			const componentText = "data:text/html," + encodeURIComponent(htmlInput);
+			terry.displayArea(componentText, "URI Component");
+		});
+		terryForms[2].addEventListener("submit",e=>{
+			e.preventDefault();
+			const fields = new FormData(e.target);
+			terry.clear();
+			let htmlInput;
+			for(const [key, value] of fields.entries()){
+				switch(key){
+					case 'html':
+						htmlInput=value.replace("<!DOCTYPE html>","");
+						break;
+				}
+			}
+			const baseText = "data:text/html;base64," + btoa(htmlInput);
+			terry.displayArea(baseText, "Base64");
+		});
+	</script>
+</body>
+</html>

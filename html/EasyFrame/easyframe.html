@@ -4,7 +4,7 @@
     body {
       padding: 0 5%;margin: 0;color: #EEE;font-family: Courier New, monospace;color-scheme: dark;font-size: 15px;margin-top: 5px;overflow: hidden;
     }
-    input, button, select{
+    input, button, select, #fileUpload{
       border: #444 outset 2px;
       border-radius: 5px;
       box-shadow: 0px 2px 10px rgba(0,0,0,0.4);
@@ -12,7 +12,7 @@
       background: #111;
       font-size: 15px;
     }
-    button:active,input:active,select:active {border: #444 inset 2px;}
+    button:active,input:active,select:active,#fileUpload:active {border: #444 inset 2px;}
     input {width: 40vw;}
     textarea {
       min-height: 100%;
@@ -101,9 +101,9 @@
     .closebtn:hover {background: rgba(0,0,0,0.1);transform: rotate(90deg)}
     .closebtn:active {border:none}
     dialog .topmodal .close {
-      margin-left: auto;
-      margin-right: 0;
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .pagemodal {min-width: 70vw;overflow:hidden;}
     .pagemodal .contentmodal {
@@ -141,6 +141,9 @@
       top: 10px;
       width: 20px;
       height: 20px;
+      display:flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 10px;
       text-align: center;
       font-size: 12px;
@@ -148,6 +151,12 @@
       font-weight: bold;
       box-shadow: none;
     }
+    .topmodal {
+      display:flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    input[type="file"]{display:none}
   </style>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
@@ -157,6 +166,7 @@
   <button id="openmodal">^</button>
   <dialog id="inputmodal" class='pagemodal'>
     <div class='topmodal'>
+      <span>Easyframe 1.1</span>
       <button class='close closebtn'>×</button>
     </div>
     <div class='contentmodal'>
@@ -174,7 +184,10 @@
       </div>
       <div id="buttons" class="inps">
       <button id="trig0e">Download</button>
-      <button id="trig1e">Upload</button>
+      <label id="fileUpload">
+        Upload
+        <input type="file" id="fileInput"/>
+      </label>
       Wrap:
       <select id="sel1">
         <option value="nw">None</option>
@@ -182,10 +195,9 @@
         <option value="ww">Word</option>
         <option value="ab">Break All</option>
       </select>
-      <input type="file" style="display: none;" id="fi0e"></input>
       </div>
     </div>
-    <footer>Copyright 2024 Pacifiky All Rights Reserved</footer>
+    <footer>© Frostbyte 2026 // AGPL-3.0</footer>
   </dialog>
   <iframe id="mainframe" srcdoc="<html style='font-family: Arial, sans-serif;'>Welcome to EasyFrame. Press the button on the top right to begin.<html>"></iframe>
   <script>
@@ -194,7 +206,7 @@
     let inp2 = document.getElementById("inp2e");
     let trig0 = document.getElementById("trig0e");
     let trig1 = document.getElementById("trig1e");
-    let fi0 = document.getElementById("fi0e");
+    let fileInput = document.getElementById("fileInput");
     let sel1 = document.getElementById("sel1");
     let nums = document.getElementsByClassName("lnnumb")[0];
     const pagem = document.getElementsByClassName("pagemodal");
@@ -211,12 +223,27 @@
       dwnelem.click();
       dwnelem.remove();
       return;
-    };
-    function uploadfile(e){
+    }
+    function shortcutHandler(e){
+      if(e.ctrlKey){
+        switch(e.key){
+          case 'o':
+            e.preventDefault();
+            fileInput.click();
+            break;
+          case 'p':
+            e.preventDefault();
+            if(!(textmodal.open)){textmodal.showModal()}else{textmodal.close()};
+            break;
+        }
+        
+      }
+    }
+    function uploadFile(){
       const fr = new FileReader;
-      fr.onload = ()=>{inp0.value=fr.result;updNum(null)};
+      fr.onload = ()=>{inp0.value=fr.result;updNum();mainframe.srcdoc=fr.result}
       fr.readAsText(this.files[0]);
-    };
+    }
     sel1.addEventListener("input",e=>{
       switch(sel1.value){
         case "ww":
@@ -232,35 +259,27 @@
           inp0.style="white-space: nowrap;";
           break;
       }
-    });
+    })
     function updNum(e) {
       let span = document.createElement("span");
       nums.innerHTML = "";
       for(let j=0;j<inp0.value.split("\n").length;j++){
         nums.appendChild(span);
         span = span.cloneNode();
-      };
-      mainframe.srcdoc = inp0.value;
-    };
-    for(let i=0;i<pagem.length;i++){pagem[i].getElementsByClassName("close")[0].addEventListener("click",e=>{pagem[i].close()});};
-    /*
-    document.body.addEventListener("keydown", (e)=>{
-      if(e.key == "o" && e.ctrlKey){
-        e.preventDefault();
-        if(!(textmodal.open)){textmodal.showModal();mainframe.srcdoc = "hi";}else{textmodal.close();mainframe.srcdoc = "bye";};
       }
-    });
-    Document.body doesn't include iframe windows.
-    */
+    }
+    for(let i=0;i<pagem.length;i++){pagem[i].getElementsByClassName("close")[0].addEventListener("click",e=>{pagem[i].close()});};
+    
+	  document.body.addEventListener("keydown",shortcutHandler);
+    mainframe.contentDocument.body.addEventListener("keydown",shortcutHandler);
     openbtn.addEventListener("click",e=>{
       if(!(textmodal.open)){textmodal.showModal();}else{textmodal.close();};
     });
     trig0.addEventListener("click", trig0f);
-    trig1.addEventListener("click", e=>{fi0.click()});
-    inp0.addEventListener("keydown", (e)=>{if(e.key == "s" && e.ctrlKey){e.preventDefault();trig0f(e)}});
-    inp0.addEventListener("input",updNum);
+    inp0.addEventListener("keydown", e=>{if(e.key == "s" && e.ctrlKey){e.preventDefault();trig0f(e)}});
+    inp0.addEventListener("input",()=>{mainframe.srcdoc = inp0.value;updNum()});
     inp0.addEventListener("keyup",updNum);
-    fi0.addEventListener("change",uploadfile);
+    fileInput.addEventListener("change",uploadFile);
     inp2.addEventListener("change",e=>{inp0.parentNode.style = "font-size: " + inp2.value + "px";});
   </script>
 </body>
