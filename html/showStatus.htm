@@ -52,15 +52,17 @@
 <body>
 <span id='statusOverlay'></span>
 Press some keys!
-<footer class='frost-foot'>Status Overlay 1.0<br>© Frostbyte 2026 // AGPL-3.0</footer>
+<footer class='frost-foot'>Status Overlay 0.1.1<br>© Frostbyte 2026 // AGPL-3.0</footer>
 <script type="module">
 const statusOverlay = document.getElementById('statusOverlay');
 let statusTimeout=null;
-function showStatus(text){
+function showStatus(text,temp=true){
 	statusOverlay.textContent = text;
 	statusOverlay.classList.add('statusOverlay--showing');
 	clearTimeout(statusTimeout);
-	statusTimeout=setTimeout(()=>statusOverlay.classList.remove('statusOverlay--showing'),2000);
+	if(temp){
+		statusTimeout=setTimeout(()=>statusOverlay.classList.remove('statusOverlay--showing'),2000);
+	}
 }
 document.addEventListener('keydown',e=>showStatus(e.code))
 </script>

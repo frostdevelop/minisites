@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Cool Glassmorphism Stuff</title>
+</head>
+<body>
+	<div class='a'><span>⇦</span></div>
+	<div class='b'><span>⇔</span></div>
+</body>
+<style>
+	div.a{
+		width:70px;
+		height:70px;
+		border:#ffffff77 solid 1.5px;
+		border-radius:50%;
+		background:radial-gradient(circle at 50%, #00000055, #ffffff77);
+		mix-blend-mode: overlay;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		color:white;
+		font-size:40px;
+		padding:0;
+		backdrop-filter: blur(1px);
+		box-shadow:0 5px 20px #000000;
+		margin:10px;
+	}
+	div.b{
+		width:70px;
+		height:70px;
+		border:#ffffff77 solid 1.5px;
+		border-radius:50%;
+		background:radial-gradient(circle at 50%, #00000055, #ffffff77);
+		mix-blend-mode: luminosity;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		color:white;
+		font-size:40px;
+		padding:0;
+		backdrop-filter: blur(1px);
+		box-shadow:0 5px 20px #000000;
+		margin:10px;
+	}
+	body{
+		background-size:cover;
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		height:100vh;
+		width:100vw;
+		padding:0;
+		margin:0;
+		font-family:Arial, sans-serif;
+		background-image:url("https://upload.wikimedia.org/wikipedia/commons/e/e7/Twenty-nine_the_Cat.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original");
+	}
+	body::after {
+		position:absolute;
+		bottom:0;
+		right:0;
+		color:white;
+		content: "© Frostbyte 2026 // Image: Rybooks";
+	}
+</style>
+</html>
